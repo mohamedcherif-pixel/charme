@@ -1,0 +1,1574 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            Alexandra Chen - Perfume Profile | Luxury Fragrance Community
+        </title>
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+        <style>
+            :root {
+                /* Luxury Perfume Brand Colors */
+                --primary-gold: #d4af37;
+                --primary-gold-light: #e8c547;
+                --primary-gold-dark: #b8941f;
+                --secondary-champagne: #f7e7ce;
+                --tertiary-cream: #fdf8f0;
+
+                /* Neutral Palette */
+                --background: #ffffff;
+                --background-soft: #fefcf8;
+                --foreground: #2c2826;
+                --foreground-muted: #6b6b6b;
+                --foreground-light: #8b8b8b;
+
+                /* Card & Surface Colors */
+                --card-background: #ffffff;
+                --card-foreground: #2c2826;
+                --card-border: #e8e8e8;
+                --card-shadow: rgba(212, 175, 55, 0.1);
+
+                /* Interactive Elements */
+                --button-primary: #d4af37;
+                --button-primary-hover: #b8941f;
+                --button-primary-foreground: #ffffff;
+                --button-secondary: #f7e7ce;
+                --button-secondary-hover: #e8c547;
+                --button-secondary-foreground: #2c2826;
+
+                /* Status & Accent Colors */
+                --accent-rose: #e8b4b8;
+                --accent-lavender: #d4c4e8;
+                --accent-sage: #c8d4b8;
+                --success: #7cb342;
+                --warning: #ff8f00;
+                --error: #d32f2f;
+
+                /* Border & Divider */
+                --border: #e8e8e8;
+                --border-light: #f5f5f5;
+                --divider: #eeeeee;
+
+                /* Profile Specific */
+                --profile-header-bg: linear-gradient(
+                    135deg,
+                    #fdf8f0 0%,
+                    #f7e7ce 100%
+                );
+                --profile-stats-bg: rgba(212, 175, 55, 0.05);
+                --profile-tab-active: #d4af37;
+                --profile-tab-inactive: #8b8b8b;
+
+                /* Typography */
+                --font-heading: "Playfair Display", serif;
+                --font-body: "Inter", sans-serif;
+                --font-accent: "Montserrat", sans-serif;
+
+                /* Font Sizes */
+                --text-xs: 0.75rem;
+                --text-sm: 0.875rem;
+                --text-base: 1rem;
+                --text-lg: 1.125rem;
+                --text-xl: 1.25rem;
+                --text-2xl: 1.5rem;
+                --text-3xl: 1.875rem;
+                --text-4xl: 2.25rem;
+
+                /* Spacing */
+                --spacing-xs: 0.25rem;
+                --spacing-sm: 0.5rem;
+                --spacing-md: 1rem;
+                --spacing-lg: 1.5rem;
+                --spacing-xl: 2rem;
+                --spacing-2xl: 3rem;
+                --spacing-3xl: 4rem;
+
+                /* Border Radius */
+                --radius-sm: 0.375rem;
+                --radius-md: 0.5rem;
+                --radius-lg: 0.75rem;
+                --radius-xl: 1rem;
+                --radius-2xl: 1.5rem;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                --shadow-md:
+                    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                --shadow-lg:
+                    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                --shadow-xl:
+                    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.25);
+                --shadow-profile: 0 8px 32px rgba(212, 175, 55, 0.15);
+
+                /* Animation */
+                --transition-fast: 150ms ease-in-out;
+                --transition-normal: 300ms ease-in-out;
+                --transition-slow: 500ms ease-in-out;
+                --ease-luxury: cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            /* Global Styles */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: var(--font-body);
+                color: var(--foreground);
+                background-color: var(--background-soft);
+                line-height: 1.6;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Header Navigation */
+            .main-header {
+                background: var(--card-background);
+                border-bottom: 1px solid var(--border);
+                padding: var(--spacing-md) 0;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                backdrop-filter: blur(20px);
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .header-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 var(--spacing-lg);
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xl);
+            }
+
+            .logo {
+                font-family: var(--font-heading);
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                color: var(--primary-gold);
+                text-decoration: none;
+            }
+
+            .search-bar {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .search-input {
+                padding: var(--spacing-sm) var(--spacing-md);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-lg);
+                font-size: var(--text-sm);
+                width: 300px;
+                background: var(--background);
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: var(--primary-gold);
+                box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            }
+
+            .search-icon {
+                position: absolute;
+                right: var(--spacing-sm);
+                color: var(--foreground-muted);
+                pointer-events: none;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-md);
+            }
+
+            .nav-button {
+                background: none;
+                border: none;
+                color: var(--foreground-muted);
+                cursor: pointer;
+                padding: var(--spacing-sm);
+                border-radius: var(--radius-md);
+                transition: all var(--transition-fast);
+            }
+
+            .nav-button:hover {
+                color: var(--primary-gold);
+                background: var(--secondary-champagne);
+            }
+
+            /* Profile Container */
+            .profile-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: var(--spacing-xl) var(--spacing-lg);
+            }
+
+            /* Profile Header */
+            .profile-header {
+                background: var(--profile-header-bg);
+                border-radius: var(--radius-xl);
+                padding: var(--spacing-2xl);
+                box-shadow: var(--shadow-profile);
+                margin-bottom: var(--spacing-xl);
+                border: 1px solid var(--border-light);
+                animation: fadeIn 0.8s ease-out;
+            }
+
+            .profile-main {
+                display: flex;
+                gap: var(--spacing-2xl);
+                align-items: flex-start;
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .profile-avatar {
+                width: 150px;
+                height: 150px;
+                border-radius: var(--radius-full);
+                border: 4px solid var(--primary-gold);
+                box-shadow: var(--shadow-gold);
+                transition: transform var(--transition-normal)
+                    var(--ease-luxury);
+                object-fit: cover;
+                animation: avatarEntry 0.6s bounce 0.3s both;
+            }
+
+            .profile-avatar:hover {
+                transform: scale(1.05);
+            }
+
+            .profile-info {
+                flex: 1;
+            }
+
+            .profile-info h1 {
+                font-size: var(--text-3xl);
+                font-family: var(--font-heading);
+                color: var(--foreground);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .profile-username {
+                font-size: var(--text-lg);
+                color: var(--primary-gold);
+                font-weight: 500;
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .profile-meta {
+                display: flex;
+                gap: var(--spacing-lg);
+                margin: var(--spacing-md) 0;
+                flex-wrap: wrap;
+            }
+
+            .profile-meta-item {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+                color: var(--foreground-muted);
+                font-size: var(--text-sm);
+            }
+
+            .profile-actions {
+                display: flex;
+                gap: var(--spacing-md);
+                margin-top: var(--spacing-lg);
+            }
+
+            .btn-follow {
+                background: var(--button-primary);
+                color: var(--button-primary-foreground);
+                border: none;
+                padding: var(--spacing-sm) var(--spacing-lg);
+                border-radius: var(--radius-lg);
+                font-weight: 600;
+                transition: all var(--transition-fast) var(--ease-luxury);
+                box-shadow: var(--shadow-sm);
+                cursor: pointer;
+                font-size: var(--text-sm);
+            }
+
+            .btn-follow:hover {
+                background: var(--button-primary-hover);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .btn-follow.following {
+                background: var(--success);
+            }
+
+            .btn-message {
+                background: var(--button-secondary);
+                color: var(--button-secondary-foreground);
+                border: 1px solid var(--border);
+                padding: var(--spacing-sm) var(--spacing-lg);
+                border-radius: var(--radius-lg);
+                font-weight: 600;
+                transition: all var(--transition-fast) var(--ease-luxury);
+                cursor: pointer;
+                font-size: var(--text-sm);
+            }
+
+            .btn-message:hover {
+                background: var(--button-secondary-hover);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+            /* Stats */
+            .profile-stats {
+                background: var(--profile-stats-bg);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                display: flex;
+                gap: var(--spacing-xl);
+                border: 1px solid var(--border-light);
+                animation: slideUp 0.4s var(--ease-luxury) 0.4s both;
+            }
+
+            .profile-stat {
+                text-align: center;
+                flex: 1;
+            }
+
+            .profile-stat-number {
+                font-size: var(--text-2xl);
+                font-weight: 700;
+                color: var(--primary-gold);
+                font-family: var(--font-accent);
+                display: block;
+            }
+
+            .profile-stat-label {
+                font-size: var(--text-sm);
+                color: var(--foreground-muted);
+                margin-top: var(--spacing-xs);
+            }
+
+            /* Bio Section */
+            .profile-bio {
+                background: var(--card-background);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                margin-bottom: var(--spacing-xl);
+                box-shadow: var(--shadow-sm);
+                animation: fadeIn 0.5s ease-in 0.6s both;
+            }
+
+            .profile-bio-text {
+                font-style: italic;
+                color: var(--foreground-muted);
+                font-size: var(--text-base);
+                line-height: 1.7;
+            }
+
+            /* Tab Navigation */
+            .profile-tabs {
+                display: flex;
+                background: var(--card-background);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-xs);
+                margin-bottom: var(--spacing-xl);
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--card-border);
+                overflow-x: auto;
+                animation: slideUp 0.4s var(--ease-luxury) 0.8s both;
+            }
+
+            .profile-tab {
+                flex: 1;
+                padding: var(--spacing-md) var(--spacing-lg);
+                border: none;
+                background: transparent;
+                color: var(--profile-tab-inactive);
+                border-radius: var(--radius-md);
+                font-weight: 500;
+                transition: all var(--transition-normal) var(--ease-luxury);
+                cursor: pointer;
+                white-space: nowrap;
+                font-size: var(--text-sm);
+            }
+
+            .profile-tab.active {
+                background: var(--profile-tab-active);
+                color: var(--button-primary-foreground);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .profile-tab:not(.active):hover {
+                background: var(--button-secondary);
+                color: var(--foreground);
+            }
+
+            /* Content Grid */
+            .profile-content {
+                background: var(--card-background);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-xl);
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--card-border);
+                min-height: 400px;
+            }
+
+            .tab-content {
+                display: none;
+                animation: contentFade 0.5s ease-in;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            .perfume-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: var(--spacing-lg);
+            }
+
+            .perfume-card {
+                background: var(--card-background);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                transition: all var(--transition-normal) var(--ease-luxury);
+                box-shadow: var(--shadow-sm);
+                cursor: pointer;
+            }
+
+            .perfume-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
+                border-color: var(--primary-gold);
+            }
+
+            .perfume-image {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border-radius: var(--radius-md);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .perfume-title {
+                font-weight: 600;
+                font-size: var(--text-lg);
+                margin-bottom: var(--spacing-xs);
+                color: var(--foreground);
+            }
+
+            .perfume-brand {
+                color: var(--foreground-muted);
+                font-size: var(--text-sm);
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .perfume-rating {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+            }
+
+            .star-rating {
+                color: var(--primary-gold);
+                font-size: var(--text-sm);
+            }
+
+            .rating-text {
+                font-size: var(--text-sm);
+                color: var(--foreground-muted);
+            }
+
+            /* Empty State */
+            .empty-state {
+                text-align: center;
+                padding: var(--spacing-3xl);
+                color: var(--foreground-muted);
+            }
+
+            .empty-state-icon {
+                font-size: var(--text-4xl);
+                margin-bottom: var(--spacing-md);
+                opacity: 0.5;
+            }
+
+            .empty-state-title {
+                font-size: var(--text-xl);
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .empty-state-description {
+                font-size: var(--text-base);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .header-container {
+                    padding: 0 var(--spacing-md);
+                    flex-direction: column;
+                    gap: var(--spacing-md);
+                }
+
+                .search-input {
+                    width: 250px;
+                }
+
+                .profile-container {
+                    padding: var(--spacing-md);
+                }
+
+                .profile-header {
+                    padding: var(--spacing-lg);
+                }
+
+                .profile-main {
+                    flex-direction: column;
+                    text-align: center;
+                    align-items: center;
+                    gap: var(--spacing-lg);
+                }
+
+                .profile-stats {
+                    justify-content: space-around;
+                    gap: var(--spacing-md);
+                }
+
+                .profile-actions {
+                    justify-content: center;
+                    width: 100%;
+                }
+
+                .profile-tabs {
+                    overflow-x: scroll;
+                }
+
+                .perfume-grid {
+                    grid-template-columns: repeat(
+                        auto-fill,
+                        minmax(150px, 1fr)
+                    );
+                    gap: var(--spacing-md);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .profile-avatar {
+                    width: 120px;
+                    height: 120px;
+                }
+
+                .profile-info h1 {
+                    font-size: var(--text-2xl);
+                }
+
+                .profile-meta {
+                    justify-content: center;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: var(--spacing-sm);
+                }
+
+                .perfume-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+
+            /* Animations */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes avatarEntry {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.8) rotate(-5deg);
+                }
+                60% {
+                    opacity: 1;
+                    transform: scale(1.1) rotate(0deg);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1) rotate(0deg);
+                }
+            }
+
+            @keyframes contentFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Loading States */
+            .loading-skeleton {
+                background: linear-gradient(
+                    90deg,
+                    var(--border-light) 25%,
+                    var(--card-border) 50%,
+                    var(--border-light) 75%
+                );
+                background-size: 200% 100%;
+                animation: skeleton-loading 2s infinite;
+                border-radius: var(--radius-md);
+            }
+
+            @keyframes skeleton-loading {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--background-soft);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--primary-gold);
+                border-radius: var(--radius-full);
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--primary-gold-dark);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Header Navigation -->
+        <header class="main-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <a href="#" class="logo">☰ Parfum Elite</a>
+                    <div class="search-bar">
+                        <input
+                            type="text"
+                            class="search-input"
+                            placeholder="Search users, brands, fragrances..."
+                        />
+                        <i data-lucide="search" class="search-icon"></i>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="nav-button">
+                        <i data-lucide="bell"></i>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="message-circle"></i>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="user"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Profile Container -->
+        <main class="profile-container">
+            <!-- Profile Header -->
+            <section class="profile-header">
+                <div class="profile-main">
+                    <img
+                        src="https://images.unsplash.com/photo-1494790108755-2616c69da7a8?w=300&h=300&fit=crop&crop=face"
+                        alt="Alexandra Chen"
+                        class="profile-avatar"
+                    />
+
+                    <div class="profile-info">
+                        <h1>Alexandra Chen</h1>
+                        <div class="profile-username">@alexandra.scents</div>
+
+                        <div class="profile-meta">
+                            <div class="profile-meta-item">
+                                <i data-lucide="map-pin"></i>
+                                <span>Paris, France</span>
+                            </div>
+                            <div class="profile-meta-item">
+                                <i data-lucide="calendar"></i>
+                                <span>Member since March 2021</span>
+                            </div>
+                            <div class="profile-meta-item">
+                                <i data-lucide="users"></i>
+                                <span
+                                    ><strong>847</strong> Following •
+                                    <strong>1.2K</strong> Followers</span
+                                >
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="btn-follow" id="followBtn">
+                                <i data-lucide="user-plus"></i>
+                                Follow
+                            </button>
+                            <button class="btn-message">
+                                <i data-lucide="message-circle"></i>
+                                Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span class="profile-stat-number" data-count="142"
+                            >0</span
+                        >
+                        <div class="profile-stat-label">Fragrances Owned</div>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-number" data-count="67"
+                            >0</span
+                        >
+                        <div class="profile-stat-label">Wishlist Items</div>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-number" data-count="89"
+                            >0</span
+                        >
+                        <div class="profile-stat-label">Reviews Written</div>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-number" data-count="23"
+                            >0</span
+                        >
+                        <div class="profile-stat-label">Collections</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bio Section -->
+            <section class="profile-bio">
+                <p class="profile-bio-text">
+                    "Passionate collector of niche and luxury fragrances with a
+                    particular love for oriental and woody compositions. Always
+                    seeking unique olfactory experiences and sharing discoveries
+                    with fellow enthusiasts. Certified perfume consultant and
+                    fragrance blogger at ScentJourney.com"
+                </p>
+            </section>
+
+            <!-- Tab Navigation -->
+            <section class="profile-tabs">
+                <button class="profile-tab active" data-tab="overview">
+                    Overview
+                </button>
+                <button class="profile-tab" data-tab="owned">
+                    Owned Collection
+                </button>
+                <button class="profile-tab" data-tab="wishlist">
+                    Wishlist
+                </button>
+                <button class="profile-tab" data-tab="reviews">Reviews</button>
+                <button class="profile-tab" data-tab="collections">
+                    Collections
+                </button>
+            </section>
+
+            <!-- Content Area -->
+            <section class="profile-content">
+                <!-- Overview Tab -->
+                <div class="tab-content active" id="overview">
+                    <div class="perfume-grid">
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=200&h=150&fit=crop"
+                                alt="Tom Ford Oud Wood"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Oud Wood</div>
+                            <div class="perfume-brand">Tom Ford</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text">5.0</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=200&h=150&fit=crop"
+                                alt="Creed Aventus"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Aventus</div>
+                            <div class="perfume-brand">Creed</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">4.5</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=200&h=150&fit=crop"
+                                alt="Maison Margiela By the Fireplace"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">By the Fireplace</div>
+                            <div class="perfume-brand">Maison Margiela</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text">4.8</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=200&h=150&fit=crop"
+                                alt="Le Labo Santal 33"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Santal 33</div>
+                            <div class="perfume-brand">Le Labo</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">4.2</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1592540651108-1da99240065d?w=200&h=150&fit=crop"
+                                alt="Diptyque Philosykos"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Philosykos</div>
+                            <div class="perfume-brand">Diptyque</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">4.3</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1595425970377-c9703cf596b3?w=200&h=150&fit=crop"
+                                alt="Amouage Jubilation XXV"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Jubilation XXV</div>
+                            <div class="perfume-brand">Amouage</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text">4.9</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=150&fit=crop"
+                                alt="Parfums MDCI Un Coeur en Mai"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Un Coeur en Mai</div>
+                            <div class="perfume-brand">Parfums MDCI</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">4.4</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=200&h=150&fit=crop"
+                                alt="Byredo Gypsy Water"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Gypsy Water</div>
+                            <div class="perfume-brand">Byredo</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">4.1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Owned Collection Tab -->
+                <div class="tab-content" id="owned">
+                    <div class="perfume-grid">
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=200&h=150&fit=crop"
+                                alt="Tom Ford Oud Wood"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Oud Wood</div>
+                            <div class="perfume-brand">Tom Ford</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text"
+                                    >Personal Rating: 5.0</span
+                                >
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=200&h=150&fit=crop"
+                                alt="Creed Aventus"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Aventus</div>
+                            <div class="perfume-brand">Creed</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text"
+                                    >Personal Rating: 4.5</span
+                                >
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=200&h=150&fit=crop"
+                                alt="Maison Margiela By the Fireplace"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">By the Fireplace</div>
+                            <div class="perfume-brand">Maison Margiela</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text"
+                                    >Personal Rating: 4.8</span
+                                >
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1595425970377-c9703cf596b3?w=200&h=150&fit=crop"
+                                alt="Amouage Jubilation XXV"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Jubilation XXV</div>
+                            <div class="perfume-brand">Amouage</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text"
+                                    >Personal Rating: 4.9</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wishlist Tab -->
+                <div class="tab-content" id="wishlist">
+                    <div class="perfume-grid">
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=200&h=150&fit=crop"
+                                alt="Frederic Malle Portrait of a Lady"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Portrait of a Lady</div>
+                            <div class="perfume-brand">Frederic Malle</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★★</div>
+                                <span class="rating-text">Community: 4.7</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=150&fit=crop"
+                                alt="Nasomatto Black Afgano"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Black Afgano</div>
+                            <div class="perfume-brand">Nasomatto</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">Community: 4.3</span>
+                            </div>
+                        </div>
+
+                        <div class="perfume-card">
+                            <img
+                                src="https://images.unsplash.com/photo-1592540651108-1da99240065d?w=200&h=150&fit=crop"
+                                alt="Serge Lutens Chergui"
+                                class="perfume-image"
+                            />
+                            <div class="perfume-title">Chergui</div>
+                            <div class="perfume-brand">Serge Lutens</div>
+                            <div class="perfume-rating">
+                                <div class="star-rating">★★★★☆</div>
+                                <span class="rating-text">Community: 4.4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div class="tab-content" id="reviews">
+                    <div class="reviews-list">
+                        <div class="review-card">
+                            <div class="review-header">
+                                <img
+                                    src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=60&h=60&fit=crop"
+                                    alt="Tom Ford Oud Wood"
+                                    class="review-perfume-image"
+                                />
+                                <div class="review-info">
+                                    <div class="review-perfume-name">
+                                        Tom Ford - Oud Wood
+                                    </div>
+                                    <div class="review-date">
+                                        Reviewed 3 days ago
+                                    </div>
+                                    <div class="review-rating">
+                                        <div class="star-rating">★★★★★</div>
+                                        <span class="rating-text">5.0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="review-content">
+                                <p>
+                                    "An absolutely stunning composition that
+                                    perfectly balances the richness of oud with
+                                    creamy sandalwood and sweet rose. The dry
+                                    down is incredibly smooth and sophisticated.
+                                    This is luxury in a bottle - perfect for
+                                    special occasions and evening wear.
+                                    Longevity is excellent, lasting well over 8
+                                    hours on my skin."
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="review-card">
+                            <div class="review-header">
+                                <img
+                                    src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=60&h=60&fit=crop"
+                                    alt="Creed Aventus"
+                                    class="review-perfume-image"
+                                />
+                                <div class="review-info">
+                                    <div class="review-perfume-name">
+                                        Creed - Aventus
+                                    </div>
+                                    <div class="review-date">
+                                        Reviewed 1 week ago
+                                    </div>
+                                    <div class="review-rating">
+                                        <div class="star-rating">★★★★☆</div>
+                                        <span class="rating-text">4.5</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="review-content">
+                                <p>
+                                    "The opening is absolutely divine with that
+                                    fresh pineapple and black currant
+                                    combination. However, I find the dry down a
+                                    bit too woody for my taste. Still a
+                                    masterpiece that deserves its reputation.
+                                    Performance is solid with moderate
+                                    projection and good longevity."
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="review-card">
+                            <div class="review-header">
+                                <img
+                                    src="https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=60&h=60&fit=crop"
+                                    alt="Maison Margiela By the Fireplace"
+                                    class="review-perfume-image"
+                                />
+                                <div class="review-info">
+                                    <div class="review-perfume-name">
+                                        Maison Margiela - By the Fireplace
+                                    </div>
+                                    <div class="review-date">
+                                        Reviewed 2 weeks ago
+                                    </div>
+                                    <div class="review-rating">
+                                        <div class="star-rating">★★★★★</div>
+                                        <span class="rating-text">4.8</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="review-content">
+                                <p>
+                                    "This fragrance instantly transports you to
+                                    a cozy evening by a crackling fire. The
+                                    smoky, woody notes are perfectly balanced
+                                    with sweet vanilla and chestnuts. It's warm,
+                                    comforting, and incredibly unique. Perfect
+                                    for autumn and winter wear."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collections Tab -->
+                <div class="tab-content" id="collections">
+                    <div class="collections-grid">
+                        <div class="collection-card">
+                            <div class="collection-header">
+                                <h3 class="collection-title">
+                                    Oriental Treasures
+                                </h3>
+                                <span class="collection-count"
+                                    >12 fragrances</span
+                                >
+                            </div>
+                            <div class="collection-preview">
+                                <img
+                                    src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <img
+                                    src="https://images.unsplash.com/photo-1595425970377-c9703cf596b3?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <img
+                                    src="https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <div class="collection-more">+9</div>
+                            </div>
+                            <p class="collection-description">
+                                My curated selection of the finest oriental and
+                                woody fragrances
+                            </p>
+                        </div>
+
+                        <div class="collection-card">
+                            <div class="collection-header">
+                                <h3 class="collection-title">
+                                    Summer Essentials
+                                </h3>
+                                <span class="collection-count"
+                                    >8 fragrances</span
+                                >
+                            </div>
+                            <div class="collection-preview">
+                                <img
+                                    src="https://images.unsplash.com/photo-1592540651108-1da99240065d?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <img
+                                    src="https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <img
+                                    src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <div class="collection-more">+5</div>
+                            </div>
+                            <p class="collection-description">
+                                Fresh, light, and uplifting scents perfect for
+                                warm weather
+                            </p>
+                        </div>
+
+                        <div class="collection-card">
+                            <div class="collection-header">
+                                <h3 class="collection-title">
+                                    Niche Discoveries
+                                </h3>
+                                <span class="collection-count"
+                                    >15 fragrances</span
+                                >
+                            </div>
+                            <div class="collection-preview">
+                                <img
+                                    src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <img
+                                    src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <img
+                                    src="https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=80&h=80&fit=crop"
+                                    alt=""
+                                    class="collection-preview-image"
+                                />
+                                <div class="collection-more">+12</div>
+                            </div>
+                            <p class="collection-description">
+                                Hidden gems from artisanal and independent
+                                perfume houses
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <script>
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // Stats Counter Animation
+            function animateStats() {
+                const statNumbers = document.querySelectorAll(
+                    ".profile-stat-number",
+                );
+
+                statNumbers.forEach((stat, index) => {
+                    const target = parseInt(stat.getAttribute("data-count"));
+                    const duration = 1200;
+                    const increment = target / (duration / 16);
+                    let current = 0;
+
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = Math.floor(current);
+                    }, 16);
+                });
+            }
+
+            // Tab Switching Functionality
+            function initializeTabs() {
+                const tabs = document.querySelectorAll(".profile-tab");
+                const contents = document.querySelectorAll(".tab-content");
+
+                tabs.forEach((tab) => {
+                    tab.addEventListener("click", () => {
+                        // Remove active class from all tabs and contents
+                        tabs.forEach((t) => t.classList.remove("active"));
+                        contents.forEach((c) => c.classList.remove("active"));
+
+                        // Add active class to clicked tab
+                        tab.classList.add("active");
+
+                        // Show corresponding content
+                        const targetTab = tab.getAttribute("data-tab");
+                        const targetContent =
+                            document.getElementById(targetTab);
+                        if (targetContent) {
+                            targetContent.classList.add("active");
+                        }
+                    });
+                });
+            }
+
+            // Follow Button Functionality
+            function initializeFollowButton() {
+                const followBtn = document.getElementById("followBtn");
+                let isFollowing = false;
+
+                followBtn.addEventListener("click", () => {
+                    if (!isFollowing) {
+                        followBtn.innerHTML =
+                            '<i data-lucide="user-check"></i> Following';
+                        followBtn.classList.add("following");
+                        isFollowing = true;
+
+                        // Update follower count
+                        const followersText = document.querySelector(
+                            ".profile-meta-item:last-child span",
+                        );
+                        const currentText = followersText.textContent;
+                        const newText = currentText.replace(
+                            /(\d+)(?!.*\d)/,
+                            (match) => {
+                                return parseInt(match) + 1;
+                            },
+                        );
+                        followersText.innerHTML = newText;
+                    } else {
+                        followBtn.innerHTML =
+                            '<i data-lucide="user-plus"></i> Follow';
+                        followBtn.classList.remove("following");
+                        isFollowing = false;
+
+                        // Update follower count
+                        const followersText = document.querySelector(
+                            ".profile-meta-item:last-child span",
+                        );
+                        const currentText = followersText.textContent;
+                        const newText = currentText.replace(
+                            /(\d+)(?!.*\d)/,
+                            (match) => {
+                                return parseInt(match) - 1;
+                            },
+                        );
+                        followersText.innerHTML = newText;
+                    }
+
+                    // Re-initialize icons after DOM change
+                    lucide.createIcons();
+                });
+            }
+
+            // Perfume Card Hover Effects
+            function initializePerfumeCards() {
+                const cards = document.querySelectorAll(".perfume-card");
+
+                cards.forEach((card) => {
+                    card.addEventListener("click", () => {
+                        // Add click animation
+                        card.style.transform = "scale(0.98)";
+                        setTimeout(() => {
+                            card.style.transform = "";
+                        }, 150);
+                    });
+                });
+            }
+
+            // Search Functionality
+            function initializeSearch() {
+                const searchInput = document.querySelector(".search-input");
+
+                searchInput.addEventListener("input", (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    // Here you would typically filter results
+                    console.log("Searching for:", searchTerm);
+                });
+            }
+
+            // Scroll Animations
+            function initializeScrollAnimations() {
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.opacity = "1";
+                                entry.target.style.transform = "translateY(0)";
+                            }
+                        });
+                    },
+                    { threshold: 0.1 },
+                );
+
+                const animatedElements = document.querySelectorAll(
+                    ".perfume-card, .review-card, .collection-card",
+                );
+                animatedElements.forEach((el) => {
+                    el.style.opacity = "0";
+                    el.style.transform = "translateY(30px)";
+                    el.style.transition =
+                        "opacity 0.6s ease, transform 0.6s ease";
+                    observer.observe(el);
+                });
+            }
+
+            // Initialize everything when DOM is loaded
+            document.addEventListener("DOMContentLoaded", () => {
+                // Start stats animation after page loads
+                setTimeout(() => {
+                    animateStats();
+                }, 600);
+
+                initializeTabs();
+                initializeFollowButton();
+                initializePerfumeCards();
+                initializeSearch();
+                initializeScrollAnimations();
+            });
+
+            // Add some CSS for the reviews and collections
+            const additionalStyles = document.createElement("style");
+            additionalStyles.textContent = `
+            .reviews-list {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-lg);
+            }
+
+            .review-card {
+                background: var(--card-background);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                transition: all var(--transition-normal) var(--ease-luxury);
+            }
+
+            .review-card:hover {
+                box-shadow: var(--shadow-md);
+                border-color: var(--primary-gold);
+            }
+
+            .review-header {
+                display: flex;
+                gap: var(--spacing-md);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .review-perfume-image {
+                width: 60px;
+                height: 60px;
+                border-radius: var(--radius-md);
+                object-fit: cover;
+            }
+
+            .review-info {
+                flex: 1;
+            }
+
+            .review-perfume-name {
+                font-weight: 600;
+                color: var(--foreground);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .review-date {
+                font-size: var(--text-sm);
+                color: var(--foreground-muted);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .review-content {
+                line-height: 1.7;
+                color: var(--foreground-muted);
+            }
+
+            .collections-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--spacing-lg);
+            }
+
+            .collection-card {
+                background: var(--card-background);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+                transition: all var(--transition-normal) var(--ease-luxury);
+            }
+
+            .collection-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-xl);
+                border-color: var(--primary-gold);
+            }
+
+            .collection-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: var(--spacing-md);
+            }
+
+            .collection-title {
+                font-size: var(--text-lg);
+                font-weight: 600;
+                color: var(--foreground);
+            }
+
+            .collection-count {
+                font-size: var(--text-sm);
+                color: var(--foreground-muted);
+                background: var(--secondary-champagne);
+                padding: var(--spacing-xs) var(--spacing-sm);
+                border-radius: var(--radius-md);
+            }
+
+            .collection-preview {
+                display: flex;
+                gap: var(--spacing-xs);
+                margin-bottom: var(--spacing-md);
+                align-items: center;
+            }
+
+            .collection-preview-image {
+                width: 50px;
+                height: 50px;
+                border-radius: var(--radius-sm);
+                object-fit: cover;
+                border: 2px solid var(--border-light);
+            }
+
+            .collection-more {
+                width: 50px;
+                height: 50px;
+                border-radius: var(--radius-sm);
+                background: var(--secondary-champagne);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                color: var(--foreground-muted);
+                font-size: var(--text-sm);
+            }
+
+            .collection-description {
+                color: var(--foreground-muted);
+                line-height: 1.6;
+                font-size: var(--text-sm);
+            }
+        `;
+            document.head.appendChild(additionalStyles);
+        </script>
+    </body>
+</html>

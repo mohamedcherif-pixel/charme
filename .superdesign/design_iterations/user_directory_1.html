@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Discover Perfume Enthusiasts | Luxury Fragrance Community</title>
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+        <style>
+            :root {
+                /* Luxury Perfume Brand Colors */
+                --primary-gold: #d4af37;
+                --primary-gold-light: #e8c547;
+                --primary-gold-dark: #b8941f;
+                --secondary-champagne: #f7e7ce;
+                --tertiary-cream: #fdf8f0;
+
+                /* Neutral Palette */
+                --background: #ffffff;
+                --background-soft: #fefcf8;
+                --foreground: #2c2826;
+                --foreground-muted: #6b6b6b;
+                --foreground-light: #8b8b8b;
+
+                /* Card & Surface Colors */
+                --card-background: #ffffff;
+                --card-foreground: #2c2826;
+                --card-border: #e8e8e8;
+                --card-shadow: rgba(212, 175, 55, 0.1);
+
+                /* Interactive Elements */
+                --button-primary: #d4af37;
+                --button-primary-hover: #b8941f;
+                --button-primary-foreground: #ffffff;
+                --button-secondary: #f7e7ce;
+                --button-secondary-hover: #e8c547;
+                --button-secondary-foreground: #2c2826;
+
+                /* Status & Accent Colors */
+                --accent-rose: #e8b4b8;
+                --accent-lavender: #d4c4e8;
+                --accent-sage: #c8d4b8;
+                --success: #7cb342;
+                --warning: #ff8f00;
+                --error: #d32f2f;
+
+                /* Border & Divider */
+                --border: #e8e8e8;
+                --border-light: #f5f5f5;
+                --divider: #eeeeee;
+
+                /* Typography */
+                --font-heading: "Playfair Display", serif;
+                --font-body: "Inter", sans-serif;
+                --font-accent: "Montserrat", sans-serif;
+
+                /* Font Sizes */
+                --text-xs: 0.75rem;
+                --text-sm: 0.875rem;
+                --text-base: 1rem;
+                --text-lg: 1.125rem;
+                --text-xl: 1.25rem;
+                --text-2xl: 1.5rem;
+                --text-3xl: 1.875rem;
+                --text-4xl: 2.25rem;
+
+                /* Spacing */
+                --spacing-xs: 0.25rem;
+                --spacing-sm: 0.5rem;
+                --spacing-md: 1rem;
+                --spacing-lg: 1.5rem;
+                --spacing-xl: 2rem;
+                --spacing-2xl: 3rem;
+                --spacing-3xl: 4rem;
+
+                /* Border Radius */
+                --radius-sm: 0.375rem;
+                --radius-md: 0.5rem;
+                --radius-lg: 0.75rem;
+                --radius-xl: 1rem;
+                --radius-2xl: 1.5rem;
+                --radius-full: 9999px;
+
+                /* Shadows */
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                --shadow-md:
+                    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                --shadow-lg:
+                    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                --shadow-xl:
+                    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.25);
+                --shadow-profile: 0 8px 32px rgba(212, 175, 55, 0.15);
+
+                /* Animation */
+                --transition-fast: 150ms ease-in-out;
+                --transition-normal: 300ms ease-in-out;
+                --transition-slow: 500ms ease-in-out;
+                --ease-luxury: cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            /* Global Styles */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: var(--font-body);
+                color: var(--foreground);
+                background-color: var(--background-soft);
+                line-height: 1.6;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            /* Header Navigation */
+            .main-header {
+                background: var(--card-background);
+                border-bottom: 1px solid var(--border);
+                padding: var(--spacing-md) 0;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                backdrop-filter: blur(20px);
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .header-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 var(--spacing-lg);
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xl);
+            }
+
+            .logo {
+                font-family: var(--font-heading);
+                font-size: var(--text-2xl);
+                font-weight: 600;
+                color: var(--primary-gold);
+                text-decoration: none;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: var(--spacing-lg);
+                list-style: none;
+            }
+
+            .nav-link {
+                color: var(--foreground-muted);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color var(--transition-fast);
+            }
+
+            .nav-link:hover,
+            .nav-link.active {
+                color: var(--primary-gold);
+            }
+
+            .search-bar {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .search-input {
+                padding: var(--spacing-sm) var(--spacing-md);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-lg);
+                font-size: var(--text-sm);
+                width: 300px;
+                background: var(--background);
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: var(--primary-gold);
+                box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+            }
+
+            .search-icon {
+                position: absolute;
+                right: var(--spacing-sm);
+                color: var(--foreground-muted);
+                pointer-events: none;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-md);
+            }
+
+            .nav-button {
+                background: none;
+                border: none;
+                color: var(--foreground-muted);
+                cursor: pointer;
+                padding: var(--spacing-sm);
+                border-radius: var(--radius-md);
+                transition: all var(--transition-fast);
+                position: relative;
+            }
+
+            .nav-button:hover {
+                color: var(--primary-gold);
+                background: var(--secondary-champagne);
+            }
+
+            .nav-badge {
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                background: var(--error);
+                color: white;
+                font-size: 10px;
+                padding: 2px 6px;
+                border-radius: var(--radius-full);
+                min-width: 18px;
+                text-align: center;
+            }
+
+            /* Main Container */
+            .main-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: var(--spacing-xl) var(--spacing-lg);
+            }
+
+            /* Page Header */
+            .page-header {
+                text-align: center;
+                margin-bottom: var(--spacing-3xl);
+                animation: fadeIn 0.8s ease-out;
+            }
+
+            .page-title {
+                font-family: var(--font-heading);
+                font-size: var(--text-4xl);
+                color: var(--foreground);
+                margin-bottom: var(--spacing-md);
+            }
+
+            .page-subtitle {
+                font-size: var(--text-lg);
+                color: var(--foreground-muted);
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            /* Filters Section */
+            .filters-section {
+                background: var(--card-background);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-xl);
+                padding: var(--spacing-xl);
+                margin-bottom: var(--spacing-xl);
+                box-shadow: var(--shadow-sm);
+                animation: slideUp 0.4s ease-out 0.2s both;
+            }
+
+            .filters-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .filters-title {
+                font-size: var(--text-xl);
+                font-weight: 600;
+                color: var(--foreground);
+            }
+
+            .results-count {
+                color: var(--foreground-muted);
+                font-size: var(--text-sm);
+            }
+
+            .filters-row {
+                display: flex;
+                gap: var(--spacing-lg);
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .filter-group {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+
+            .filter-label {
+                font-size: var(--text-sm);
+                color: var(--foreground-muted);
+                font-weight: 500;
+            }
+
+            .filter-select {
+                padding: var(--spacing-sm) var(--spacing-md);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                background: var(--background);
+                color: var(--foreground);
+                font-size: var(--text-sm);
+                min-width: 150px;
+            }
+
+            .filter-select:focus {
+                outline: none;
+                border-color: var(--primary-gold);
+                box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+            }
+
+            .sort-buttons {
+                display: flex;
+                gap: var(--spacing-xs);
+            }
+
+            .sort-btn {
+                padding: var(--spacing-xs) var(--spacing-md);
+                border: 1px solid var(--border);
+                background: var(--card-background);
+                color: var(--foreground-muted);
+                border-radius: var(--radius-md);
+                font-size: var(--text-sm);
+                cursor: pointer;
+                transition: all var(--transition-fast);
+            }
+
+            .sort-btn.active {
+                background: var(--primary-gold);
+                color: var(--button-primary-foreground);
+                border-color: var(--primary-gold);
+            }
+
+            .sort-btn:hover:not(.active) {
+                background: var(--secondary-champagne);
+                color: var(--foreground);
+            }
+
+            /* Featured Section */
+            .featured-section {
+                margin-bottom: var(--spacing-3xl);
+                animation: slideUp 0.4s ease-out 0.4s both;
+            }
+
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .section-title {
+                font-family: var(--font-heading);
+                font-size: var(--text-2xl);
+                color: var(--foreground);
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+            }
+
+            .section-link {
+                color: var(--primary-gold);
+                text-decoration: none;
+                font-weight: 500;
+                font-size: var(--text-sm);
+                transition: color var(--transition-fast);
+            }
+
+            .section-link:hover {
+                color: var(--primary-gold-dark);
+            }
+
+            /* User Grid */
+            .users-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: var(--spacing-xl);
+                margin-bottom: var(--spacing-3xl);
+            }
+
+            .user-card {
+                background: var(--card-background);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-xl);
+                padding: var(--spacing-xl);
+                transition: all var(--transition-normal) var(--ease-luxury);
+                cursor: pointer;
+                box-shadow: var(--shadow-sm);
+                text-decoration: none;
+                color: inherit;
+            }
+
+            .user-card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-profile);
+                border-color: var(--primary-gold);
+            }
+
+            .user-card-header {
+                display: flex;
+                gap: var(--spacing-md);
+                margin-bottom: var(--spacing-lg);
+                align-items: flex-start;
+            }
+
+            .user-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: var(--radius-full);
+                border: 3px solid var(--primary-gold);
+                box-shadow: var(--shadow-gold);
+                object-fit: cover;
+                flex-shrink: 0;
+            }
+
+            .user-info {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .user-name {
+                font-weight: 600;
+                font-size: var(--text-lg);
+                color: var(--foreground);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .user-username {
+                color: var(--primary-gold);
+                font-size: var(--text-sm);
+                margin-bottom: var(--spacing-xs);
+            }
+
+            .user-location {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-xs);
+                color: var(--foreground-muted);
+                font-size: var(--text-xs);
+            }
+
+            .user-stats {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: var(--spacing-md);
+                padding: var(--spacing-sm);
+                background: var(--tertiary-cream);
+                border-radius: var(--radius-md);
+            }
+
+            .user-stat {
+                text-align: center;
+                flex: 1;
+            }
+
+            .user-stat-number {
+                font-weight: 700;
+                color: var(--primary-gold);
+                font-size: var(--text-base);
+                display: block;
+            }
+
+            .user-stat-label {
+                font-size: var(--text-xs);
+                color: var(--foreground-muted);
+                margin-top: 2px;
+            }
+
+            .user-bio {
+                color: var(--foreground-muted);
+                font-size: var(--text-sm);
+                line-height: 1.5;
+                margin-bottom: var(--spacing-md);
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .user-badges {
+                display: flex;
+                gap: var(--spacing-xs);
+                flex-wrap: wrap;
+            }
+
+            .user-badge {
+                background: var(--secondary-champagne);
+                color: var(--foreground);
+                font-size: var(--text-xs);
+                padding: var(--spacing-xs) var(--spacing-sm);
+                border-radius: var(--radius-md);
+                font-weight: 500;
+            }
+
+            .user-badge.expert {
+                background: var(--primary-gold);
+                color: var(--button-primary-foreground);
+            }
+
+            .user-badge.verified {
+                background: var(--success);
+                color: white;
+            }
+
+            /* Load More */
+            .load-more {
+                text-align: center;
+                margin-top: var(--spacing-3xl);
+            }
+
+            .load-more-btn {
+                background: var(--button-primary);
+                color: var(--button-primary-foreground);
+                border: none;
+                padding: var(--spacing-md) var(--spacing-2xl);
+                border-radius: var(--radius-lg);
+                font-weight: 600;
+                font-size: var(--text-base);
+                cursor: pointer;
+                transition: all var(--transition-fast);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .load-more-btn:hover {
+                background: var(--button-primary-hover);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .header-container {
+                    flex-wrap: wrap;
+                    gap: var(--spacing-md);
+                }
+
+                .search-input {
+                    width: 250px;
+                }
+
+                .users-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    gap: var(--spacing-lg);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .header-container {
+                    flex-direction: column;
+                    padding: 0 var(--spacing-md);
+                }
+
+                .nav-links {
+                    display: none;
+                }
+
+                .search-input {
+                    width: 100%;
+                    max-width: 300px;
+                }
+
+                .main-container {
+                    padding: var(--spacing-lg) var(--spacing-md);
+                }
+
+                .page-title {
+                    font-size: var(--text-3xl);
+                }
+
+                .filters-row {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .filter-group {
+                    width: 100%;
+                }
+
+                .users-grid {
+                    grid-template-columns: 1fr;
+                    gap: var(--spacing-md);
+                }
+
+                .user-card {
+                    padding: var(--spacing-lg);
+                }
+
+                .section-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: var(--spacing-sm);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .user-card-header {
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                }
+
+                .user-avatar {
+                    width: 100px;
+                    height: 100px;
+                }
+
+                .filters-section {
+                    padding: var(--spacing-lg);
+                }
+            }
+
+            /* Animations */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Loading States */
+            .loading-skeleton {
+                background: linear-gradient(
+                    90deg,
+                    var(--border-light) 25%,
+                    var(--card-border) 50%,
+                    var(--border-light) 75%
+                );
+                background-size: 200% 100%;
+                animation: skeleton-loading 2s infinite;
+                border-radius: var(--radius-md);
+            }
+
+            @keyframes skeleton-loading {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--background-soft);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--primary-gold);
+                border-radius: var(--radius-full);
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--primary-gold-dark);
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Header Navigation -->
+        <header class="main-header">
+            <div class="header-container">
+                <div class="header-left">
+                    <a href="/" class="logo">Parfum Elite</a>
+                    <nav>
+                        <ul class="nav-links">
+                            <li><a href="/" class="nav-link">Home</a></li>
+                            <li><a href="/about" class="nav-link">About</a></li>
+                            <li><a href="/fragrances" class="nav-link">Fragrances</a></li>
+                            <li><a href="/community" class="nav-link active">Community</a></li>
+                            <li><a href="/contact" class="nav-link">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="search-bar">
+                    <input
+                        type="text"
+                        class="search-input"
+                        placeholder="Search users, brands, fragrances..."
+                        id="mainSearch"
+                    />
+                    <i data-lucide="search" class="search-icon"></i>
+                </div>
+                <div class="header-right">
+                    <button class="nav-button">
+                        <i data-lucide="bell"></i>
+                        <span class="nav-badge">3</span>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="message-circle"></i>
+                        <span class="nav-badge">2</span>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="heart"></i>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="user"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <!-- Page Header -->
+            <section class="page-header">
+                <h1 class="page-title">Discover Perfume Enthusiasts</h1>
+                <p class="page-subtitle">
+                    Connect with fellow fragrance lovers, discover new scents
+                    through their collections, and share your passion for luxury
+                    perfumes
+                </p>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <div class="filters-header">
+                    <h2 class="filters-title">Find Your Community</h2>
+                    <span class="results-count">Showing 247 members</span>
+                </div>
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Location</label>
+                        <select class="filter-select" id="locationFilter">
+                            <option value="">All Locations</option>
+                            <option value="paris">Paris, France</option>
+                            <option value="london">London, UK</option>
+                            <option value="nyc">New York, USA</option>
+                            <option value="tokyo">Tokyo, Japan</option>
+                            <option value="milan">Milan, Italy</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Expertise</label>
+                        <select class="filter-select" id="expertiseFilter">
+                            <option value="">All Levels</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="expert">Expert</option>
+                            <option value="professional">Professional</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Interests</label>
+                        <select class="filter-select" id="interestsFilter">
+                            <option value="">All Interests</option>
+                            <option value="niche">Niche Fragrances</option>
+                            <option value="designer">Designer Houses</option>
+                            <option value="vintage">Vintage Perfumes</option>
+                            <option value="oriental">Oriental Scents</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <div class="sort-buttons">
+                            <button class="sort-btn active" data-sort="recent">Recent</button>
+                            <button class="sort-btn" data-sort="popular">Popular</button>
+                            <button class="sort-btn" data-sort="expert">Expert</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Members -->
+            <section class="featured-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i data-lucide="star"></i>
+                        Featured Members
+                    </h2>
+                    <a href="#" class="section-link">View All →</a>
+                </div>
+                <div class="users-grid">
+                    <a href="user_profile_1.html" class="user-card">
+                        <div class="user-card-header">
+                            <img
+                                src="https://images.unsplash.com/photo-1494790108755-2616c69da7a8?w=160&h=160&fit=crop&crop=face"
+                                alt="Alexandra Chen"
+                                class="user-avatar"
+                            />
+                            <div class="user-info">
+                                <div class="user-name">Alexandra Chen</div>
+                                <div class="user-username">@alexandra.scents</div>
+                                <div class="user-location">
+                                    <i data-lucide="map-pin" size="12"></i>
+                                    Paris, France
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-stat">
+                                <span class="user-stat-number">142</span>
+                                <span class="user-stat-label">Owned</span>
+                            </div>
+                            <div class="user-stat">
+                                <span class="user-stat-number">89</span>
+                                <span class="user-stat-label">Reviews</span>
+                            </div>
+                            <div class="user-stat">
+                                <span class="user-stat-number">1.2K</span>
+                                <span class="user-stat-label">Followers</span>
+                            </div>
+                        </div>
+                        <p class="user-bio">
+                            Passionate collector of niche and luxury fragrances
+                            with a love for oriental compositions...
+                        </p>
+                        <div class="user-badges">
+                            <span class="user-badge expert">Expert</span>
+                            <span class="user-badge verified">Verified</span>
+                            <span class="user-badge">Niche Lover</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="user-card">
+                        <div class="user-card-header">
+                            <img
+                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&fit=crop&crop=face"
+                                alt="Marcus Johnson"
+                                class="user-avatar"
+                            />
+                            <div class="user-info">
+                                <div class="user-name">Marcus Johnson</div>
+                                <div class="user-username">@marcus_perfumes</div>
+                                <div class="user-location">
+                                    <i data-lucide="map-pin" size="12"></i>
+                                    London, UK
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-stat">
+                                <span class="user-stat-number">87</span>
+                                <span class="user-stat-label">Owned</span>
+                            </div>
+                            <div class="user-stat">
+                                <span class="user-stat-number">156</span>
+                                <span class="user-stat-label">Reviews</span>
+                            </div>
+                            <div class="user-stat">
+                                <span class="user-stat-number">892</span>

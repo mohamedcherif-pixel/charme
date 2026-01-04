@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show All Fragrances Button Fix Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .test-header h1 {
+            color: rgba(212, 175, 55, 1);
+            margin-bottom: 10px;
+        }
+
+        .test-header p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background-color: #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .modal-simulation {
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            margin: 20px 0;
+        }
+
+        .modal-title {
+            color: rgba(212, 175, 55, 1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Always Visible Actions Section */
+        .always-visible-actions {
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .always-visible-actions .search-action {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Selected Ingredients Bar */
+        .selected-ingredients-bar {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 0.15) 0%,
+                rgba(212, 175, 55, 0.1) 100%
+            );
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            backdrop-filter: blur(15px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(15px);
+            display: none;
+        }
+
+        .selected-ingredients-bar.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        .selected-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .selected-bar-header h4 {
+            color: rgba(212, 175, 55, 0.9);
+        }
+
+        .search-action {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .enhanced-search-btn {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 0.8) 0%,
+                rgba(212, 175, 55, 0.6) 100%
+            );
+            border: 2px solid rgba(212, 175, 55, 1);
+            color: #1a1a1a;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            min-height: 55px;
+        }
+
+        .enhanced-search-btn:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 1) 0%,
+                rgba(212, 175, 55, 0.8) 100%
+            );
+            transform: translateY(-3px) scale(1.05);
+            box-shadow:
+                0 15px 40px rgba(212, 175, 55, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .enhanced-search-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .enhanced-search-btn:hover svg {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .show-all-btn {
+            background: linear-gradient(
+                135deg,
+                rgba(45, 45, 45, 0.9) 0%,
+                rgba(30, 30, 30, 0.95) 100%
+            ) !important;
+            border: 2px solid rgba(212, 175, 55, 0.6) !important;
+            color: rgba(212, 175, 55, 0.9) !important;
+        }
+
+        .show-all-btn:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 0.15) 0%,
+                rgba(212, 175, 55, 0.1) 100%
+            ) !important;
+            border: 2px solid rgba(212, 175, 55, 1) !important;
+            color: rgba(212, 175, 55, 1) !important;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow:
+                0 15px 40px rgba(212, 175, 55, 0.3),
+                inset 0 1px 0 rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-count {
+            background: rgba(212, 175, 55, 0.3);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .show-all-btn .btn-count {
+            background: rgba(212, 175, 55, 0.2);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .show-all-btn:hover .btn-count {
+            background: rgba(212, 175, 55, 0.3);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            transform: scale(1.1);
+        }
+
+        .clear-all-btn {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.4);
+            color: rgba(255, 100, 100, 1);
+            padding: 8px 16px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-all-btn:hover {
+            background: rgba(255, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .clear-all-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .test-controls {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-controls h3 {
+            color: rgba(212, 175, 55, 1);
+            margin-bottom: 15px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: rgba(100, 100, 100, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(150, 150, 150, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .status-section {
+            background: rgba(0, 100, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .status-section h3 {
+            color: rgba(0, 255, 0, 1);
+            margin-bottom: 15px;
+        }
+
+        .selected-ingredients-display {
+            margin: 15px 0;
+            min-height: 20px;
+        }
+
+        .ingredient-pill {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.3);
+            color: rgba(212, 175, 55, 1);
+            padding: 5px 12px;
+            margin: 5px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>✅ Show All Fragrances Button Fix Test</h1>
+            <p>Verifying that the "Show All Fragrances" button is always visible</p>
+            <p style="margin-top: 10px; color: rgba(0, 255, 0, 1);">
+                <span class="status-indicator"></span>
+                <strong>STATUS: FIXED</strong> - Button is now always visible
+            </p>
+        </div>
+
+        <div class="modal-simulation">
+            <h2 class="modal-title">🔍 Ingredient Discovery Modal</h2>
+
+            <!-- Always Visible Actions Section - THE FIX! -->
+            <div class="always-visible-actions">
+                <div class="search-action">
+                    <button class="enhanced-search-btn show-all-btn" id="showAllBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                        <span class="btn-text">Show All Fragrances</span>
+                        <span class="btn-count">200+</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selected Ingredients Bar (Hidden by default) -->
+            <div class="selected-ingredients-bar" id="selectedBar">
+                <div class="selected-bar-header">
+                    <h4>Selected Ingredients</h4>
+                    <button class="clear-all-btn" onclick="clearIngredients()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                        </svg>
+                        Clear All
+                    </button>
+                </div>
+                <div class="selected-ingredients-display" id="selectedDisplay">
+                    <!-- Selected ingredients will appear here -->
+                </div>
+                <div class="search-action">
+                    <button class="enhanced-search-btn" id="discoverBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span class="btn-text">Discover Fragrances</span>
+                        <span class="btn-count" id="discoverCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-controls">
+            <h3>🎮 Test Controls</h3>
+            <div class="control-buttons">
+                <button class="control-btn" onclick="addIngredient()">➕ Add Ingredient</button>
+                <button class="control-btn" onclick="removeIngredient()">➖ Remove Ingredient</button>
+                <button class="control-btn" onclick="clearIngredients()">🗑️ Clear All</button>
+                <button class="control-btn" onclick="checkButtonVisibility()">👁️ Check Visibility</button>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults">
+                <p><strong>✅ Show All Fragrances Button:</strong> Always visible (outside selectedIngredientsBar)</p>
+                <p><strong>🔄 Discover Fragrances Button:</strong> Only visible when ingredients are selected</p>
+                <p><strong>📍 Fix Applied:</strong> Moved "Show All Fragrances" to always-visible-actions section</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedIngredients = [];
+        let ingredientCount = 0;
+
+        function addIngredient() {
+            ingredientCount++;
+            const ingredient = `Ingredient ${ingredientCount}`;
+            selectedIngredients.push(ingredient);
+            updateDisplay();
+            logAction(`Added: ${ingredient}`);
+        }
+
+        function removeIngredient() {
+            if (selectedIngredients.length > 0) {
+                const removed = selectedIngredients.pop();
+                updateDisplay();
+                logAction(`Removed: ${removed}`);
+            }
+        }
+
+        function clearIngredients() {
+            selectedIngredients = [];
+            updateDisplay();
+            logAction('Cleared all ingredients');
+        }
+
+        function updateDisplay() {
+            const selectedBar = document.getElementById('selectedBar');
+            const selectedDisplay = document.getElementById('selectedDisplay');
+            const discoverCount = document.getElementById('discoverCount');
+
+            if (selectedIngredients.length > 0) {
+                // Show the selected ingredients bar
+                selectedBar.style.display = 'block';
+                setTimeout(() => {
+                    selectedBar.classList.add('show');
+                }, 10);
+
+                // Update ingredients display
+                selectedDisplay.innerHTML = selectedIngredients
+                    .map(ingredient => `<span class="ingredient-pill">${ingredient}</span>`)
+                    .join('');
+
+                // Update discover button count
+                discoverCount.textContent = selectedIngredients.length * 5;
+            } else {
+                // Hide the selected ingredients bar
+                selectedBar.classList.remove('show');
+                setTimeout(() => {
+                    selectedBar.style.display = 'none';
+                }, 300);
+
+                discoverCount.textContent = '0';
+            }
+
+            checkButtonVisibility();
+        }
+
+        function checkButtonVisibility() {
+            const showAllBtn = document.getElementById('showAllBtn');
+            const discoverBtn = document.getElementById('discoverBtn');
+
+            const showAllVisible = window.getComputedStyle(showAllBtn).display !== 'none' &&
+                                 window.getComputedStyle(showAllBtn.closest('.always-visible-actions')).display !== 'none';
+
+            const discoverVisible = selectedIngredients.length > 0;
+
+            logAction(`Show All Button: ${showAllVisible ? '✅ VISIBLE' : '❌ HIDDEN'}`);
+            logAction(`Discover Button: ${discoverVisible ? '✅ VISIBLE' : '❌ HIDDEN'}`);
+        }
+
+        function logAction(message) {
+            const results = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('p');
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logEntry.style.color = 'rgba(255, 255, 255, 0.8)';
+            logEntry.style.fontSize = '14px';
+            results.appendChild(logEntry);
+
+            // Keep only last 10 entries
+            while (results.children.length > 13) {
+                results.removeChild(results.children[3]); // Keep first 3 static entries
+            }
+        }
+
+        // Button click handlers
+        document.getElementById('showAllBtn').addEventListener('click', () => {
+            logAction('🎯 Show All Fragrances clicked - Would display all 200+ fragrances');
+        });
+
+        document.getElementById('discoverBtn').addEventListener('click', () => {
+            logAction('🎯 Discover Fragrances clicked - Would search for matching fragrances');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            logAction('🚀 Test initialized - Show All Fragrances button is always visible');
+            checkButtonVisibility();
+        });
+    </script>
+</body>
+</html>

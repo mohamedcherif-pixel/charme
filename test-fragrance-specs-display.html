@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragrance Specs Display Test - Parfumerie Charme</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/fragrance-results.css">
+    <link rel="stylesheet" href="css/fragrance-results-extra.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .test-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>🧪 Fragrance Specs Display Test</h1>
+            <p>Testing the new concentration types (EDT, EDP, Parfum) and bottle sizes display</p>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-btn" onclick="showLuxuryFragrances()">Luxury Fragrances</button>
+            <button class="test-btn" onclick="showDesignerFragrances()">Designer Collection</button>
+            <button class="test-btn" onclick="showNicheFragrances()">Niche Brands</button>
+            <button class="test-btn" onclick="showAllTypes()">All Concentration Types</button>
+            <button class="test-btn" onclick="clearResults()">Clear All</button>
+        </div>
+
+        <div id="fragrance-results"></div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="js/fragrance-api-service.js"></script>
+    <script src="js/fragrance-results.js"></script>
+
+    <script>
+        // Initialize the fragrance service and results handler
+        let fragranceService;
+        let resultsHandler;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fragranceService = new FragranceAPIService();
+            resultsHandler = new FragranceResultsHandler('fragrance-results');
+            
+            console.log('✅ Fragrance specs display test initialized');
+            
+            // Show sample data on load
+            setTimeout(() => {
+                showLuxuryFragrances();
+            }, 500);
+        });
+
+        function showLuxuryFragrances() {
+            const luxuryBrands = ['Parfums de Marly', 'Tom Ford', 'Creed'];
+            const results = [];
+            
+            Object.entries(fragranceService.comprehensiveDatabase).forEach(([name, profile]) => {
+                if (luxuryBrands.includes(profile.brand)) {
+                    results.push({
+                        fragrance: name,
+                        percentage: Math.floor(Math.random() * 20) + 80,
+                        matchCount: Math.floor(Math.random() * 4) + 2,
+                        matchedIngredients: profile.ingredients ? profile.ingredients.slice(0, 3) : [],
+                        profile: profile
+                    });
+                }
+            });
+            
+            resultsHandler.displayResults(results.slice(0, 6));
+            console.log(`Showing ${results.length} luxury fragrances`);
+        }
+
+        function showDesignerFragrances() {
+            const designerBrands = ['Dior', 'Chanel', 'Versace', 'Calvin Klein', 'Hugo Boss'];
+            const results = [];
+            
+            Object.entries(fragranceService.comprehensiveDatabase).forEach(([name, profile]) => {
+                if (designerBrands.includes(profile.brand)) {
+                    results.push({
+                        fragrance: name,
+                        percentage: Math.floor(Math.random() * 20) + 75,
+                        matchCount: Math.floor(Math.random() * 3) + 2,
+                        matchedIngredients: profile.ingredients ? profile.ingredients.slice(0, 4) : [],
+                        profile: profile
+                    });
+                }
+            });
+            
+            resultsHandler.displayResults(results.slice(0, 8));
+            console.log(`Showing ${results.length} designer fragrances`);
+        }
+
+        function showNicheFragrances() {
+            const nicheBrands = ['Lattafa', 'Armaf', 'Afnan'];
+            const results = [];
+            
+            Object.entries(fragranceService.comprehensiveDatabase).forEach(([name, profile]) => {
+                if (nicheBrands.includes(profile.brand)) {
+                    results.push({
+                        fragrance: name,
+                        percentage: Math.floor(Math.random() * 25) + 70,
+                        matchCount: Math.floor(Math.random() * 3) + 1,
+                        matchedIngredients: profile.ingredients ? profile.ingredients.slice(0, 3) : [],
+                        profile: profile
+                    });
+                }
+            });
+            
+            resultsHandler.displayResults(results);
+            console.log(`Showing ${results.length} niche fragrances`);
+        }
+
+        function showAllTypes() {
+            // Show a variety of concentration types and sizes
+            const testFragrances = [
+                {
+                    fragrance: "Sample EDT Fragrance",
+                    percentage: 85,
+                    matchCount: 3,
+                    matchedIngredients: ["bergamot", "lavender", "cedar"],
+                    profile: {
+                        brand: "Test Brand",
+                        description: "A fresh and vibrant EDT perfect for daily wear.",
+                        concentration: "EDT",
+                        sizes: ["50ml", "100ml", "200ml"],
+                        ingredients: ["bergamot", "lavender", "cedar"]
+                    }
+                },
+                {
+                    fragrance: "Sample EDP Fragrance",
+                    percentage: 92,
+                    matchCount: 4,
+                    matchedIngredients: ["rose", "vanilla", "musk", "amber"],
+                    profile: {
+                        brand: "Premium House",
+                        description: "An sophisticated EDP with long-lasting performance.",
+                        concentration: "EDP",
+                        sizes: ["50ml", "100ml"],
+                        ingredients: ["rose", "vanilla", "musk", "amber"]
+                    }
+                },
+                {
+                    fragrance: "Sample Parfum Fragrance",
+                    percentage: 96,
+                    matchCount: 5,
+                    matchedIngredients: ["oud", "sandalwood", "vanilla", "amber", "musk"],
+                    profile: {
+                        brand: "Luxury Maison",
+                        description: "An ultra-concentrated parfum for special occasions.",
+                        concentration: "Parfum",
+                        sizes: ["30ml", "50ml"],
+                        ingredients: ["oud", "sandalwood", "vanilla", "amber", "musk"]
+                    }
+                },
+                {
+                    fragrance: "Sample Elixir Fragrance",
+                    percentage: 98,
+                    matchCount: 6,
+                    matchedIngredients: ["saffron", "rose", "oud", "amber", "musk", "vanilla"],
+                    profile: {
+                        brand: "Exclusive Collection",
+                        description: "The most intense and luxurious concentration available.",
+                        concentration: "Elixir",
+                        sizes: ["60ml", "100ml"],
+                        ingredients: ["saffron", "rose", "oud", "amber", "musk", "vanilla"]
+                    }
+                }
+            ];
+            
+            resultsHandler.displayResults(testFragrances);
+            console.log(`Showing all concentration types: EDT, EDP, Parfum, Elixir`);
+        }
+
+        function clearResults() {
+            resultsHandler.clearResults();
+            console.log('Results cleared');
+        }
+
+        // Mock window functions for testing
+        window.showLoginModal = function() {
+            console.log('Login modal would open');
+        };
+
+        window.searchByIngredients = function(ingredients) {
+            console.log(`Would search for: ${ingredients.join(', ')}`);
+        };
+    </script>
+</body>
+</html>

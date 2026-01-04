@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Profile Modal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-btn {
+            padding: 15px 25px;
+            margin: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 300px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        .output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .warning { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>Final Profile Modal Test</h1>
+    
+    <button class="test-btn" onclick="runFullTest()">🧪 Run Complete Test</button>
+    <button class="test-btn" onclick="testModalDirect()">🎯 Test Modal Direct</button>
+    <button class="test-btn" onclick="testSearchAndClick()">🔍 Test Search & Click</button>
+    <button class="test-btn" onclick="clearLog()">🗑️ Clear Log</button>
+    
+    <div id="log" class="output">Initializing test...</div>
+
+    <script src="script.js"></script>
+    <script>
+        function log(msg, type = 'info') {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            logEl.innerHTML += `<div class="${color}">[${time}] ${msg}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        function runFullTest() {
+            clearLog();
+            log('🧪 RUNNING COMPLETE PROFILE MODAL TEST');
+            log('================================================');
+            
+            // Test 1: Check system availability
+            log('1. Checking system availability...');
+            if (typeof window.profileModal !== 'undefined') {
+                log('✅ window.profileModal exists', 'success');
+                if (typeof window.profileModal.showProfileModal === 'function') {
+                    log('✅ showProfileModal method available', 'success');
+                } else {
+                    log('❌ showProfileModal method missing', 'error');
+                }
+            } else {
+                log('❌ window.profileModal not found', 'error');
+            }
+            
+            if (typeof window.testProfileModal === 'function') {
+                log('✅ testProfileModal function available', 'success');
+            } else {
+                log('❌ testProfileModal function missing', 'error');
+            }
+            
+            // Test 2: Try calling the modal
+            setTimeout(() => {
+                log('2. Testing modal call...');
+                try {
+                    if (typeof window.testProfileModal === 'function') {
+                        window.testProfileModal('fulltest@example.com');
+                        log('✅ Modal function called', 'success');
+                        
+                        // Check if modal appeared
+                        setTimeout(() => {
+                            const modal = document.querySelector('.profile-modal-overlay');
+                            if (modal) {
+                                log('✅ Modal element found in DOM', 'success');
+                                const rect = modal.getBoundingClientRect();
+                                log(`Modal size: ${rect.width}x${rect.height}`, 'info');
+                                if (rect.width > 0 && rect.height > 0) {
+                                    log('✅ Modal is visible', 'success');
+                                } else {
+                                    log('❌ Modal has no dimensions', 'error');
+                                }
+                            } else {
+                                log('❌ Modal not found in DOM', 'error');
+                            }
+                        }, 1000);
+                    } else {
+                        log('❌ Cannot test - function not available', 'error');
+                    }
+                } catch (error) {
+                    log(`❌ Error calling modal: ${error.message}`, 'error');
+                }
+            }, 500);
+            
+            // Test 3: Check profile search
+            setTimeout(() => {
+                log('3. Testing profile search system...');
+                const profileTab = document.querySelector('.search-tab[data-search-type="profiles"]');
+                const searchInput = document.getElementById('quickSearchInput');
+                
+                if (profileTab && searchInput) {
+                    log('✅ Profile search elements found', 'success');
+                    log('Triggering profile search...', 'info');
+                    
+                    profileTab.click();
+                    setTimeout(() => {
+                        searchInput.value = 'bil';
+                        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        setTimeout(() => {
+                            const suggestions = document.querySelectorAll('.profile-suggestion, .search-suggestion');
+                            log(`Found ${suggestions.length} profile suggestions`, 'info');
+                            
+                            if (suggestions.length > 0) {
+                                log('✅ Profile suggestions generated', 'success');
+                                log('Adding test click handler to first suggestion...', 'info');
+                                
+                                const first = suggestions[0];
+                                first.style.border = '3px solid red';
+                                first.style.background = 'rgba(255,0,0,0.2)';
+                                first.title = 'TEST CLICK - Should open modal';
+                                
+                                first.addEventListener('click', (e) => {
+                                    log('🔥 SUGGESTION CLICKED!', 'success');
+                                    log('Event target: ' + e.target.tagName, 'info');
+                                    
+                                    // Manual modal trigger
+                                    if (window.profileModal && window.profileModal.showProfileModal) {
+                                        log('Manually triggering modal...', 'info');
+                                        window.profileModal.showProfileModal('clicked_user', 'clicked@test.com');
+                                    } else {
+                                        log('❌ Cannot trigger modal - not available', 'error');
+                                    }
+                                });
+                                
+                                log('✅ Test handler added - click the red suggestion!', 'success');
+                            } else {
+                                log('❌ No profile suggestions found', 'error');
+                            }
+                        }, 2000);
+                    }, 200);
+                } else {
+                    log('❌ Profile search elements not found', 'error');
+                    log(`Profile tab: ${!!profileTab}, Search input: ${!!searchInput}`, 'info');
+                }
+            }, 2000);
+        }
+
+        function testModalDirect() {
+            clearLog();
+            log('🎯 TESTING DIRECT MODAL CALL');
+            log('================================');
+            
+            try {
+                if (window.profileModal && window.profileModal.showProfileModal) {
+                    log('Calling profileModal.showProfileModal directly...', 'info');
+                    window.profileModal.showProfileModal('direct_test', 'direct@test.com');
+                    log('✅ Direct call completed', 'success');
+                } else if (typeof window.testProfileModal === 'function') {
+                    log('Calling testProfileModal...', 'info');
+                    window.testProfileModal('direct@test.com');
+                    log('✅ Test function call completed', 'success');
+                } else {
+                    log('❌ No modal functions available', 'error');
+                }
+                
+                // Check result
+                setTimeout(() => {
+                    const modals = document.querySelectorAll('.profile-modal-overlay');
+                    log(`Found ${modals.length} modal(s) in DOM`, 'info');
+                    
+                    if (modals.length > 0) {
+                        const modal = modals[0];
+                        const computed = window.getComputedStyle(modal);
+                        log(`Modal display: ${computed.display}`, 'info');
+                        log(`Modal z-index: ${computed.zIndex}`, 'info');
+                        log(`Modal position: ${computed.position}`, 'info');
+                        
+                        const rect = modal.getBoundingClientRect();
+                        if (rect.width > 0 && rect.height > 0) {
+                            log('✅ Modal is visible and has dimensions', 'success');
+                        } else {
+                            log('❌ Modal exists but is not visible', 'error');
+                        }
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                log(`❌ Error in direct test: ${error.message}`, 'error');
+                console.error('Direct test error:', error);
+            }
+        }
+
+        function testSearchAndClick() {
+            clearLog();
+            log('🔍 TESTING SEARCH AND CLICK FLOW');
+            log('==================================');
+            
+            // Step 1: Switch to profiles tab
+            const profileTab = document.querySelector('.search-tab[data-search-type="profiles"]');
+            if (!profileTab) {
+                log('❌ Profile tab not found', 'error');
+                return;
+            }
+            
+            log('Switching to profiles tab...', 'info');
+            profileTab.click();
+            
+            setTimeout(() => {
+                // Step 2: Enter search query
+                const searchInput = document.getElementById('quickSearchInput');
+                if (!searchInput) {
+                    log('❌ Search input not found', 'error');
+                    return;
+                }
+                
+                log('Entering search query "bil"...', 'info');
+                searchInput.value = 'bil';
+                searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                
+                setTimeout(() => {
+                    // Step 3: Wait for and test suggestions
+                    const suggestions = document.querySelectorAll('.profile-suggestion, .search-suggestion');
+                    log(`Generated ${suggestions.length} suggestions`, 'info');
+                    
+                    if (suggestions.length === 0) {
+                        log('❌ No suggestions generated', 'error');
+                        return;
+                    }
+                    
+                    // Step 4: Add visual indicators and test handlers
+                    suggestions.forEach((suggestion, i) => {
+                        suggestion.style.border = '2px solid lime';
+                        suggestion.style.background = 'rgba(0,255,0,0.1)';
+                        suggestion.style.cursor = 'pointer';
+                        suggestion.title = `Test Suggestion ${i + 1} - Click to test modal`;
+                        
+                        // Add comprehensive click handler
+                        suggestion.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            log(`🔥 Suggestion ${i + 1} clicked!`, 'success');
+                            log(`Target: ${e.target.tagName}.${e.target.className}`, 'info');
+                            
+                            // Extract data
+                            const userId = suggestion.getAttribute('data-user-id') || `test_${i}`;
+                            const userName = suggestion.querySelector('.profile-name')?.textContent || `User ${i + 1}`;
+                            
+                            log(`User ID: ${userId}, Name: ${userName}`, 'info');
+                            
+                            // Try multiple modal trigger methods
+                            let modalTriggered = false;
+                            
+                            if (window.profileModal && window.profileModal.showProfileModal) {
+                                log('Triggering via profileModal.showProfileModal...', 'info');
+                                try {
+                                    window.profileModal.showProfileModal(userId, userName);
+                                    modalTriggered = true;
+                                    log('✅ Modal triggered via profileModal', 'success');
+                                } catch (error) {
+                                    log(`❌ Error with profileModal: ${error.message}`, 'error');
+                                }
+                            }
+                            
+                            if (!modalTriggered && typeof window.testProfileModal === 'function') {
+                                log('Triggering via testProfileModal...', 'info');
+                                try {
+                                    window.testProfileModal(userName);
+                                    modalTriggered = true;
+                                    log('✅ Modal triggered via testProfileModal', 'success');
+                                } catch (error) {
+                                    log(`❌ Error with testProfileModal: ${error.message}`, 'error');
+                                }
+                            }
+                            
+                            if (!modalTriggered) {
+                                log('❌ Could not trigger modal with any method', 'error');
+                            }
+                            
+                            // Check if modal appeared
+                            setTimeout(() => {
+                                const modal = document.querySelector('.profile-modal-overlay');
+                                if (modal) {
+                                    log('✅ Modal found in DOM after click', 'success');
+                                } else {
+                                    log('❌ Modal not found after click', 'error');
+                                }
+                            }, 500);
+                        });
+                    });
+                    
+                    log(`✅ Added test handlers to ${suggestions.length} suggestions`, 'success');
+                    log('Click any green-bordered suggestion to test!', 'warning');
+                    
+                }, 2000);
+            }, 300);
+        }
+
+        // Auto-run basic test on load
+        setTimeout(() => {
+            log('Auto-running basic availability test...');
+            if (typeof window.profileModal !== 'undefined') {
+                log('✅ Profile modal system detected', 'success');
+            } else {
+                log('❌ Profile modal system not detected', 'error');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

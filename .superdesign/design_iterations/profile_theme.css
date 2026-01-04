@@ -1,0 +1,543 @@
+:root {
+  /* Luxury Perfume Brand Colors */
+  --primary-gold: #D4AF37;
+  --primary-gold-light: #E8C547;
+  --primary-gold-dark: #B8941F;
+  --secondary-champagne: #F7E7CE;
+  --tertiary-cream: #FDF8F0;
+
+  /* Neutral Palette */
+  --background: #FFFFFF;
+  --background-soft: #FEFCF8;
+  --foreground: #2C2826;
+  --foreground-muted: #6B6B6B;
+  --foreground-light: #8B8B8B;
+
+  /* Card & Surface Colors */
+  --card-background: #FFFFFF;
+  --card-foreground: #2C2826;
+  --card-border: #E8E8E8;
+  --card-shadow: rgba(212, 175, 55, 0.1);
+
+  /* Interactive Elements */
+  --button-primary: #D4AF37;
+  --button-primary-hover: #B8941F;
+  --button-primary-foreground: #FFFFFF;
+  --button-secondary: #F7E7CE;
+  --button-secondary-hover: #E8C547;
+  --button-secondary-foreground: #2C2826;
+
+  /* Status & Accent Colors */
+  --accent-rose: #E8B4B8;
+  --accent-lavender: #D4C4E8;
+  --accent-sage: #C8D4B8;
+  --success: #7CB342;
+  --warning: #FF8F00;
+  --error: #D32F2F;
+
+  /* Border & Divider */
+  --border: #E8E8E8;
+  --border-light: #F5F5F5;
+  --divider: #EEEEEE;
+
+  /* Profile Specific */
+  --profile-header-bg: linear-gradient(135deg, #FDF8F0 0%, #F7E7CE 100%);
+  --profile-stats-bg: rgba(212, 175, 55, 0.05);
+  --profile-tab-active: #D4AF37;
+  --profile-tab-inactive: #8B8B8B;
+
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-accent: 'Montserrat', sans-serif;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.25);
+  --shadow-profile: 0 8px 32px rgba(212, 175, 55, 0.15);
+
+  /* Animation */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+  --ease-luxury: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Z-Index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1A1A1A;
+    --background-soft: #1F1F1F;
+    --foreground: #F5F5F5;
+    --foreground-muted: #A0A0A0;
+    --foreground-light: #808080;
+
+    --card-background: #252525;
+    --card-foreground: #F5F5F5;
+    --card-border: #404040;
+    --card-shadow: rgba(212, 175, 55, 0.2);
+
+    --border: #404040;
+    --border-light: #353535;
+    --divider: #353535;
+
+    --profile-header-bg: linear-gradient(135deg, #2A2520 0%, #3A3020 100%);
+    --profile-stats-bg: rgba(212, 175, 55, 0.1);
+  }
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body) !important;
+  color: var(--foreground) !important;
+  background-color: var(--background) !important;
+  line-height: 1.6 !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Typography */
+.profile-heading {
+  font-family: var(--font-heading) !important;
+  font-weight: 600 !important;
+  color: var(--foreground) !important;
+}
+
+.profile-subheading {
+  font-family: var(--font-accent) !important;
+  font-weight: 500 !important;
+  color: var(--foreground-muted) !important;
+}
+
+.profile-body {
+  font-family: var(--font-body) !important;
+  color: var(--foreground) !important;
+}
+
+.profile-caption {
+  font-family: var(--font-body) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--foreground-light) !important;
+}
+
+/* Profile Container */
+.profile-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: var(--spacing-lg) !important;
+  background: var(--background-soft) !important;
+}
+
+/* Profile Header */
+.profile-header {
+  background: var(--profile-header-bg) !important;
+  border-radius: var(--radius-xl) !important;
+  padding: var(--spacing-2xl) !important;
+  box-shadow: var(--shadow-profile) !important;
+  margin-bottom: var(--spacing-xl) !important;
+  border: 1px solid var(--border-light) !important;
+}
+
+.profile-avatar {
+  width: 150px !important;
+  height: 150px !important;
+  border-radius: var(--radius-full) !important;
+  border: 4px solid var(--primary-gold) !important;
+  box-shadow: var(--shadow-gold) !important;
+  transition: transform var(--transition-normal) var(--ease-luxury) !important;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05) !important;
+}
+
+.profile-info h1 {
+  font-size: var(--text-3xl) !important;
+  font-family: var(--font-heading) !important;
+  color: var(--foreground) !important;
+  margin-bottom: var(--spacing-xs) !important;
+}
+
+.profile-username {
+  font-size: var(--text-lg) !important;
+  color: var(--primary-gold) !important;
+  font-weight: 500 !important;
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.profile-meta {
+  display: flex !important;
+  gap: var(--spacing-lg) !important;
+  margin: var(--spacing-md) 0 !important;
+  flex-wrap: wrap !important;
+}
+
+.profile-meta-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-xs) !important;
+  color: var(--foreground-muted) !important;
+  font-size: var(--text-sm) !important;
+}
+
+/* Stats */
+.profile-stats {
+  background: var(--profile-stats-bg) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: var(--spacing-lg) !important;
+  display: flex !important;
+  gap: var(--spacing-xl) !important;
+  margin: var(--spacing-lg) 0 !important;
+  border: 1px solid var(--border-light) !important;
+}
+
+.profile-stat {
+  text-align: center !important;
+}
+
+.profile-stat-number {
+  font-size: var(--text-2xl) !important;
+  font-weight: 700 !important;
+  color: var(--primary-gold) !important;
+  font-family: var(--font-accent) !important;
+}
+
+.profile-stat-label {
+  font-size: var(--text-sm) !important;
+  color: var(--foreground-muted) !important;
+  margin-top: var(--spacing-xs) !important;
+}
+
+/* Action Buttons */
+.profile-actions {
+  display: flex !important;
+  gap: var(--spacing-md) !important;
+  margin-top: var(--spacing-lg) !important;
+}
+
+.btn-follow {
+  background: var(--button-primary) !important;
+  color: var(--button-primary-foreground) !important;
+  border: none !important;
+  padding: var(--spacing-sm) var(--spacing-lg) !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: 600 !important;
+  transition: all var(--transition-fast) var(--ease-luxury) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.btn-follow:hover {
+  background: var(--button-primary-hover) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.btn-message {
+  background: var(--button-secondary) !important;
+  color: var(--button-secondary-foreground) !important;
+  border: 1px solid var(--border) !important;
+  padding: var(--spacing-sm) var(--spacing-lg) !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: 600 !important;
+  transition: all var(--transition-fast) var(--ease-luxury) !important;
+}
+
+.btn-message:hover {
+  background: var(--button-secondary-hover) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Bio Section */
+.profile-bio {
+  background: var(--card-background) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: var(--spacing-lg) !important;
+  margin-bottom: var(--spacing-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.profile-bio-text {
+  font-style: italic !important;
+  color: var(--foreground-muted) !important;
+  font-size: var(--text-base) !important;
+  line-height: 1.7 !important;
+}
+
+/* Tab Navigation */
+.profile-tabs {
+  display: flex !important;
+  background: var(--card-background) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: var(--spacing-xs) !important;
+  margin-bottom: var(--spacing-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--card-border) !important;
+  overflow-x: auto !important;
+}
+
+.profile-tab {
+  flex: 1 !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--profile-tab-inactive) !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-normal) var(--ease-luxury) !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.profile-tab.active {
+  background: var(--profile-tab-active) !important;
+  color: var(--button-primary-foreground) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.profile-tab:not(.active):hover {
+  background: var(--button-secondary) !important;
+  color: var(--foreground) !important;
+}
+
+/* Content Grid */
+.profile-content {
+  background: var(--card-background) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: var(--spacing-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--card-border) !important;
+}
+
+.perfume-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  gap: var(--spacing-lg) !important;
+}
+
+.perfume-card {
+  background: var(--card-background) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: var(--spacing-lg) !important;
+  transition: all var(--transition-normal) var(--ease-luxury) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.perfume-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-xl) !important;
+  border-color: var(--primary-gold) !important;
+}
+
+.perfume-image {
+  width: 100% !important;
+  height: 150px !important;
+  object-fit: cover !important;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: var(--spacing-md) !important;
+}
+
+.perfume-title {
+  font-weight: 600 !important;
+  font-size: var(--text-lg) !important;
+  margin-bottom: var(--spacing-xs) !important;
+  color: var(--foreground) !important;
+}
+
+.perfume-brand {
+  color: var(--foreground-muted) !important;
+  font-size: var(--text-sm) !important;
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.perfume-rating {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--spacing-xs) !important;
+}
+
+.star-rating {
+  color: var(--primary-gold) !important;
+  font-size: var(--text-sm) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: var(--spacing-md) !important;
+  }
+
+  .profile-header {
+    padding: var(--spacing-lg) !important;
+    text-align: center !important;
+  }
+
+  .profile-header .row {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--spacing-lg) !important;
+  }
+
+  .profile-stats {
+    justify-content: space-around !important;
+    gap: var(--spacing-md) !important;
+  }
+
+  .profile-actions {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .profile-tabs {
+    overflow-x: scroll !important;
+  }
+
+  .perfume-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: var(--spacing-md) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-avatar {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  .profile-info h1 {
+    font-size: var(--text-2xl) !important;
+  }
+
+  .profile-meta {
+    justify-content: center !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--spacing-sm) !important;
+  }
+
+  .perfume-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Loading States */
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--border-light) 25%, var(--card-border) 50%, var(--border-light) 75%) !important;
+  background-size: 200% 100% !important;
+  animation: skeleton-loading 2s infinite !important;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0 !important;
+  }
+  100% {
+    background-position: -200% 0 !important;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-soft) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-gold) !important;
+  border-radius: var(--radius-full) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-gold-dark) !important;
+}
+
+/* Focus States */
+.profile-tab:focus,
+.btn-follow:focus,
+.btn-message:focus {
+  outline: 2px solid var(--primary-gold) !important;
+  outline-offset: 2px !important;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0 !important;
+    transform: translateY(20px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.4s var(--ease-luxury) !important;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0 !important;
+    transform: translateY(30px) !important;
+  }
+  to {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+}

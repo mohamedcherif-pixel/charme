@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Fragrance Results - Layout Test</title>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Custom Stylesheets -->
+    <link rel="stylesheet" href="css/fragrance-results.css">
+    <link rel="stylesheet" href="css/fragrance-results-extra.css">
+
+    <style>
+        /* Base page styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .test-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-transform: none;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .test-btn:active {
+            transform: translateY(0);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin: 40px 0 20px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .layout-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .layout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .layout-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .layout-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .layout-btn.active:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        /* Test scenarios styling */
+        .test-scenario {
+            margin-bottom: 60px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scenario-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .scenario-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .demo-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffd700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .test-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .layout-toggle {
+                flex-wrap: wrap;
+            }
+
+            .demo-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Enhanced Fragrance Results</h1>
+            <p>Testing the improved layout, interactions, and responsive design for fragrance search results with proper text spacing and enhanced user experience.</p>
+        </div>
+
+        <!-- Demo Statistics -->
+        <div class="demo-stats">
+            <div class="stat-item">
+                <span class="stat-number" id="totalResults">0</span>
+                <span class="stat-label">Total Results</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="avgMatch">0%</span>
+                <span class="stat-label">Avg Match</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="favoriteCount">0</span>
+                <span class="stat-label">Favorited</span>
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="test-controls">
+            <button class="test-btn" onclick="showLoadingState()">
+                <i class="fas fa-spinner"></i> Loading State
+            </button>
+            <button class="test-btn" onclick="showSampleResults()">
+                <i class="fas fa-search"></i> Sample Results
+            </button>
+            <button class="test-btn" onclick="showLongTextResults()">
+                <i class="fas fa-align-left"></i> Long Text Test
+            </button>
+            <button class="test-btn" onclick="showManyResults()">
+                <i class="fas fa-th"></i> Many Results
+            </button>
+            <button class="test-btn" onclick="showEmptyState()">
+                <i class="fas fa-ban"></i> Empty State
+            </button>
+            <button class="test-btn" onclick="clearAll()">
+                <i class="fas fa-trash"></i> Clear All
+            </button>
+        </div>
+
+        <!-- Layout Toggle -->
+        <div class="layout-toggle">
+            <button class="layout-btn active" onclick="setLayout('grid')">
+                <i class="fas fa-th"></i> Grid View
+            </button>
+            <button class="layout-btn" onclick="setLayout('list')">
+                <i class="fas fa-list"></i> List View
+            </button>
+            <button class="layout-btn" onclick="setLayout('compact')">
+                <i class="fas fa-compress"></i> Compact
+            </button>
+            <button class="layout-btn" onclick="setLayout('comfortable')">
+                <i class="fas fa-expand"></i> Comfortable
+            </button>
+        </div>
+
+        <!-- Main Test Scenarios -->
+        <div class="test-scenario">
+            <div class="scenario-header">
+                <h3 class="scenario-title">Primary Results Display</h3>
+                <div class="scenario-controls">
+                    <button class="test-btn" onclick="toggleFavorites()">
+                        <i class="fas fa-heart"></i> Toggle Favorites
+                    </button>
+                    <button class="test-btn" onclick="shuffleResults()">
+                        <i class="fas fa-random"></i> Shuffle
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Container -->
+            <div id="fragrance-results"></div>
+        </div>
+
+        <!-- Secondary Results for Comparison -->
+        <div class="test-scenario">
+            <div class="scenario-header">
+                <h3 class="scenario-title">Layout Comparison</h3>
+                <div class="scenario-controls">
+                    <button class="test-btn" onclick="showComparisonResults()">
+                        <i class="fas fa-columns"></i> Show Comparison
+                    </button>
+                </div>
+            </div>
+
+            <div id="comparison-results"></div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript -->
+    <script src="js/fragrance-results.js"></script>
+
+    <script>
+        // Mock fragrance data for testing
+        const mockFragranceData = [
+            {
+                fragrance: "Creed Aventus",
+                percentage: 95,
+                matchCount: 4,
+                matchedIngredients: ["bergamot", "blackcurrant", "apple", "pineapple"],
+                profile: {
+                    brand: "Creed",
+                    description: "A sophisticated blend of fruity and woody notes that creates a powerful and confident signature scent. Perfect for the modern gentleman who demands excellence.",
+                    notes: {
+                        top: ["bergamot", "blackcurrant", "apple", "pineapple"],
+                        heart: ["rose", "dry birch", "moroccan jasmine", "patchouli"],
+                        base: ["oakmoss", "musk", "ambergris", "vanilla"]
+                    }
+                }
+            },
+            {
+                fragrance: "Tom Ford Oud Wood",
+                percentage: 88,
+                matchCount: 3,
+                matchedIngredients: ["oud", "sandalwood", "vanilla"],
+                profile: {
+                    brand: "Tom Ford",
+                    description: "An exotic and smoky fragrance that captures the essence of rare oud wood with creamy sandalwood and rich vanilla undertones.",
+                    notes: {
+                        top: ["oud", "rosewood", "cardamom"],
+                        heart: ["sandalwood", "rose", "sichuan pepper"],
+                        base: ["vanilla", "amber", "tonka bean"]
+                    }
+                }
+            },
+            {
+                fragrance: "Maison Francis Kurkdjian Baccarat Rouge 540",
+                percentage: 92,
+                matchCount: 5,
+                matchedIngredients: ["saffron", "jasmine", "amberwood", "ambergris", "cedar"],
+                profile: {
+                    brand: "Maison Francis Kurkdjian",
+                    description: "A luminous and radiant fragrance that blends mineral and floral accords with a woody amber base. Absolutely mesmerizing and unique.",
+                    notes: {
+                        top: ["saffron", "jasmine"],
+                        heart: ["amberwood", "ambergris"],
+                        base: ["cedar", "fir resin"]
+                    }
+                }
+            },
+            {
+                fragrance: "Dior Sauvage",
+                percentage: 85,
+                matchCount: 3,
+                matchedIngredients: ["bergamot", "pepper", "ambroxan"],
+                profile: {
+                    brand: "Christian Dior",
+                    description: "A fresh and powerful fragrance inspired by wide-open spaces. A composition of raw energy and noble wood.",
+                    notes: {
+                        top: ["bergamot", "pepper"],
+                        heart: ["lavender", "star anise", "nutmeg"],
+                        base: ["ambroxan", "cedar", "labdanum"]
+                    }
+                }
+            },
+            {
+                fragrance: "Le Labo Santal 33",
+                percentage: 79,
+                matchCount: 2,
+                matchedIngredients: ["sandalwood", "cedar"],
+                profile: {
+                    brand: "Le Labo",
+                    description: "A unisex fragrance that captures the spirit of the American West with creamy sandalwood and spicy cardamom.",
+                    notes: {
+                        top: ["cardamom", "iris", "violet"],
+                        heart: ["sandalwood", "papyrus", "ambroxan"],
+                        base: ["cedar", "leather", "amber"]
+                    }
+                }
+            },
+            {
+                fragrance: "Byredo Gypsy Water",
+                percentage: 73,
+                matchCount: 2,
+                matchedIngredients: ["bergamot", "pepper"],
+                profile: {
+                    brand: "Byredo",
+                    description: "A fresh and woody fragrance that evokes the romani lifestyle. A nomadic and free-spirited scent with aromatic herbs.",
+                    notes: {
+                        top: ["bergamot", "pepper", "juniper berries"],
+                        heart: ["incense", "pine needles", "orris"],
+                        base: ["amber", "vanilla", "sandalwood"]
+                    }
+                }
+            }
+        ];
+
+        // Extended mock data for testing long text and many results
+        const longTextData = [
+            {
+                fragrance: "Extremely Long Fragrance Name That Tests Text Wrapping And Layout Behavior",
+                percentage: 91,
+                matchCount: 6,
+                matchedIngredients: ["extremely-long-ingredient-name", "another-very-long-ingredient", "bergamot", "vanilla", "cedar", "musk"],
+                profile: {
+                    brand: "A Very Long Brand Name That Should Test Wrapping",
+                    description: "This is an extremely long description that is designed to test how the layout handles extensive text content. It should wrap properly without breaking the card layout or causing overflow issues. The description continues with more details about the fragrance composition, its history, the inspiration behind its creation, and the specific notes that make it unique in the world of luxury perfumery.",
+                    notes: {
+                        top: ["bergamot", "extremely-long-note-name", "another-long-note"],
+                        heart: ["very-long-heart-note", "middle-note-with-long-name", "jasmine"],
+                        base: ["long-base-note-name", "vanilla", "cedar", "musk", "amber", "tonka"]
+                    }
+                }
+            }
+        ];
+
+        // Generate many results for pagination testing
+        function generateManyResults() {
+            const results = [];
+            const brands = ["Creed", "Tom Ford", "Dior", "Chanel", "Hermès", "Maison Francis Kurkdjian", "Le Labo", "Byredo", "Amouage", "Diptyque"];
+            const notes = ["bergamot", "rose", "vanilla", "cedar", "musk", "amber", "jasmine", "sandalwood", "oud", "patchouli", "lavender", "citrus"];
+
+            for (let i = 1; i <= 25; i++) {
+                const brand = brands[Math.floor(Math.random() * brands.length)];
+                const noteCount = Math.floor(Math.random() * 4) + 2;
+                const selectedNotes = notes.slice(0, noteCount);
+
+                results.push({
+                    fragrance: `${brand} Test Fragrance ${i}`,
+                    percentage: Math.floor(Math.random() * 30) + 70,
+                    matchCount: noteCount,
+                    matchedIngredients: selectedNotes,
+                    profile: {
+                        brand: brand,
+                        description: `A carefully crafted fragrance that combines ${selectedNotes.join(', ')} in perfect harmony. Test fragrance number ${i} showcases the artistry of modern perfumery.`,
+                        notes: {
+                            top: selectedNotes.slice(0, Math.ceil(noteCount/3)),
+                            heart: selectedNotes.slice(Math.ceil(noteCount/3), Math.ceil(noteCount*2/3)),
+                            base: selectedNotes.slice(Math.ceil(noteCount*2/3))
+                        }
+                    }
+                });
+            }
+            return results;
+        }
+
+        // Initialize results handler
+        let resultsHandler;
+        let currentLayout = 'grid';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            resultsHandler = new FragranceResultsHandler('fragrance-results');
+            updateStats();
+        });
+
+        // Test Functions
+        function showLoadingState() {
+            resultsHandler.displayResults([], { showLoading: true });
+            updateStats(0);
+        }
+
+        function showSampleResults() {
+            resultsHandler.displayResults(mockFragranceData);
+            updateStats(mockFragranceData.length, calculateAverageMatch(mockFragranceData));
+        }
+
+        function showLongTextResults() {
+            resultsHandler.displayResults(longTextData);
+            updateStats(longTextData.length, calculateAverageMatch(longTextData));
+        }
+
+        function showManyResults() {
+            const manyResults = generateManyResults();
+            resultsHandler.displayResults(manyResults);
+            updateStats(manyResults.length, calculateAverageMatch(manyResults));
+        }
+
+        function showEmptyState() {
+            resultsHandler.displayResults([], { emptyMessage: "No fragrances found matching your search criteria. Try different ingredients or explore our featured collections." });
+            updateStats(0);
+        }
+
+        function clearAll() {
+            resultsHandler.clearResults();
+            updateStats(0);
+        }
+
+        function showComparisonResults() {
+            const comparisonContainer = document.getElementById('comparison-results');
+            if (!comparisonContainer) return;
+
+            // Create a secondary results handler
+            const comparisonHandler = new FragranceResultsHandler('comparison-results');
+            comparisonHandler.displayResults(mockFragranceData.slice(0, 3));
+        }
+
+        // Layout Functions
+        function setLayout(layout) {
+            currentLayout = layout;
+            const container = document.getElementById('fragrance-results');
+            const buttons = document.querySelectorAll('.layout-btn');
+
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="setLayout('${layout}')"]`).classList.add('active');
+
+            // Update container class
+            if (container && container.querySelector('.fragrance-results-container')) {
+                const resultsContainer = container.querySelector('.fragrance-results-container');
+                resultsContainer.className = `fragrance-results-container`;
+
+                switch(layout) {
+                    case 'list':
+                        resultsContainer.classList.add('list-view');
+                        break;
+                    case 'compact':
+                        resultsContainer.classList.add('grid-compact');
+                        break;
+                    case 'comfortable':
+                        resultsContainer.classList.add('grid-comfortable');
+                        break;
+                    default:
+                        // Default grid layout
+                        break;
+                }
+            }
+        }
+
+        // Utility Functions
+        function toggleFavorites() {
+            const favoriteButtons = document.querySelectorAll('.favorite-button');
+            favoriteButtons.forEach((btn, index) => {
+                if (index % 2 === 0) {
+                    btn.click();
+                }
+            });
+        }
+
+        function shuffleResults() {
+            const currentResults = resultsHandler.getResults();
+            if (currentResults.length > 0) {
+                const shuffled = [...currentResults].sort(() => Math.random() - 0.5);
+                resultsHandler.displayResults(shuffled);
+            }
+        }
+
+        function updateStats(totalResults = 0, avgMatch = 0, favoriteCount = 0) {
+            document.getElementById('totalResults').textContent = totalResults;
+            document.getElementById('avgMatch').textContent = avgMatch + '%';
+            document.getElementById('favoriteCount').textContent = favoriteCount;
+        }
+
+        function calculateAverageMatch(results) {
+            if (!results || results.length === 0) return 0;
+            const total = results.reduce((sum, result) => sum + (result.percentage || 0), 0);
+            return Math.round(total / results.length);
+        }
+
+        // Mock some enhanced interactions
+        window.showLoginModal = function() {
+            alert('Login modal would open here - user needs to log in to save favorites');
+        };
+
+        window.searchByIngredients = function(ingredients) {
+            alert(`Would search for fragrances containing: ${ingredients.join(', ')}`);
+        };
+
+        // Show sample results on load
+        setTimeout(() => {
+            showSampleResults();
+        }, 1000);
+
+        // Add some CSS animations for demo
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes highlight {
+                0% { background: rgba(212, 175, 55, 0.1); }
+                50% { background: rgba(212, 175, 55, 0.3); }
+                100% { background: rgba(212, 175, 55, 0.1); }
+            }
+
+            .highlight-demo {
+                animation: highlight 1s ease-out;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

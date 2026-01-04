@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Modal Test</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: Arial; padding: 20px; }
+        button { padding: 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Quick Profile Modal Test</h1>
+    <button onclick="testModal()">Test Profile Modal</button>
+    <button onclick="testSimple()">Test Simple Modal</button>
+    
+    <script src="script.js"></script>
+    <script>
+        function testModal() {
+            console.log('Testing profile modal...');
+            if (window.testProfileModal) {
+                window.testProfileModal('test@example.com');
+                console.log('Profile modal function called');
+            } else {
+                console.error('testProfileModal not found');
+                alert('testProfileModal function not found');
+            }
+        }
+        
+        function testSimple() {
+            console.log('Creating simple modal...');
+            const div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            div.innerHTML = '<div style="background:white;color:black;padding:30px;border-radius:8px;text-align:center;"><h2>Simple Modal Works!</h2><button onclick="this.closest(\'div\').remove()">Close</button></div>';
+            document.body.appendChild(div);
+            console.log('Simple modal created');
+        }
+        
+        setTimeout(() => {
+            console.log('Profile modal available:', typeof window.testProfileModal);
+            console.log('Profile modal system:', typeof window.profileModal);
+        }, 1000);
+    </script>
+</body>
+</html>

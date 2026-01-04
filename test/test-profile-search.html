@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Search Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Search Tabs */
+        .search-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 4px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .search-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: rgba(102, 126, 234, 0.8);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-tab:hover {
+            color: rgba(102, 126, 234, 1);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .search-tab.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Search Container */
+        .quick-search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .quick-search-bar {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-search-bar:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            width: 18px;
+            height: 18px;
+            color: #6c757d;
+            margin-right: 12px;
+        }
+
+        #quickSearchInput {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+            color: #333;
+        }
+
+        #clearQuickSearch {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            display: none;
+        }
+
+        /* Dropdown */
+        .quick-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .quick-search-dropdown.show {
+            display: block;
+        }
+
+        /* Profile Search Suggestions */
+        .profile-suggestion {
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-suggestion:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(4px);
+        }
+
+        .profile-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .profile-suggestion-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .profile-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 8px;
+            border: 2px solid white;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        .profile-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .profile-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-badge.admin {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .profile-badge.member {
+            background: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        .member-since {
+            color: #6c757d;
+            opacity: 0.8;
+        }
+
+        .no-results {
+            padding: 24px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .test-info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .test-info h3 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+
+        .test-info p {
+            margin: 5px 0;
+            color: #424242;
+        }
+
+        .search-suggestion {
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-suggestion:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Profile Search Test</h1>
+
+        <div class="test-info">
+            <h3>Test Instructions:</h3>
+            <p>1. Click between "Fragrances" and "Profiles" tabs to test tab switching</p>
+            <p>2. When on "Profiles" tab, type at least 2 characters to search for users</p>
+            <p>3. Check that placeholder text changes based on selected tab</p>
+            <p>4. Verify profile search results display correctly with avatars, names, and badges</p>
+        </div>
+
+        <div class="quick-search-container" id="quickSearchContainer">
+            <div class="search-tabs">
+                <button class="search-tab active" data-search-type="fragrances">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Fragrances
+                </button>
+                <button class="search-tab" data-search-type="profiles">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Profiles
+                </button>
+            </div>
+
+            <div class="quick-search-bar" id="quickSearchBar">
+                <div class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </div>
+                <input
+                    type="text"
+                    placeholder="Search fragrances..."
+                    id="quickSearchInput"
+                    autocomplete="off"
+                    data-fragrance-placeholder="Search fragrances..."
+                    data-profile-placeholder="Search user profiles..."
+                />
+                <button
+                    type="button"
+                    id="clearQuickSearch"
+                    style="display: none"
+                >
+                    ×
+                </button>
+            </div>
+
+            <div class="quick-search-dropdown" id="quickSearchDropdown">
+                <div class="dropdown-content" id="quickSearchResults">
+                    <!-- Search results will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock fragrance data for testing
+        const fragrances = [
+            { name: "Layton", brand: "Parfums de Marly", notes: ["Apple", "Lavender", "Vanilla"], type: "Oriental" },
+            { name: "Haltane", brand: "Parfums de Marly", notes: ["Bergamot", "Saffron", "Agarwood"], type: "Oriental" },
+            { name: "Pegasus", brand: "Parfums de Marly", notes: ["Heliotrope", "Lavender", "Sandalwood"], type: "Aromatic" }
+        ];
+
+        // Initialize variables
+        let currentSearchType = "fragrances";
+        let selectedSuggestionIndex = -1;
+
+        // Get DOM elements
+        const quickSearchInput = document.getElementById("quickSearchInput");
+        const clearQuickSearch = document.getElementById("clearQuickSearch");
+        const quickSearchDropdown = document.getElementById("quickSearchDropdown");
+        const quickSearchResults = document.getElementById("quickSearchResults");
+        const searchTabs = document.querySelectorAll(".search-tab");
+
+        // Tab switching functionality
+        searchTabs.forEach((tab) => {
+            tab.addEventListener("click", function () {
+                // Remove active class from all tabs
+                searchTabs.forEach((t) => t.classList.remove("active"));
+                // Add active class to clicked tab
+                this.classList.add("active");
+
+                // Update current search type
+                currentSearchType = this.dataset.searchType;
+
+                // Update placeholder text
+                const placeholder = currentSearchType === "fragrances"
+                    ? quickSearchInput.dataset.fragrancePlaceholder
+                    : quickSearchInput.dataset.profilePlaceholder;
+                quickSearchInput.placeholder = placeholder;
+
+                // Clear current search and hide dropdown
+                quickSearchInput.value = "";
+                clearQuickSearch.style.display = "none";
+                hideDropdown();
+
+                console.log("Switched to:", currentSearchType);
+            });
+        });
+
+        // Search functionality
+        async function searchProfiles(query) {
+            try {
+                console.log("Searching profiles for:", query);
+                const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error("Search failed");
+                return await response.json();
+            } catch (error) {
+                console.error("Error searching profiles:", error);
+                // Return mock data for testing when API is not available
+                return [
+                    {
+                        id: 1,
+                        display_name: "John Doe",
+                        first_name: "John",
+                        last_name: "Doe",
+                        email: "john@example.com",
+                        avatar_url: "default.jpg",
+                        level: 5,
+                        experience: 1250,
+                        member_since: "2023-01-15",
+                        is_admin: false,
+                        badge: "Expert"
+                    },
+                    {
+                        id: 2,
+                        display_name: "Jane Smith",
+                        first_name: "Jane",
+                        last_name: "Smith",
+                        email: "jane@example.com",
+                        avatar_url: "default.jpg",
+                        level: 2,
+                        experience: 350,
+                        member_since: "2023-06-20",
+                        is_admin: true,
+                        badge: "Admin"
+                    },
+                    {
+                        id: 3,
+                        display_name: "Mike Johnson",
+                        first_name: "Mike",
+                        last_name: "Johnson",
+                        email: "mike@example.com",
+                        avatar_url: "default.jpg",
+                        level: 1,
+                        experience: 75,
+                        member_since: "2023-11-08",
+                        is_admin: false,
+                        badge: "Member"
+                    }
+                ].filter(user =>
+                    user.display_name.toLowerCase().includes(query.toLowerCase()) ||
+                    user.email.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+        }
+
+        function showFragranceResults(query) {
+            const filteredFragrances = fragrances.filter(
+                (fragrance) =>
+                    fragrance.name.toLowerCase().includes(query.toLowerCase()) ||
+                    fragrance.brand.toLowerCase().includes(query.toLowerCase()) ||
+                    fragrance.notes.some((note) =>
+                        note.toLowerCase().includes(query.toLowerCase())
+                    ) ||
+                    fragrance.type.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filteredFragrances.length === 0 && query.length > 0) {
+                quickSearchResults.innerHTML = '<div class="no-results">No fragrances found</div>';
+                showDropdown();
+                return;
+            }
+
+            const suggestionsHTML = filteredFragrances.map(fragrance => `
+                <div class="search-suggestion" data-fragrance="${fragrance.name}">
+                    <div>
+                        <strong>${fragrance.name}</strong> by ${fragrance.brand}
+                        <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                            ${fragrance.notes.join(", ")} - ${fragrance.type}
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+
+            quickSearchResults.innerHTML = suggestionsHTML;
+            showDropdown();
+        }
+
+        async function showProfileResults(query) {
+            if (query.length < 2) {
+                hideDropdown();
+                return;
+            }
+
+            const profiles = await searchProfiles(query);
+
+            if (profiles.length === 0) {
+                quickSearchResults.innerHTML = '<div class="no-results">No users found</div>';
+                showDropdown();
+                return;
+            }
+
+            const suggestionsHTML = profiles.map(profile => `
+                <div class="profile-suggestion" data-user-id="${profile.id}">
+                    <div class="profile-suggestion-content">
+                        <div class="profile-avatar">
+                            <img src="${profile.avatar_url || "default.jpg"}" alt="${profile.display_name}" onerror="this.src='https://via.placeholder.com/40x40/667eea/white?text=${profile.display_name.charAt(0)}'">
+                            ${profile.level ? `<div class="level-badge">${profile.level}</div>` : ""}
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name">${profile.display_name}</div>
+                            <div class="profile-meta">
+                                <span class="profile-badge ${profile.is_admin ? "admin" : "member"}">${profile.badge}</span>
+                                ${profile.member_since ? `<span class="member-since">Member since ${new Date(profile.member_since).getFullYear()}</span>` : ""}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+
+            quickSearchResults.innerHTML = suggestionsHTML;
+            showDropdown();
+
+            // Add click listeners to profile suggestions
+            const suggestions = quickSearchResults.querySelectorAll(".profile-suggestion");
+            suggestions.forEach((suggestion) => {
+                suggestion.addEventListener("click", function () {
+                    const userId = this.dataset.userId;
+                    const displayName = this.querySelector(".profile-name").textContent;
+                    quickSearchInput.value = displayName;
+                    hideDropdown();
+                    console.log("Selected user:", userId, displayName);
+                    alert(`Selected user: ${displayName} (ID: ${userId})`);
+                });
+            });
+        }
+
+        async function showQuickSearchSuggestionsEnhanced(query) {
+            if (!quickSearchResults || !quickSearchDropdown) return;
+
+            if (currentSearchType === "fragrances") {
+                showFragranceResults(query);
+            } else if (currentSearchType === "profiles") {
+                await showProfileResults(query);
+            }
+        }
+
+        function showDropdown() {
+            if (quickSearchDropdown) {
+                quickSearchDropdown.style.display = "block";
+                setTimeout(() => {
+                    quickSearchDropdown.classList.add("show");
+                }, 10);
+            }
+        }
+
+        function hideDropdown() {
+            if (quickSearchDropdown) {
+                quickSearchDropdown.classList.remove("show");
+                setTimeout(() => {
+                    quickSearchDropdown.style.display = "none";
+                }, 300);
+            }
+        }
+
+        // Input event handlers
+        if (quickSearchInput) {
+            quickSearchInput.addEventListener("input", function () {
+                const value = this.value.trim();
+                if (clearQuickSearch) {
+                    clearQuickSearch.style.display = value ? "flex" : "none";
+                }
+                showQuickSearchSuggestionsEnhanced(value);
+            });
+
+            quickSearchInput.addEventListener("focus", function () {
+                const value = this.value.trim();
+                if (value) {
+                    showQuickSearchSuggestionsEnhanced(value);
+                }
+            });
+
+            quickSearchInput.addEventListener("blur", function () {
+                setTimeout(() => hideDropdown(), 200);
+            });
+        }
+
+        // Clear search functionality
+        if (clearQuickSearch) {
+            clearQuickSearch.addEventListener("click", function () {
+                if (quickSearchInput) {
+                    quickSearchInput.value = "";
+                    this.style.display = "none";
+                    hideDropdown();
+                    quickSearchInput.focus();
+                }
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (e) {
+            if (
+                !quickSearchInput?.contains(e.target) &&
+                !quickSearchDropdown?.contains(e.target)
+            ) {
+                hideDropdown();
+            }
+        });
+
+        console.log("Profile search test initialized!");
+    </script>
+</body>
+</html>

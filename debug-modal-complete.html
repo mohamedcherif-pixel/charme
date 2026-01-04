@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Modal Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+            margin: 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Complete Profile Modal Debug</h1>
+    
+    <div class="test-section">
+        <h3>Step 1: Basic Modal Test</h3>
+        <button onclick="testBasicModal()">Test Basic Modal</button>
+        <div id="basicTest" class="console-output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 2: Check Script Loading</h3>
+        <button onclick="checkScriptLoading()">Check Script Status</button>
+        <div id="scriptTest" class="console-output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 3: Test Profile Modal System</h3>
+        <button onclick="testProfileSystem()">Test Profile Modal</button>
+        <div id="profileTest" class="console-output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 4: Force Profile Modal</h3>
+        <button onclick="forceProfileModal()">Force Create Modal</button>
+        <div id="forceTest" class="console-output"></div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function testBasicModal() {
+            const logId = 'basicTest';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Creating basic test modal...', 'info');
+            
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(255, 0, 0, 0.8) !important;
+                z-index: 99999 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            `;
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white !important;
+                color: black !important;
+                padding: 30px !important;
+                border-radius: 8px !important;
+                text-align: center !important;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+            `;
+            
+            modal.innerHTML = `
+                <h2>✅ Basic Modal Works!</h2>
+                <p>This proves modals can be displayed.</p>
+                <button onclick="this.closest('div').remove()">Close</button>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            log(logId, '✅ Basic modal created successfully', 'success');
+            
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                    log(logId, '🗑️ Basic modal auto-closed', 'info');
+                }
+            }, 3000);
+        }
+
+        function checkScriptLoading() {
+            const logId = 'scriptTest';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Checking script loading status...', 'info');
+            
+            // Check if script.js is already loaded
+            const scripts = document.querySelectorAll('script[src*="script.js"]');
+            log(logId, `Found ${scripts.length} script.js references`, 'info');
+            
+            if (scripts.length === 0) {
+                log(logId, 'Loading script.js...', 'info');
+                const script = document.createElement('script');
+                script.src = 'script.js';
+                script.onload = function() {
+                    log(logId, '✅ script.js loaded successfully', 'success');
+                    setTimeout(() => checkProfileModalAvailability(logId), 1000);
+                };
+                script.onerror = function() {
+                    log(logId, '❌ Failed to load script.js', 'error');
+                };
+                document.head.appendChild(script);
+            } else {
+                log(logId, '✅ script.js already loaded', 'success');
+                checkProfileModalAvailability(logId);
+            }
+        }
+
+        function checkProfileModalAvailability(logId) {
+            log(logId, 'Checking profile modal availability...', 'info');
+            
+            if (typeof window.profileModal !== 'undefined') {
+                log(logId, '✅ window.profileModal exists', 'success');
+                
+                if (typeof window.profileModal.showProfileModal === 'function') {
+                    log(logId, '✅ showProfileModal method available', 'success');
+                } else {
+                    log(logId, '❌ showProfileModal method missing', 'error');
+                }
+            } else {
+                log(logId, '❌ window.profileModal not found', 'error');
+            }
+            
+            if (typeof window.testProfileModal === 'function') {
+                log(logId, '✅ testProfileModal function available', 'success');
+            } else {
+                log(logId, '❌ testProfileModal function missing', 'error');
+            }
+            
+            // Check ProfileModalManager class
+            if (typeof ProfileModalManager !== 'undefined') {
+                log(logId, '✅ ProfileModalManager class exists', 'success');
+            } else {
+                log(logId, '❌ ProfileModalManager class not found', 'error');
+            }
+        }
+
+        function testProfileSystem() {
+            const logId = 'profileTest';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Testing profile modal system...', 'info');
+            
+            if (typeof window.testProfileModal === 'function') {
+                try {
+                    log(logId, 'Calling testProfileModal("debug@test.com")...', 'info');
+                    window.testProfileModal("debug@test.com");
+                    log(logId, '✅ testProfileModal called without error', 'success');
+                    
+                    // Check if modal appeared
+                    setTimeout(() => {
+                        const modal = document.querySelector('.profile-modal-overlay');
+                        if (modal) {
+                            log(logId, '✅ Profile modal found in DOM', 'success');
+                            log(logId, `Modal display: ${modal.style.display}`, 'info');
+                            log(logId, `Modal z-index: ${modal.style.zIndex}`, 'info');
+                        } else {
+                            log(logId, '❌ Profile modal not found in DOM', 'error');
+                        }
+                    }, 1000);
+                    
+                } catch (error) {
+                    log(logId, `❌ Error calling testProfileModal: ${error.message}`, 'error');
+                }
+            } else if (window.profileModal && window.profileModal.showProfileModal) {
+                try {
+                    log(logId, 'Calling profileModal.showProfileModal directly...', 'info');
+                    window.profileModal.showProfileModal('debug_user', 'debug@test.com');
+                    log(logId, '✅ Direct call completed', 'success');
+                } catch (error) {
+                    log(logId, `❌ Error in direct call: ${error.message}`, 'error');
+                }
+            } else {
+                log(logId, '❌ No profile modal functions available', 'error');
+            }
+        }
+
+        function forceProfileModal() {
+            const logId = 'forceTest';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Force creating profile modal...', 'info');
+            
+            // Remove any existing modals
+            document.querySelectorAll('.profile-modal-overlay').forEach(el => el.remove());
+            
+            // Create modal using the same structure as the ProfileModalManager
+            const overlay = document.createElement('div');
+            overlay.className = 'profile-modal-overlay';
+            overlay.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                backdrop-filter: blur(10px) !important;
+                z-index: 99999 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                animation: fadeIn 0.3s ease !important;
+                padding: 20px !important;
+                box-sizing: border-box !important;
+            `;
+            
+            const modal = document.createElement('div');
+            modal.className = 'profile-modal';
+            modal.style.cssText = `
+                background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(30, 30, 30, 0.95) 100%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 16px !important;
+                backdrop-filter: blur(20px) !important;
+                color: white !important;
+                padding: 30px !important;
+                max-width: 600px !important;
+                width: 90% !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+                position: relative !important;
+            `;
+            
+            modal.innerHTML = `
+                <div style="text-align: center;">
+                    <h2 style="color: #d4af37; margin-bottom: 20px;">🧪 Force-Created Profile Modal</h2>
+                    <div style="margin: 20px 0;">
+                        <img src="default.jpg" alt="User Avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #d4af37;">
+                    </div>
+                    <h3 style="margin: 10px 0;">debug@test.com</h3>
+                    <p style="color: #888; margin-bottom: 20px;">This modal was force-created to test visibility</p>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; min-width: 80px;">
+                            <div style="font-size: 18px; font-weight: bold;">12</div>
+                            <div style="font-size: 12px; color: #888;">Reviews</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; min-width: 80px;">
+                            <div style="font-size: 18px; font-weight: bold;">34</div>
+                            <div style="font-size: 12px; color: #888;">Followers</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; min-width: 80px;">
+                            <div style="font-size: 18px; font-weight: bold;">56</div>
+                            <div style="font-size: 12px; color: #888;">Following</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <button onclick="this.closest('.profile-modal-overlay').remove()" style="background: #d4af37; color: black; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Close Modal</button>
+                    </div>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            log(logId, '✅ Force-created profile modal added to DOM', 'success');
+            log(logId, `Modal element: ${modal.tagName}.${modal.className}`, 'info');
+            log(logId, `Overlay z-index: ${overlay.style.zIndex}`, 'info');
+            
+            // Check visibility
+            setTimeout(() => {
+                const rect = overlay.getBoundingClientRect();
+                log(logId, `Modal dimensions: ${rect.width}x${rect.height}`, 'info');
+                
+                if (rect.width > 0 && rect.height > 0) {
+                    log(logId, '✅ Modal is visible and has dimensions', 'success');
+                } else {
+                    log(logId, '❌ Modal has no dimensions (not visible)', 'error');
+                }
+                
+                // Check computed styles
+                const computed = window.getComputedStyle(overlay);
+                log(logId, `Computed display: ${computed.display}`, 'info');
+                log(logId, `Computed position: ${computed.position}`, 'info');
+                log(logId, `Computed z-index: ${computed.zIndex}`, 'info');
+            }, 100);
+            
+            // Auto-close after 10 seconds
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                    log(logId, '🗑️ Force-created modal auto-closed', 'info');
+                }
+            }, 10000);
+        }
+
+        // Auto-run initial test
+        setTimeout(() => {
+            checkScriptLoading();
+        }, 500);
+    </script>
+</body>
+</html>

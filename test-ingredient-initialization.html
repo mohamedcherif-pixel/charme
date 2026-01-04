@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ingredient Finder Initialization Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background: #1a1a1a;
+                color: white;
+            }
+
+            .test-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .test-section {
+                background: #2a2a2a;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 8px;
+                border: 1px solid #444;
+            }
+
+            .status {
+                padding: 10px;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+
+            .status.success {
+                background: #2d5a2d;
+                border: 1px solid #4a8a4a;
+            }
+
+            .status.error {
+                background: #5a2d2d;
+                border: 1px solid #8a4a4a;
+            }
+
+            .status.info {
+                background: #2d3a5a;
+                border: 1px solid #4a6a8a;
+            }
+
+            button {
+                background: #d4af37;
+                color: #1a1a1a;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                margin: 5px;
+            }
+
+            button:hover {
+                background: #f0c040;
+            }
+
+            /* Minimal modal styles for testing */
+            .ingredient-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+            }
+
+            .ingredient-modal.show {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .ingredient-modal-content {
+                background: #2a2a2a;
+                border-radius: 12px;
+                padding: 30px;
+                max-width: 90%;
+                max-height: 90%;
+                overflow-y: auto;
+                position: relative;
+            }
+
+            .ingredient-modal-close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: #666;
+                border: none;
+                color: white;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+
+            .ingredient-finder-icon {
+                background: #d4af37;
+                color: #1a1a1a;
+                border: none;
+                padding: 12px;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .console-output {
+                background: #000;
+                color: #0f0;
+                padding: 15px;
+                border-radius: 4px;
+                font-family: monospace;
+                height: 200px;
+                overflow-y: auto;
+                white-space: pre-wrap;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="test-container">
+            <h1>🧪 Ingredient Finder Initialization Test</h1>
+
+            <div class="test-section">
+                <h2>Test Status</h2>
+                <div id="initStatus" class="status info">Initializing...</div>
+                <div id="classStatus" class="status info">
+                    Checking class availability...
+                </div>
+                <div id="instanceStatus" class="status info">
+                    Checking instance creation...
+                </div>
+                <div id="modalStatus" class="status info">
+                    Checking modal functionality...
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h2>Test Controls</h2>
+                <div class="ingredient-finder" id="ingredientFinder">
+                    <div
+                        class="ingredient-finder-icon"
+                        id="ingredientFinderIcon"
+                        title="Ingredient Search"
+                    >
+                        🧪
+                    </div>
+                </div>
+                <button onclick="runTests()">🔄 Run All Tests</button>
+                <button onclick="testModalOpen()">📂 Test Modal Open</button>
+                <button onclick="testModalClose()">❌ Test Modal Close</button>
+                <button onclick="testReset()">🔄 Test Reset Function</button>
+                <button onclick="clearConsole()">🧹 Clear Console</button>
+            </div>
+
+            <div class="test-section">
+                <h2>Console Output</h2>
+                <div id="consoleOutput" class="console-output"></div>
+            </div>
+        </div>
+
+        <!-- Minimal Modal Structure for Testing -->
+        <div class="ingredient-modal" id="ingredientModal">
+            <div
+                class="ingredient-modal-overlay"
+                id="ingredientModalOverlay"
+            ></div>
+            <div class="ingredient-modal-content">
+                <button
+                    class="ingredient-modal-close"
+                    id="ingredientModalClose"
+                >
+                    ×
+                </button>
+                <h2>Ingredient Discovery Test Modal</h2>
+                <p>
+                    This is a test modal to verify the ingredient finder is
+                    working correctly.
+                </p>
+
+                <!-- Search Section -->
+                <div id="ingredientSearchSection" style="display: block">
+                    <h3>Search Section (Should be visible on open)</h3>
+                    <input
+                        type="text"
+                        id="enhancedIngredientSearch"
+                        placeholder="Search ingredients..."
+                    />
+                    <button id="showAllFragrancesBtn">
+                        Show All Fragrances
+                        <span class="btn-count" id="allFragrancesCount"
+                            >2+</span
+                        >
+                    </button>
+                </div>
+
+                <!-- Results Section -->
+                <div id="ingredientResultsSection" style="display: none">
+                    <h3>Results Section (Should be hidden initially)</h3>
+                    <button id="backToSearchBtn">Back to Search</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include the necessary scripts -->
+        <script>
+            // Mock FragranceAPIService for testing
+            class FragranceAPIService {
+                constructor() {
+                    this.comprehensiveDatabase = {
+                        // Mock fragrance data for testing
+                        "Test Fragrance 1": {
+                            brand: "Test Brand",
+                            family: "Oriental",
+                            description: "A test fragrance",
+                            ingredients: ["vanilla", "amber"],
+                            year: 2020,
+                            perfumer: "Test Perfumer",
+                        },
+                        "Test Fragrance 2": {
+                            brand: "Test Brand 2",
+                            family: "Fresh",
+                            description: "Another test fragrance",
+                            ingredients: ["bergamot", "lemon"],
+                            year: 2021,
+                            perfumer: "Test Perfumer 2",
+                        },
+                    };
+                    console.log("🔧 Mock FragranceAPIService initialized");
+                }
+            }
+
+            // Console capture
+            const originalConsoleLog = console.log;
+            const originalConsoleWarn = console.warn;
+            const originalConsoleError = console.error;
+
+            function logToTestConsole(message, type = "log") {
+                const output = document.getElementById("consoleOutput");
+                const timestamp = new Date().toLocaleTimeString();
+                const prefix =
+                    type === "warn" ? "⚠️" : type === "error" ? "❌" : "📝";
+                output.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+                output.scrollTop = output.scrollHeight;
+            }
+
+            console.log = function (...args) {
+                originalConsoleLog.apply(console, args);
+                logToTestConsole(args.join(" "), "log");
+            };
+
+            console.warn = function (...args) {
+                originalConsoleWarn.apply(console, args);
+                logToTestConsole(args.join(" "), "warn");
+            };
+
+            console.error = function (...args) {
+                originalConsoleError.apply(console, args);
+                logToTestConsole(args.join(" "), "error");
+            };
+
+            function updateStatus(elementId, message, type = "info") {
+                const element = document.getElementById(elementId);
+                element.textContent = message;
+                element.className = `status ${type}`;
+            }
+
+            function clearConsole() {
+                document.getElementById("consoleOutput").textContent = "";
+            }
+
+            function testModalOpen() {
+                console.log("🧪 Testing modal open...");
+                if (window.ingredientFinder) {
+                    window.ingredientFinder.openModal();
+                    updateStatus(
+                        "modalStatus",
+                        "Modal open test completed",
+                        "success",
+                    );
+                } else {
+                    console.error("No ingredientFinder instance available");
+                    updateStatus(
+                        "modalStatus",
+                        "Modal open test failed - no instance",
+                        "error",
+                    );
+                }
+            }
+
+            function testModalClose() {
+                console.log("🧪 Testing modal close...");
+                if (window.ingredientFinder) {
+                    window.ingredientFinder.closeModal();
+                    updateStatus(
+                        "modalStatus",
+                        "Modal close test completed",
+                        "success",
+                    );
+                } else {
+                    console.error("No ingredientFinder instance available");
+                    updateStatus(
+                        "modalStatus",
+                        "Modal close test failed - no instance",
+                        "error",
+                    );
+                }
+            }
+
+            function testReset() {
+                console.log("🧪 Testing reset function...");
+                if (window.ingredientFinder) {
+                    try {
+                        window.ingredientFinder.reset();
+                        console.log("✅ Reset function executed successfully");
+                        updateStatus(
+                            "modalStatus",
+                            "Reset function test passed",
+                            "success",
+                        );
+                    } catch (error) {
+                        console.error(
+                            "❌ Reset function failed:",
+                            error.message,
+                        );
+                        updateStatus(
+                            "modalStatus",
+                            "Reset function test failed",
+                            "error",
+                        );
+                    }
+                } else {
+                    console.error("No ingredientFinder instance available");
+                    updateStatus(
+                        "modalStatus",
+                        "Reset test failed - no instance",
+                        "error",
+                    );
+                }
+            }
+
+            function runTests() {
+                console.log("🚀 Starting comprehensive tests...");
+
+                // Test 1: Check if class exists
+                if (typeof IngredientFragranceFinder !== "undefined") {
+                    console.log(
+                        "✅ IngredientFragranceFinder class is available",
+                    );
+                    updateStatus("classStatus", "Class available", "success");
+                } else {
+                    console.error(
+                        "❌ IngredientFragranceFinder class not found",
+                    );
+                    updateStatus("classStatus", "Class not found", "error");
+                    return;
+                }
+
+                // Test 2: Check if instance exists
+                if (window.ingredientFinder) {
+                    console.log("✅ ingredientFinder instance exists");
+                    updateStatus(
+                        "instanceStatus",
+                        "Instance created successfully",
+                        "success",
+                    );
+
+                    // Test 3: Test key functions
+                    try {
+                        // Test reset function (the one that was broken)
+                        window.ingredientFinder.reset();
+                        console.log("✅ reset() function works correctly");
+
+                        // Test modal functions
+                        window.ingredientFinder.openModal();
+                        setTimeout(() => {
+                            window.ingredientFinder.closeModal();
+                            console.log(
+                                "✅ Modal open/close functions work correctly",
+                            );
+                            updateStatus(
+                                "modalStatus",
+                                "All modal functions working",
+                                "success",
+                            );
+                        }, 1000);
+                    } catch (error) {
+                        console.error(
+                            "❌ Function test failed:",
+                            error.message,
+                        );
+                        updateStatus(
+                            "modalStatus",
+                            "Function tests failed",
+                            "error",
+                        );
+                    }
+                } else {
+                    console.error("❌ ingredientFinder instance not found");
+                    updateStatus(
+                        "instanceStatus",
+                        "Instance creation failed",
+                        "error",
+                    );
+                }
+
+                updateStatus("initStatus", "All tests completed", "success");
+            }
+        </script>
+
+        <!-- Load the actual ingredient finder -->
+        <script src="js/ingredient-finder.js"></script>
+
+        <script>
+            // Initialize ingredient finder on page load (simulating the fix)
+            document.addEventListener("DOMContentLoaded", function () {
+                console.log(
+                    "🔄 DOM Content Loaded - Initializing Ingredient Finder...",
+                );
+
+                // Initialize Ingredient Finder (the fix we implemented)
+                if (typeof IngredientFragranceFinder !== "undefined") {
+                    window.ingredientFinder = new IngredientFragranceFinder();
+                    console.log("🧪 Ingredient Fragrance Finder initialized!");
+                    updateStatus(
+                        "initStatus",
+                        "Initialization successful",
+                        "success",
+                    );
+
+                    // Auto-run tests after a short delay
+                    setTimeout(() => {
+                        console.log("🔄 Auto-running tests...");
+                        runTests();
+                    }, 1000);
+                } else {
+                    console.warn(
+                        "⚠️ IngredientFragranceFinder class not found",
+                    );
+                    updateStatus("initStatus", "Class not found", "error");
+                }
+            });
+        </script>
+    </body>
+</html>

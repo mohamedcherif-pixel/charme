@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragrance Availability System Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .test-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #d4af37, #f0c040);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #d4af37;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-number.available {
+            color: #22c55e;
+        }
+
+        .stat-number.unavailable {
+            color: #ef4444;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .fragrance-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 16px;
+        }
+
+        .fragrance-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .fragrance-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .fragrance-card.available {
+            border-left: 4px solid #22c55e;
+        }
+
+        .fragrance-card.unavailable {
+            border-left: 4px solid #ef4444;
+            opacity: 0.7;
+        }
+
+        .fragrance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .fragrance-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .fragrance-brand {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            color: #d4af37;
+        }
+
+        .availability-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .availability-badge.available {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .availability-badge.unavailable {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .fragrance-type {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .notes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .note-tag {
+            background: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .test-search {
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-btn.active {
+            background: #d4af37;
+            color: #1e293b;
+            border-color: #d4af37;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🧪 Fragrance Availability System</h1>
+            <p>Testing availability status based on home page presence</p>
+        </div>
+
+        <div class="test-section">
+            <div class="section-title">
+                📊 Availability Statistics
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number available" id="availableCount">0</div>
+                    <div class="stat-label">Available Fragrances</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number unavailable" id="unavailableCount">0</div>
+                    <div class="stat-label">Not Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">Total Fragrances</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="availabilityRate" style="color: #d4af37;">0%</div>
+                    <div class="stat-label">Availability Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="section-title">
+                🔍 Search & Filter Test
+            </div>
+            <div class="test-search">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search fragrances by name, brand, or notes...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All Fragrances</button>
+                <button class="filter-btn" data-filter="available">Available Only</button>
+                <button class="filter-btn" data-filter="unavailable">Not Available</button>
+                <button class="filter-btn" data-filter="parfums-de-marly">Parfums de Marly</button>
+                <button class="filter-btn" data-filter="tom-ford">Tom Ford</button>
+                <button class="filter-btn" data-filter="creed">Creed</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="section-title">
+                🌟 Fragrance Database
+            </div>
+            <div class="fragrance-list" id="fragranceList">
+                <!-- Fragrances will be populated here -->
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                <h3>No fragrances found</h3>
+                <p>Try adjusting your search or filter criteria</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample fragrance data (copy from main script.js for testing)
+        const fragrances = [
+            // Parfums de Marly
+            {
+                name: "Layton",
+                brand: "Parfums de Marly",
+                notes: ["Apple", "Lavender", "Geranium", "Vanilla", "Cardamom"],
+                type: "Oriental Woody",
+                available: true,
+            },
+            {
+                name: "Herod",
+                brand: "Parfums de Marly",
+                notes: ["Cinnamon", "Pepper", "Osmanthus", "Tobacco", "Vanilla"],
+                type: "Oriental Spicy",
+                available: false,
+            },
+            {
+                name: "Pegasus",
+                brand: "Parfums de Marly",
+                notes: ["Bergamot", "Heliotrope", "Bitter Almond", "Vanilla", "Sandalwood"],
+                type: "Oriental Gourmand",
+                available: true,
+            },
+            {
+                name: "Greenly",
+                brand: "Parfums de Marly",
+                notes: ["Lemon", "Green Apple", "Mint", "Vetiver", "Sage", "Cedarwood"],
+                type: "Fresh Green",
+                available: true,
+            },
+            {
+                name: "Haltane",
+                brand: "Parfums de Marly",
+                notes: ["Praline", "Vanilla", "Oud", "Amber", "Saffron"],
+                type: "Oriental Gourmand",
+                available: true,
+            },
+            {
+                name: "Galloway",
+                brand: "Parfums de Marly",
+                notes: ["Elemi", "Lavender", "Geranium", "Cashmere Wood", "Ambergris"],
+                type: "Woody Aromatic",
+                available: false,
+            },
+            // Tom Ford
+            {
+                name: "Tom Ford Black Orchid",
+                brand: "Tom Ford",
+                notes: ["Black Orchid", "Chocolate", "Vanilla", "Patchouli", "Amber"],
+                type: "Oriental Floral",
+                available: false,
+            },
+            {
+                name: "Tom Ford Oud Wood",
+                brand: "Tom Ford",
+                notes: ["Oud", "Rosewood", "Cardamom", "Pink Pepper", "Sandalwood"],
+                type: "Woody Oriental",
+                available: false,
+            },
+            // Creed
+            {
+                name: "Creed Aventus",
+                brand: "Creed",
+                notes: ["Pineapple", "Bergamot", "Apple", "Birch", "Musk", "Vanilla"],
+                type: "Woody Fruity",
+                available: false,
+            },
+            {
+                name: "Creed Green Irish Tweed",
+                brand: "Creed",
+                notes: ["Lemon", "Mint", "Violet Leaves", "Sandalwood", "Ambergris"],
+                type: "Woody Aromatic",
+                available: false,
+            }
+        ];
+
+        let filteredFragrances = fragrances;
+        let currentFilter = 'all';
+
+        function updateStats() {
+            const available = fragrances.filter(f => f.available).length;
+            const unavailable = fragrances.filter(f => !f.available).length;
+            const total = fragrances.length;
+            const rate = Math.round((available / total) * 100);
+
+            document.getElementById('availableCount').textContent = available;
+            document.getElementById('unavailableCount').textContent = unavailable;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('availabilityRate').textContent = rate + '%';
+        }
+
+        function renderFragrances(fragrancesToRender = filteredFragrances) {
+            const container = document.getElementById('fragranceList');
+            const noResults = document.getElementById('noResults');
+
+            if (fragrancesToRender.length === 0) {
+                container.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            container.innerHTML = fragrancesToRender.map(fragrance => `
+                <div class="fragrance-card ${fragrance.available ? 'available' : 'unavailable'}">
+                    <div class="fragrance-header">
+                        <div>
+                            <div class="fragrance-name">${fragrance.name}</div>
+                            <div class="fragrance-brand">${fragrance.brand}</div>
+                        </div>
+                        <div class="availability-badge ${fragrance.available ? 'available' : 'unavailable'}">
+                            ${fragrance.available ? '✓ Available' : '✗ Not Available'}
+                        </div>
+                    </div>
+                    <div class="fragrance-type">${fragrance.type}</div>
+                    <div class="notes-container">
+                        ${fragrance.notes.map(note => `<span class="note-tag">${note}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterFragrances(filter) {
+            switch(filter) {
+                case 'available':
+                    filteredFragrances = fragrances.filter(f => f.available);
+                    break;
+                case 'unavailable':
+                    filteredFragrances = fragrances.filter(f => !f.available);
+                    break;
+                case 'parfums-de-marly':
+                    filteredFragrances = fragrances.filter(f => f.brand === 'Parfums de Marly');
+                    break;
+                case 'tom-ford':
+                    filteredFragrances = fragrances.filter(f => f.brand === 'Tom Ford');
+                    break;
+                case 'creed':
+                    filteredFragrances = fragrances.filter(f => f.brand === 'Creed');
+                    break;
+                default:
+                    filteredFragrances = fragrances;
+            }
+            currentFilter = filter;
+            applySearch();
+        }
+
+        function applySearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let results = filteredFragrances;
+
+            if (searchTerm) {
+                results = filteredFragrances.filter(fragrance =>
+                    fragrance.name.toLowerCase().includes(searchTerm) ||
+                    fragrance.brand.toLowerCase().includes(searchTerm) ||
+                    fragrance.notes.some(note => note.toLowerCase().includes(searchTerm)) ||
+                    fragrance.type.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderFragrances(results);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', applySearch);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterFragrances(btn.dataset.filter);
+            });
+        });
+
+        // Initialize
+        updateStats();
+        renderFragrances();
+
+        console.log('🧪 Availability System Test Loaded');
+        console.log(`📊 Statistics:`, {
+            available: fragrances.filter(f => f.available).length,
+            unavailable: fragrances.filter(f => !f.available).length,
+            total: fragrances.length
+        });
+        console.log('✅ Available fragrances:', fragrances.filter(f => f.available).map(f => f.name));
+        console.log('❌ Unavailable fragrances:', fragrances.filter(f => !f.available).map(f => f.name));
+    </script>
+</body>
+</html>

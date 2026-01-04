@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Function Test</title>
+</head>
+<body>
+    <h1>Function Accessibility Test</h1>
+    <div id="results"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Test function accessibility
+        setTimeout(() => {
+            console.log('Testing function accessibility...');
+
+            const resultsDiv = document.getElementById('results');
+            let results = '<h2>Test Results:</h2>';
+
+            // Test changePassword
+            if (typeof window.changePassword === 'function') {
+                console.log('✅ changePassword is accessible');
+                results += '<p style="color: green;">✅ changePassword is accessible</p>';
+            } else {
+                console.error('❌ changePassword is not accessible');
+                results += '<p style="color: red;">❌ changePassword is not accessible</p>';
+            }
+
+            // Test checkAndApplyAdminStyling
+            if (typeof window.checkAndApplyAdminStyling === 'function') {
+                console.log('✅ checkAndApplyAdminStyling is accessible');
+                results += '<p style="color: green;">✅ checkAndApplyAdminStyling is accessible</p>';
+            } else {
+                console.error('❌ checkAndApplyAdminStyling is not accessible');
+                results += '<p style="color: red;">❌ checkAndApplyAdminStyling is not accessible</p>';
+            }
+
+            // Test deleteAccount
+            if (typeof window.deleteAccount === 'function') {
+                console.log('✅ deleteAccount is accessible');
+                results += '<p style="color: green;">✅ deleteAccount is accessible</p>';
+            } else {
+                console.error('❌ deleteAccount is not accessible');
+                results += '<p style="color: red;">❌ deleteAccount is not accessible</p>';
+            }
+
+            resultsDiv.innerHTML = results;
+        }, 1000);
+    </script>
+</body>
+</html>

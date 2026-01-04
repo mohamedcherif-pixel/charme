@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Show All Fragrances Functionality</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: rgba(212, 175, 55, 1);
+        }
+
+        .test-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .test-header p {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.8) 0%, rgba(212, 175, 55, 0.6) 100%);
+            border: 2px solid rgba(212, 175, 55, 1);
+            color: #1a1a1a;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-btn:hover {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 1) 0%, rgba(212, 175, 55, 0.8) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.6);
+        }
+
+        .show-all-btn {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.9) 0%, rgba(30, 30, 30, 0.95) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            color: rgba(212, 175, 55, 0.9);
+        }
+
+        .show-all-btn:hover {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.1) 100%);
+            border: 2px solid rgba(212, 175, 55, 1);
+            color: rgba(212, 175, 55, 1);
+        }
+
+        .btn-count {
+            background: rgba(212, 175, 55, 0.2);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .test-info {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .test-info h3 {
+            color: rgba(212, 175, 55, 1);
+            margin-bottom: 10px;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .results-title h3 {
+            color: rgba(212, 175, 55, 1);
+            font-size: 1.8em;
+        }
+
+        .results-title p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.8);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);
+        }
+
+        .fragrance-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: rgba(212, 175, 55, 1);
+            margin-bottom: 5px;
+        }
+
+        .fragrance-brand {
+            color: rgba(212, 175, 55, 0.8);
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .fragrance-family {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .fragrance-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .fragrance-ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .ingredient-tag {
+            background: rgba(212, 175, 55, 0.2);
+            color: rgba(212, 175, 55, 1);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(212, 175, 55, 0.8);
+        }
+
+        .loading svg {
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: rgba(255, 100, 100, 1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .status {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: rgba(100, 255, 100, 1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🌟 Show All Fragrances Test</h1>
+            <p>Testing the "Show All Fragrances" functionality in the Ingredient Finder</p>
+        </div>
+
+        <div class="test-info">
+            <h3>Test Information</h3>
+            <p><strong>Purpose:</strong> Verify that the "Show All Fragrances" button displays all 200+ fragrances from the comprehensive database.</p>
+            <p><strong>Expected Result:</strong> All fragrances should be displayed in a grid format with their details.</p>
+            <p><strong>Test Status:</strong> <span id="testStatus">Ready to test</span></p>
+        </div>
+
+        <div class="test-controls">
+            <button class="test-btn" id="loadServicesBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+                Initialize Services
+            </button>
+
+            <button class="test-btn show-all-btn" id="showAllFragrancesBtn" disabled>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                Show All Fragrances
+                <span class="btn-count" id="allFragrancesCount">---</span>
+            </button>
+
+            <button class="test-btn" id="clearResultsBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"/>
+                    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                </svg>
+                Clear Results
+            </button>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <div class="results-title">
+                    <h3>Fragrance Database</h3>
+                    <p id="resultsSubtitle">Loading...</p>
+                </div>
+            </div>
+
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the actual services -->
+    <script src="js/fragrance-api-service.js"></script>
+    <script src="js/ingredient-finder.js"></script>
+
+    <script>
+        // Test Script
+        class ShowAllFragrancesTest {
+            constructor() {
+                this.fragranceService = null;
+                this.ingredientFinder = null;
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                const loadServicesBtn = document.getElementById('loadServicesBtn');
+                const showAllBtn = document.getElementById('showAllFragrancesBtn');
+                const clearBtn = document.getElementById('clearResultsBtn');
+
+                loadServicesBtn.addEventListener('click', () => this.initializeServices());
+                showAllBtn.addEventListener('click', () => this.showAllFragrances());
+                clearBtn.addEventListener('click', () => this.clearResults());
+            }
+
+            updateStatus(message, isError = false) {
+                const statusEl = document.getElementById('testStatus');
+                statusEl.textContent = message;
+                statusEl.style.color = isError ? 'rgba(255, 100, 100, 1)' : 'rgba(100, 255, 100, 1)';
+            }
+
+            async initializeServices() {
+                try {
+                    this.updateStatus('Initializing services...');
+
+                    // Initialize FragranceAPIService
+                    this.fragranceService = new FragranceAPIService();
+                    console.log('✅ FragranceAPIService initialized');
+
+                    // Update count badge
+                    const totalFragrances = Object.keys(this.fragranceService.comprehensiveDatabase).length;
+                    const countBadge = document.getElementById('allFragrancesCount');
+                    countBadge.textContent = `${totalFragrances}`;
+
+                    // Enable the show all button
+                    const showAllBtn = document.getElementById('showAllFragrancesBtn');
+                    showAllBtn.disabled = false;
+
+                    this.updateStatus(`✅ Services initialized! Found ${totalFragrances} fragrances in database.`);
+
+                    console.log('📊 Database Overview:', {
+                        totalFragrances: totalFragrances,
+                        sampleFragrances: Object.keys(this.fragranceService.comprehensiveDatabase).slice(0, 5),
+                        ingredientDatabase: Object.keys(this.fragranceService.ingredientDatabase).length + ' ingredients'
+                    });
+
+                } catch (error) {
+                    console.error('❌ Error initializing services:', error);
+                    this.updateStatus('❌ Failed to initialize services: ' + error.message, true);
+                }
+            }
+
+            async showAllFragrances() {
+                try {
+                    this.updateStatus('Loading all fragrances...');
+
+                    if (!this.fragranceService) {
+                        throw new Error('Services not initialized. Please click "Initialize Services" first.');
+                    }
+
+                    // Show loading
+                    const resultsSection = document.getElementById('resultsSection');
+                    const resultsGrid = document.getElementById('resultsGrid');
+                    const resultsSubtitle = document.getElementById('resultsSubtitle');
+
+                    resultsSection.style.display = 'block';
+                    resultsGrid.innerHTML = '<div class="loading">Loading all fragrances...<br><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M14,2A10,10,0,0,1,14,22"/></svg></div>';
+
+                    // Get all fragrances from database
+                    const allFragrances = Object.entries(this.fragranceService.comprehensiveDatabase).map(([name, profile]) => ({
+                        fragrance: name,
+                        matchCount: 0,
+                        matchedIngredients: [],
+                        percentage: 100,
+                        profile: profile
+                    }));
+
+                    console.log(`🌟 Displaying ${allFragrances.length} total fragrances`);
+
+                    // Update subtitle
+                    resultsSubtitle.textContent = `Showing all ${allFragrances.length} fragrances in our collection`;
+
+                    // Small delay to show loading state
+                    setTimeout(() => {
+                        this.displayResults(allFragrances);
+                        this.updateStatus(`✅ Successfully loaded ${allFragrances.length} fragrances!`);
+                    }, 500);
+
+                } catch (error) {
+                    console.error('❌ Error showing all fragrances:', error);
+                    this.updateStatus('❌ Error: ' + error.message, true);
+
+                    const resultsGrid = document.getElementById('resultsGrid');
+                    resultsGrid.innerHTML = `
+                        <div class="error">
+                            <h4>Error Loading Fragrances</h4>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            displayResults(matches) {
+                const resultsGrid = document.getElementById('resultsGrid');
+
+                if (matches.length === 0) {
+                    resultsGrid.innerHTML = `
+                        <div class="error">
+                            <h4>No fragrances found</h4>
+                            <p>The database appears to be empty.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Group fragrances by brand for better organization
+                const fragrancesByBrand = {};
+                matches.forEach(match => {
+                    const brand = match.profile.brand;
+                    if (!fragrancesByBrand[brand]) {
+                        fragrancesByBrand[brand] = [];
+                    }
+                    fragrancesByBrand[brand].push(match);
+                });
+
+                // Sort brands alphabetically
+                const sortedBrands = Object.keys(fragrancesByBrand).sort();
+
+                let html = '';
+                sortedBrands.forEach(brand => {
+                    // Add brand header
+                    html += `
+                        <div class="brand-header" style="grid-column: 1 / -1; margin: 20px 0 10px 0; padding: 10px; background: rgba(212, 175, 55, 0.1); border-radius: 10px; border-left: 4px solid rgba(212, 175, 55, 0.8);">
+                            <h3 style="color: rgba(212, 175, 55, 1); margin: 0; font-size: 1.4em;">${brand}</h3>
+                            <p style="color: rgba(255, 255, 255, 0.7); margin: 5px 0 0 0; font-size: 0.9em;">${fragrancesByBrand[brand].length} fragrances</p>
+                        </div>
+                    `;
+
+                    // Add fragrances for this brand
+                    fragrancesByBrand[brand].forEach(match => {
+                        const fragrance = match.profile;
+                        const ingredientTags = fragrance.ingredients.slice(0, 6).map(ingredient =>
+                            `<span class="ingredient-tag">${ingredient}</span>`
+                        ).join('');
+
+                        const moreIngredients = fragrance.ingredients.length > 6 ?
+                            `<span class="ingredient-tag">+${fragrance.ingredients.length - 6} more</span>` : '';
+
+                        html += `
+                            <div class="result-card" data-fragrance="${match.fragrance.toLowerCase()}">
+                                <div class="fragrance-name">${match.fragrance}</div>
+                                <div class="fragrance-brand">by ${fragrance.brand}</div>
+                                <div class="fragrance-family">${fragrance.family} • ${fragrance.year || 'N/A'}</div>
+                                <div class="fragrance-description">${fragrance.description}</div>
+                                <div class="fragrance-ingredients">
+                                    ${ingredientTags}
+                                    ${moreIngredients}
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+
+                resultsGrid.innerHTML = html;
+
+                // Add click handlers for cards
+                resultsGrid.querySelectorAll('.result-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const fragrance = card.dataset.fragrance;
+                        console.log('🔍 Clicked fragrance:', fragrance);
+                        alert(`Clicked: ${fragrance}\n\nIn a real implementation, this would navigate to the fragrance details.`);
+                    });
+                });
+
+                console.log('✅ Results displayed successfully');
+            }
+
+            clearResults() {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsGrid = document.getElementById('resultsGrid');
+
+                resultsSection.style.display = 'none';
+                resultsGrid.innerHTML = '';
+
+                this.updateStatus('Results cleared');
+            }
+        }
+
+        // Initialize test when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Show All Fragrances Test initialized');
+            new ShowAllFragrancesTest();
+        });
+    </script>
+</body>
+</html>

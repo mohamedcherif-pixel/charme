@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Syntax Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .error-log {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 JavaScript Syntax Test</h1>
+
+        <div class="test-section" id="syntaxTest">
+            <h3>Script.js Syntax Check</h3>
+            <p>Testing if script.js loads without syntax errors...</p>
+            <div id="syntaxResult" class="warning">
+                <strong>Status:</strong> Testing...
+            </div>
+            <div id="errorDetails" class="error-log hidden"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Manual Tests</h3>
+            <button onclick="testReviewsManager()">Test ReviewsManager</button>
+            <button onclick="testAuthStateManager()">Test AuthStateManager</button>
+            <button onclick="testCartManager()">Test CartManager</button>
+            <button onclick="clearErrors()">Clear Errors</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Console Output</h3>
+            <div id="consoleOutput" class="error-log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Override console methods to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        let consoleOutput = [];
+
+        function addToConsole(level, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg =>
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+
+            consoleOutput.push(`[${timestamp}] ${level.toUpperCase()}: ${message}`);
+            updateConsoleDisplay();
+
+            // Also call original methods
+            if (level === 'error') originalError(...args);
+            else if (level === 'warn') originalWarn(...args);
+            else originalLog(...args);
+        }
+
+        console.log = (...args) => addToConsole('log', ...args);
+        console.error = (...args) => addToConsole('error', ...args);
+        console.warn = (...args) => addToConsole('warn', ...args);
+
+        function updateConsoleDisplay() {
+            const output = document.getElementById('consoleOutput');
+            if (output) {
+                output.textContent = consoleOutput.slice(-20).join('\n'); // Show last 20 entries
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        function clearErrors() {
+            consoleOutput = [];
+            updateConsoleDisplay();
+
+            const errorDetails = document.getElementById('errorDetails');
+            if (errorDetails) {
+                errorDetails.textContent = '';
+                errorDetails.classList.add('hidden');
+            }
+        }
+
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            const errorInfo = `
+Error: ${event.error?.message || event.message}
+File: ${event.filename}
+Line: ${event.lineno}
+Column: ${event.colno}
+Stack: ${event.error?.stack || 'No stack trace available'}
+            `.trim();
+
+            console.error('JavaScript Error Caught:', errorInfo);
+
+            const errorDetails = document.getElementById('errorDetails');
+            if (errorDetails) {
+                errorDetails.textContent = errorInfo;
+                errorDetails.classList.remove('hidden');
+            }
+
+            updateSyntaxStatus('error', `JavaScript Error: ${event.error?.message || event.message}`);
+        });
+
+        function updateSyntaxStatus(status, message) {
+            const result = document.getElementById('syntaxResult');
+            if (!result) return;
+
+            result.className = status;
+            result.innerHTML = `<strong>Status:</strong> ${message}`;
+        }
+
+        function testReviewsManager() {
+            try {
+                console.log('🧪 Testing ReviewsManager...');
+
+                if (typeof ReviewsManager === 'undefined') {
+                    console.warn('ReviewsManager class not found globally');
+
+                    // Try to access via window.reviewsManager instance
+                    if (window.reviewsManager) {
+                        console.log('✅ Found ReviewsManager instance:', typeof window.reviewsManager);
+                        console.log('Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.reviewsManager)));
+                    } else {
+                        console.error('❌ No ReviewsManager instance found');
+                    }
+                } else {
+                    console.log('✅ ReviewsManager class available');
+                }
+            } catch (error) {
+                console.error('❌ Error testing ReviewsManager:', error);
+            }
+        }
+
+        function testAuthStateManager() {
+            try {
+                console.log('🧪 Testing AuthStateManager...');
+
+                if (typeof AuthStateManager === 'undefined') {
+                    console.warn('AuthStateManager class not found globally');
+
+                    // Try to access via window instance
+                    if (window.authStateManager) {
+                        console.log('✅ Found AuthStateManager instance:', typeof window.authStateManager);
+                    } else {
+                        console.error('❌ No AuthStateManager instance found');
+                    }
+                } else {
+                    console.log('✅ AuthStateManager class available');
+                }
+            } catch (error) {
+                console.error('❌ Error testing AuthStateManager:', error);
+            }
+        }
+
+        function testCartManager() {
+            try {
+                console.log('🧪 Testing CartManager...');
+
+                if (typeof CartManager === 'undefined') {
+                    console.warn('CartManager class not found globally');
+
+                    if (window.cartManager) {
+                        console.log('✅ Found CartManager instance:', typeof window.cartManager);
+                    } else {
+                        console.error('❌ No CartManager instance found');
+                    }
+                } else {
+                    console.log('✅ CartManager class available');
+                }
+            } catch (error) {
+                console.error('❌ Error testing CartManager:', error);
+            }
+        }
+
+        // Test basic syntax first
+        console.log('🔧 JavaScript Syntax Test initialized');
+        updateSyntaxStatus('warning', 'Loading script.js...');
+    </script>
+
+    <!-- Load the main script -->
+    <script src="script.js" onload="handleScriptLoad()" onerror="handleScriptError(event)"></script>
+
+    <script>
+        function handleScriptLoad() {
+            console.log('✅ script.js loaded successfully');
+            updateSyntaxStatus('success', 'Script loaded without syntax errors');
+
+            // Test if main classes are available
+            setTimeout(() => {
+                testReviewsManager();
+                testAuthStateManager();
+                testCartManager();
+            }, 1000);
+        }
+
+        function handleScriptError(event) {
+            console.error('❌ Failed to load script.js');
+            updateSyntaxStatus('error', 'Failed to load script.js - check for syntax errors');
+        }
+    </script>
+</body>
+</html>

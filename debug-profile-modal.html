@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Modal Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .log {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>Profile Modal Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h3>1. Test Profile Modal Availability</h3>
+        <button onclick="testModalAvailability()">Check Modal System</button>
+        <div id="modalCheck" class="log"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>2. Test Manual Modal Opening</h3>
+        <button onclick="testManualModal()">Open Test Modal</button>
+        <div id="manualTest" class="log"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>3. Check Profile Search Elements</h3>
+        <button onclick="checkSearchElements()">Check Search DOM</button>
+        <div id="searchCheck" class="log"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>4. Test Profile Search & Click</h3>
+        <button onclick="testProfileSearch()">Trigger Profile Search</button>
+        <button onclick="highlightClickableElements()">Highlight Clickable Elements</button>
+        <div id="searchTest" class="log"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>5. Console Commands</h3>
+        <p>Open browser console and try these commands:</p>
+        <code>
+            testProfileModal("test@example.com")<br>
+            debugProfileHandlers()<br>
+            testClickOnElement()
+        </code>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            element.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function testModalAvailability() {
+            const logId = 'modalCheck';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Testing profile modal availability...', 'info');
+            
+            // Check if window.profileModal exists
+            if (typeof window.profileModal !== 'undefined') {
+                log(logId, '✅ window.profileModal exists', 'success');
+                
+                if (typeof window.profileModal.showProfileModal === 'function') {
+                    log(logId, '✅ showProfileModal function exists', 'success');
+                } else {
+                    log(logId, '❌ showProfileModal function missing', 'error');
+                }
+                
+                // Check if modal HTML exists in DOM
+                const modalElement = document.getElementById('profileModal');
+                if (modalElement) {
+                    log(logId, '✅ Profile modal HTML element found', 'success');
+                } else {
+                    log(logId, '❌ Profile modal HTML element missing', 'error');
+                }
+            } else {
+                log(logId, '❌ window.profileModal not found', 'error');
+            }
+            
+            // Check test functions
+            if (typeof window.testProfileModal === 'function') {
+                log(logId, '✅ testProfileModal function available', 'success');
+            } else {
+                log(logId, '❌ testProfileModal function missing', 'error');
+            }
+        }
+
+        function testManualModal() {
+            const logId = 'manualTest';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Testing manual modal opening...', 'info');
+            
+            try {
+                if (typeof window.testProfileModal === 'function') {
+                    log(logId, 'Calling testProfileModal("debug@test.com")...', 'info');
+                    window.testProfileModal("debug@test.com");
+                    log(logId, '✅ testProfileModal called successfully', 'success');
+                } else if (typeof window.profileModal !== 'undefined' && window.profileModal.showProfileModal) {
+                    log(logId, 'Calling profileModal.showProfileModal directly...', 'info');
+                    window.profileModal.showProfileModal("debug_user", "debug@test.com");
+                    log(logId, '✅ profileModal.showProfileModal called successfully', 'success');
+                } else {
+                    log(logId, '❌ No modal functions available', 'error');
+                }
+            } catch (error) {
+                log(logId, `❌ Error opening modal: ${error.message}`, 'error');
+                console.error('Modal error:', error);
+            }
+        }
+
+        function checkSearchElements() {
+            const logId = 'searchCheck';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Checking search elements...', 'info');
+            
+            // Check search input
+            const searchInput = document.getElementById('quickSearchInput');
+            if (searchInput) {
+                log(logId, '✅ Search input found', 'success');
+            } else {
+                log(logId, '❌ Search input not found', 'error');
+            }
+            
+            // Check search dropdown
+            const searchDropdown = document.getElementById('quickSearchDropdown');
+            if (searchDropdown) {
+                log(logId, '✅ Search dropdown found', 'success');
+            } else {
+                log(logId, '❌ Search dropdown not found', 'error');
+            }
+            
+            // Check search results
+            const searchResults = document.getElementById('quickSearchResults');
+            if (searchResults) {
+                log(logId, '✅ Search results container found', 'success');
+            } else {
+                log(logId, '❌ Search results container not found', 'error');
+            }
+            
+            // Check search tabs
+            const searchTabs = document.querySelectorAll('.search-tab');
+            log(logId, `Found ${searchTabs.length} search tabs`, searchTabs.length > 0 ? 'success' : 'warning');
+            
+            // Check profile suggestions
+            const profileSuggestions = document.querySelectorAll('.profile-suggestion, .search-suggestion');
+            log(logId, `Found ${profileSuggestions.length} profile suggestions`, 'info');
+        }
+
+        function testProfileSearch() {
+            const logId = 'searchTest';
+            document.getElementById(logId).innerHTML = '';
+            
+            log(logId, 'Testing profile search...', 'info');
+            
+            try {
+                // Switch to profiles tab
+                const profileTab = document.querySelector('.search-tab[data-search-type="profiles"]');
+                if (profileTab) {
+                    log(logId, 'Clicking profiles tab...', 'info');
+                    profileTab.click();
+                    
+                    setTimeout(() => {
+                        // Enter search query
+                        const searchInput = document.getElementById('quickSearchInput');
+                        if (searchInput) {
+                            log(logId, 'Entering search query "bil"...', 'info');
+                            searchInput.value = 'bil';
+                            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            
+                            setTimeout(() => {
+                                const suggestions = document.querySelectorAll('.profile-suggestion, .search-suggestion');
+                                log(logId, `Found ${suggestions.length} suggestions after search`, 'info');
+                                
+                                if (suggestions.length > 0) {
+                                    log(logId, 'Adding test click handlers...', 'info');
+                                    suggestions.forEach((suggestion, index) => {
+                                        suggestion.style.border = '2px solid red';
+                                        suggestion.style.cursor = 'pointer';
+                                        suggestion.title = `Test Click ${index + 1}`;
+                                        
+                                        suggestion.addEventListener('click', (e) => {
+                                            log(logId, `🔥 Suggestion ${index + 1} clicked!`, 'success');
+                                            console.log('Suggestion clicked:', suggestion);
+                                        });
+                                    });
+                                    log(logId, '✅ Test handlers added to all suggestions', 'success');
+                                } else {
+                                    log(logId, '⚠️ No suggestions found to add handlers to', 'warning');
+                                }
+                            }, 1500);
+                        } else {
+                            log(logId, '❌ Search input not found', 'error');
+                        }
+                    }, 200);
+                } else {
+                    log(logId, '❌ Profiles tab not found', 'error');
+                }
+            } catch (error) {
+                log(logId, `❌ Error in profile search: ${error.message}`, 'error');
+                console.error('Search error:', error);
+            }
+        }
+
+        function highlightClickableElements() {
+            const logId = 'searchTest';
+            
+            log(logId, 'Highlighting all clickable elements...', 'info');
+            
+            const selectors = [
+                '.profile-suggestion',
+                '.search-suggestion',
+                '[data-user-id]',
+                '.profile-suggestion-content',
+                '.profile-name'
+            ];
+            
+            let totalFound = 0;
+            
+            selectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                log(logId, `${selector}: ${elements.length} elements`, 'info');
+                
+                elements.forEach((el, index) => {
+                    el.style.border = '3px solid lime';
+                    el.style.background = 'rgba(0, 255, 0, 0.1)';
+                    el.style.cursor = 'pointer';
+                    el.title = `${selector} - Click to test`;
+                    totalFound++;
+                    
+                    el.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        log(logId, `🔥 ${selector} clicked!`, 'success');
+                        console.log('Element clicked:', el);
+                        
+                        // Try to open modal
+                        if (window.profileModal && window.profileModal.showProfileModal) {
+                            window.profileModal.showProfileModal(`test_${index}`, `test${index}@example.com`);
+                        }
+                    });
+                });
+            });
+            
+            log(logId, `✅ Highlighted ${totalFound} clickable elements`, 'success');
+        }
+
+        // Auto-run initial checks
+        setTimeout(() => {
+            testModalAvailability();
+        }, 1000);
+    </script>
+</body>
+</html>

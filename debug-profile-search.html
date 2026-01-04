@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Search Debug - Parfumerie Charme</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .debug-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .main-panel, .debug-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .debug-panel {
+            background: rgba(0, 0, 0, 0.85);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .debug-panel h2 {
+            color: #00ffff;
+            font-size: 14px;
+            margin: 20px 0 10px 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.green { background: #22c55e; }
+        .status-indicator.red { background: #ef4444; }
+        .status-indicator.yellow { background: #eab308; }
+
+        /* Search Tabs */
+        .search-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 4px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .search-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: rgba(102, 126, 234, 0.8);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-tab:hover {
+            color: rgba(102, 126, 234, 1);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .search-tab.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Search Container */
+        .quick-search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .quick-search-bar {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-search-bar:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            width: 18px;
+            height: 18px;
+            color: #6c757d;
+            margin-right: 12px;
+        }
+
+        #quickSearchInput {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+            color: #333;
+        }
+
+        #clearQuickSearch {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            display: none;
+        }
+
+        /* Dropdown */
+        .quick-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .quick-search-dropdown.show {
+            display: block;
+        }
+
+        /* Profile Search Suggestions */
+        .profile-suggestion {
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            opacity: 1;
+        }
+
+        .profile-suggestion:hover {
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(4px);
+        }
+
+        .profile-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .profile-suggestion-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .profile-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 8px;
+            border: 2px solid white;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        .profile-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .profile-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-badge.admin {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .profile-badge.member {
+            background: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        .member-since {
+            color: #6c757d;
+            opacity: 0.8;
+        }
+
+        .no-results {
+            padding: 24px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .search-suggestion {
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-suggestion:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .test-btn.secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #e9ecef;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        #debugLog {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .log-entry.error { color: #ff6b6b; }
+        .log-entry.warning { color: #ffd93d; }
+        .log-entry.success { color: #6bcf7f; }
+        .log-entry.info { color: #4dabf7; }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <div class="main-panel">
+            <h1>🔍 Profile Search Debug Tool</h1>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQueries">0</div>
+                    <div class="stat-label">Total Queries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successfulQueries">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failedQueries">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentSearchType">fragrances</div>
+                    <div class="stat-label">Search Type</div>
+                </div>
+            </div>
+
+            <div class="test-buttons">
+                <button class="test-btn primary" onclick="testAPIConnection()">Test API Connection</button>
+                <button class="test-btn secondary" onclick="testWithSampleQuery()">Test Sample Query</button>
+                <button class="test-btn secondary" onclick="clearDebugLog()">Clear Debug Log</button>
+                <button class="test-btn secondary" onclick="toggleVerboseLogging()">Toggle Verbose Logging</button>
+            </div>
+
+            <div class="quick-search-container" id="quickSearchContainer">
+                <div class="search-tabs">
+                    <button class="search-tab active" data-search-type="fragrances">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        Fragrances
+                    </button>
+                    <button class="search-tab" data-search-type="profiles">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Profiles
+                    </button>
+                </div>
+
+                <div class="quick-search-bar" id="quickSearchBar">
+                    <div class="search-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search fragrances..."
+                        id="quickSearchInput"
+                        autocomplete="off"
+                        data-fragrance-placeholder="Search fragrances..."
+                        data-profile-placeholder="Search user profiles..."
+                    />
+                    <button
+                        type="button"
+                        id="clearQuickSearch"
+                        style="display: none"
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div class="quick-search-dropdown" id="quickSearchDropdown">
+                    <div class="dropdown-content" id="quickSearchResults">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="debug-panel">
+            <h2>🐛 Debug Console</h2>
+            <div>
+                <span class="status-indicator" id="apiStatus"></span>
+                <span id="apiStatusText">API Status: Checking...</span>
+            </div>
+            <div>
+                <span class="status-indicator" id="searchStatus"></span>
+                <span id="searchStatusText">Search Status: Ready</span>
+            </div>
+
+            <h2>📊 Live Statistics</h2>
+            <div id="liveStats"></div>
+
+            <h2>📝 Debug Log</h2>
+            <div id="debugLog"></div>
+
+            <h2>🔧 Last API Response</h2>
+            <div id="lastResponse" style="color: #ffff00; font-size: 10px; max-height: 150px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Debug state
+        let debugState = {
+            totalQueries: 0,
+            successfulQueries: 0,
+            failedQueries: 0,
+            verboseLogging: true,
+            currentSearchType: 'fragrances',
+            lastQuery: '',
+            lastResponse: null
+        };
+
+        // Initialize variables
+        let selectedSuggestionIndex = -1;
+
+        // Get DOM elements
+        const quickSearchInput = document.getElementById("quickSearchInput");
+        const clearQuickSearch = document.getElementById("clearQuickSearch");
+        const quickSearchDropdown = document.getElementById("quickSearchDropdown");
+        const quickSearchResults = document.getElementById("quickSearchResults");
+        const searchTabs = document.querySelectorAll(".search-tab");
+
+        // Debug logging function
+        function debugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('debugLog');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logElement.appendChild(logEntry);
+            logElement.scrollTop = logElement.scrollHeight;
+
+            // Also log to console for development
+            console.log(`[Profile Search Debug] ${message}`);
+        }
+
+        // Update statistics display
+        function updateStats() {
+            document.getElementById('totalQueries').textContent = debugState.totalQueries;
+            document.getElementById('successfulQueries').textContent = debugState.successfulQueries;
+            document.getElementById('failedQueries').textContent = debugState.failedQueries;
+            document.getElementById('currentSearchType').textContent = debugState.currentSearchType;
+
+            // Update live stats in debug panel
+            const liveStats = document.getElementById('liveStats');
+            liveStats.innerHTML = `
+                <div>Current Query: "${debugState.lastQuery}"</div>
+                <div>Success Rate: ${debugState.totalQueries ? Math.round((debugState.successfulQueries / debugState.totalQueries) * 100) : 0}%</div>
+                <div>Verbose Logging: ${debugState.verboseLogging ? 'ON' : 'OFF'}</div>
+            `;
+        }
+
+        // Test functions
+        async function testAPIConnection() {
+            debugLog('Testing API connection...', 'info');
+            try {
+                const response = await fetch('/api/search/users?q=test');
+                const statusIndicator = document.getElementById('apiStatus');
+                const statusText = document.getElementById('apiStatusText');
+
+                if (response.ok) {
+                    statusIndicator.className = 'status-indicator green';
+                    statusText.textContent = 'API Status: Connected';
+                    debugLog('✅ API connection successful', 'success');
+                } else {
+                    statusIndicator.className = 'status-indicator red';
+                    statusText.textContent = `API Status: Error ${response.status}`;
+                    debugLog(`❌ API connection failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                const statusIndicator = document.getElementById('apiStatus');
+                const statusText = document.getElementById('apiStatusText');
+                statusIndicator.className = 'status-indicator red';
+                statusText.textContent = 'API Status: Disconnected';
+                debugLog(`❌ API connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWithSampleQuery() {
+            debugLog('Testing with sample query "bil"...', 'info');
+            quickSearchInput.value = 'bil';
+            // Switch to profiles tab first
+            const profileTab = document.querySelector('.search-tab[data-search-type="profiles"]');
+            profileTab.click();
+            // Trigger search
+            setTimeout(() => {
+                quickSearchInput.dispatchEvent(new Event('input'));
+            }, 100);
+        }
+
+        function clearDebugLog() {
+            document.getElementById('debugLog').innerHTML = '';
+            debugLog('Debug log cleared', 'info');
+        }
+
+        function toggleVerboseLogging() {
+            debugState.verboseLogging = !debugState.verboseLogging;
+            debugLog(`Verbose logging ${debugState.verboseLogging ? 'enabled' : 'disabled'}`, 'info');
+            updateStats();
+        }
+
+        // Tab switching functionality
+        searchTabs.forEach((tab) => {
+            tab.addEventListener("click", function () {
+                debugLog(`🔄 Tab clicked: ${this.dataset.searchType}`, 'info');
+
+                // Remove active class from all tabs
+                searchTabs.forEach((t) => t.classList.remove("active"));
+                // Add active class to clicked tab
+                this.classList.add("active");
+
+                // Update current search type
+                debugState.currentSearchType = this.dataset.searchType;
+                debugLog(`✅ Current search type updated to: ${debugState.currentSearchType}`, 'success');
+
+                // Update placeholder text
+                if (quickSearchInput) {
+                    const placeholder = debugState.currentSearchType === "fragrances"
+                        ? quickSearchInput.dataset.fragrancePlaceholder
+                        : quickSearchInput.dataset.profilePlaceholder;
+                    quickSearchInput.placeholder = placeholder;
+                    debugLog(`📝 Placeholder updated to: ${placeholder}`, 'info');
+
+                    // Clear current search and hide dropdown
+                    quickSearchInput.value = "";
+                    if (clearQuickSearch) {
+                        clearQuickSearch.style.display = "none";
+                    }
+                    hideDropdown();
+                }
+
+                updateStats();
+            });
+        });
+
+        // Profile search function
+        async function searchProfiles(query) {
+            debugState.totalQueries++;
+            debugState.lastQuery = query;
+
+            try {
+                debugLog(`🔍 Searching profiles with query: "${query}"`, 'info');
+                const response = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`);
+                debugLog(`📡 API Response status: ${response.status}`, response.ok ? 'info' : 'warning');
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const profiles = await response.json();
+                debugState.lastResponse = profiles;
+                document.getElementById('lastResponse').textContent = JSON.stringify(profiles, null, 2);
+
+                debugLog(`👥 Profiles received: ${profiles.length} users`, 'success');
+
+                if (debugState.verboseLogging && profiles.length > 0) {
+                    profiles.forEach((profile, index) => {
+                        debugLog(`   ${index + 1}. ${profile.display_name || profile.first_name + ' ' + profile.last_name} (${profile.email})`, 'info');
+                    });
+                }
+
+                debugState.successfulQueries++;
+                updateStats();
+                return profiles;
+            } catch (error) {
+                debugState.failedQueries++;
+                debugLog(`❌ Error searching profiles: ${error.message}`, 'error');
+                updateStats();
+                return [];
+            }
+        }
+
+        // Mock fragrance search for testing
+        function showFragranceResults(query) {
+            const mockFragrances = [
+                { name: "Layton", brand: "Parfums de Marly", notes: ["Apple", "Lavender", "Vanilla"], type: "Oriental" },
+                { name: "Haltane", brand: "Parfums de Marly", notes: ["Bergamot", "Saffron", "Agarwood"], type: "Oriental" }
+            ];
+
+            const filteredFragrances = mockFragrances.filter(
+                (fragrance) =>
+                    fragrance.name.toLowerCase().includes(query.toLowerCase()) ||
+                    fragrance.brand.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filteredFragrances.length === 0 && query.length > 0) {
+                quickSearchResults.innerHTML = '<div class="no-results">No fragrances found</div>';
+                showDropdown();
+                return;
+            }
+
+            const suggestionsHTML = filteredFragrances.map(fragrance => `
+                <div class="search-suggestion" data-fragrance="${fragrance.name}">
+                    <div>
+                        <strong>${fragrance.name}</strong> by ${fragrance.brand}
+                        <div style="font-size: 12px; color: #666; margin-top: 2px;">
+                            ${fragrance.notes.join(", ")} - ${fragrance.type}
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+
+            quickSearchResults.innerHTML = suggestionsHTML;
+            showDropdown();
+        }
+
+        // Enhanced search suggestions function to handle both types
+        async function showQuickSearchSuggestionsEnhanced(query) {
+            debugLog(`🔍 Enhanced search called with: "${query}" (Type: ${debugState.currentSearchType})`, 'info');
+
+            if (!quickSearchResults || !quickSearchDropdown) {
+                debugLog('❌ Missing DOM elements', 'error');
+                return;
+            }
+
+            // Update search status
+            const searchStatus = document.getElementById('searchStatus');
+            const searchStatusText = document.getElementById('searchStatusText');
+            searchStatus.className = 'status-indicator yellow';
+            searchStatusText.textContent = 'Search Status: Searching...';
+
+            if (debugState.currentSearchType === "fragrances") {
+                debugLog('🌸 Using fragrance search', 'info');
+                showFragranceResults(query);
+                searchStatus.className = 'status-indicator green';
+                searchStatusText.textContent = 'Search Status: Complete';
+            } else if (debugState.currentSearchType === "profiles") {
+                debugLog('👥 Using profile search', 'info');
+
+                // Handle profile search
+                if (query.length < 2) {
+                    debugLog('⚠️ Query too short, hiding dropdown', 'warning');
+                    hideDropdown();
+                    searchStatus.className = 'status-indicator red';
+                    searchStatusText.textContent = 'Search Status: Query too short';
+                    return;
+                }
+
+                const profiles = await searchProfiles(query);
+                debugLog(`📊 Profiles to display: ${profiles.length}`, 'info');
+
+                if (profiles.length === 0) {
+                    debugLog('📝 No profiles found, showing no results message', 'warning');
+                    quickSearchResults.innerHTML = '<div class="no-results">No users found</div>';
+                    showDropdown();
+                    searchStatus.className = 'status-indicator yellow';
+                    searchStatusText.textContent = 'Search Status: No results';
+                    return;
+                }
+
+                debugLog('🏗️ Building HTML for profiles...', 'info');
+                const suggestionsHTML = profiles.map((profile) => {
+                    // Ensure display_name exists
+                    const displayName = profile.display_name ||
+                        `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
+                        profile.email;
+                    const avatarUrl = profile.avatar_url && profile.avatar_url !== "default.jpg"
+                        ? profile.avatar_url
+                        : "default.jpg";
+
+                    const html = `
+                    <div class="profile-suggestion" data-user-id="${profile.id}">
+                        <div class="profile-suggestion-content">
+                            <div class="profile-avatar">
+                                <img src="${avatarUrl}" alt="${displayName}" onerror="this.src='default.jpg'" loading="lazy">
+                                ${profile.level && profile.level > 1 ? `<div class="level-badge">${profile.level}</div>` : ""}
+                            </div>
+                            <div class="profile-info">
+                                <div class="profile-name">${displayName}</div>
+                                <div class="profile-meta">
+                                    <span class="profile-badge ${profile.is_admin ? "admin" : "member"}">${profile.badge || (profile.is_admin ? "Admin" : "Member")}</span>
+                                    ${profile.member_since ? `<span class="member-since">Member since ${new Date(profile.member_since).getFullYear()}</span>` : ""}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                    if (debugState.verboseLogging) {
+                        debugLog(`

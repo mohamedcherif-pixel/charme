@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Modal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-button {
+            padding: 15px 25px;
+            margin: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #218838;
+        }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Direct Profile Modal Test</h1>
+    
+    <button class="test-button" onclick="testSimpleModal()">Test Simple Modal</button>
+    <button class="test-button" onclick="testProfileModal()">Test Profile Modal</button>
+    <button class="test-button" onclick="checkConsole()">Check Console</button>
+    
+    <div id="console" class="console-output">Console output will appear here...</div>
+
+    <script>
+        // Override console.log to show in our div
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleDiv = document.getElementById('console');
+        
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f00' : '#0f0';
+            consoleDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+
+        function testSimpleModal() {
+            console.log('=== TESTING SIMPLE MODAL ===');
+            
+            // Create a simple modal to test if modals work at all
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: white;
+                color: black;
+                padding: 30px;
+                border-radius: 8px;
+                max-width: 400px;
+                text-align: center;
+            `;
+            
+            modal.innerHTML = `
+                <h2>Simple Test Modal</h2>
+                <p>This is a basic modal to test if modals work.</p>
+                <button onclick="this.closest('.modal-overlay').remove()">Close</button>
+            `;
+            
+            overlay.className = 'modal-overlay';
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            console.log('✅ Simple modal created and added to DOM');
+            
+            // Auto-close after 3 seconds
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                    console.log('✅ Simple modal auto-closed');
+                }
+            }, 3000);
+        }
+
+        function testProfileModal() {
+            console.log('=== TESTING PROFILE MODAL ===');
+            
+            // Check if script.js is loaded
+            if (typeof window.profileModal === 'undefined') {
+                console.error('❌ window.profileModal is undefined');
+                console.log('Trying to load script.js...');
+                
+                // Try to load script.js
+                const script = document.createElement('script');
+                script.src = 'script.js';
+                script.onload = function() {
+                    console.log('✅ script.js loaded');
+                    setTimeout(() => {
+                        testProfileModalAfterLoad();
+                    }, 1000);
+                };
+                script.onerror = function() {
+                    console.error('❌ Failed to load script.js');
+                };
+                document.head.appendChild(script);
+            } else {
+                testProfileModalAfterLoad();
+            }
+        }
+        
+        function testProfileModalAfterLoad() {
+            console.log('Testing profile modal after script load...');
+            
+            if (typeof window.profileModal !== 'undefined') {
+                console.log('✅ window.profileModal exists');
+                
+                if (typeof window.profileModal.showProfileModal === 'function') {
+                    console.log('✅ showProfileModal method exists');
+                    
+                    try {
+                        console.log('Calling showProfileModal...');
+                        window.profileModal.showProfileModal('test_user_123', 'test@example.com');
+                        console.log('✅ showProfileModal called successfully');
+                    } catch (error) {
+                        console.error('❌ Error calling showProfileModal:', error.message);
+                    }
+                } else {
+                    console.error('❌ showProfileModal method not found');
+                }
+            } else {
+                console.error('❌ window.profileModal still undefined after script load');
+            }
+            
+            // Also test the testProfileModal function
+            if (typeof window.testProfileModal === 'function') {
+                console.log('✅ testProfileModal function exists');
+                try {
+                    console.log('Calling testProfileModal...');
+                    window.testProfileModal('test@example.com');
+                    console.log('✅ testProfileModal called successfully');
+                } catch (error) {
+                    console.error('❌ Error calling testProfileModal:', error.message);
+                }
+            } else {
+                console.error('❌ testProfileModal function not found');
+            }
+        }
+
+        function checkConsole() {
+            console.log('=== CONSOLE CHECK ===');
+            console.log('Available window objects:');
+            console.log('- window.profileModal:', typeof window.profileModal);
+            console.log('- window.testProfileModal:', typeof window.testProfileModal);
+            console.log('- window.debugProfileHandlers:', typeof window.debugProfileHandlers);
+            console.log('- window.testClickOnElement:', typeof window.testClickOnElement);
+        }
+
+        // Auto-run initial check
+        setTimeout(() => {
+            console.log('=== AUTO-RUNNING INITIAL CHECKS ===');
+            checkConsole();
+        }, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show All Fragrances Button Visibility Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .test-header h1 {
+            color: rgba(212, 175, 55, 1);
+            margin-bottom: 10px;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .test-section h2 {
+            color: rgba(212, 175, 55, 0.9);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Button Styles from main CSS */
+        .search-action {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .enhanced-search-btn {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 0.8) 0%,
+                rgba(212, 175, 55, 0.6) 100%
+            );
+            border: 2px solid rgba(212, 175, 55, 1);
+            color: #1a1a1a;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            min-height: 55px;
+        }
+
+        .enhanced-search-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .enhanced-search-btn:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 1) 0%,
+                rgba(212, 175, 55, 0.8) 100%
+            );
+            transform: translateY(-3px) scale(1.05);
+            box-shadow:
+                0 15px 40px rgba(212, 175, 55, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .enhanced-search-btn:hover::before {
+            left: 100%;
+        }
+
+        .enhanced-search-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .enhanced-search-btn:hover svg {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .show-all-btn {
+            background: linear-gradient(
+                135deg,
+                rgba(45, 45, 45, 0.9) 0%,
+                rgba(30, 30, 30, 0.95) 100%
+            ) !important;
+            border: 2px solid rgba(212, 175, 55, 0.6) !important;
+            color: rgba(212, 175, 55, 0.9) !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .show-all-btn:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(212, 175, 55, 0.15) 0%,
+                rgba(212, 175, 55, 0.1) 100%
+            ) !important;
+            border: 2px solid rgba(212, 175, 55, 1) !important;
+            color: rgba(212, 175, 55, 1) !important;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow:
+                0 15px 40px rgba(212, 175, 55, 0.3),
+                inset 0 1px 0 rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-count {
+            background: rgba(212, 175, 55, 0.3);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            min-width: 28px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .show-all-btn .btn-count {
+            background: rgba(212, 175, 55, 0.2);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .show-all-btn:hover .btn-count {
+            background: rgba(212, 175, 55, 0.3);
+            color: rgba(212, 175, 55, 1);
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            transform: scale(1.1);
+        }
+
+        .test-info {
+            background: rgba(0, 100, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .test-error {
+            background: rgba(100, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-visible {
+            background-color: #00ff00;
+        }
+
+        .status-hidden {
+            background-color: #ff0000;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            background: rgba(100, 100, 100, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            background: rgba(150, 150, 150, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .modal-simulation {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+        }
+
+        .ingredient-search-section {
+            display: block;
+        }
+
+        .ingredient-results-section {
+            display: none;
+        }
+
+        .selected-ingredients-display {
+            margin: 15px 0;
+            min-height: 20px;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: rgba(212, 175, 55, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🔍 Show All Fragrances Button Visibility Test</h1>
+            <p>Testing the visibility and behavior of the "Show All Fragrances" button</p>
+        </div>
+
+        <!-- Test Section 1: Static Button Display -->
+        <div class="test-section">
+            <h2>
+                <span class="status-indicator status-visible"></span>
+                Test 1: Static Button Display
+            </h2>
+            <p>Both buttons should be visible by default:</p>
+
+            <div class="search-action">
+                <button class="enhanced-search-btn" id="discoverBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span class="btn-text">Discover Fragrances</span>
+                    <span class="btn-count" id="discoverCount">12</span>
+                </button>
+                <button class="enhanced-search-btn show-all-btn" id="showAllBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                    <span class="btn-text">Show All Fragrances</span>
+                    <span class="btn-count" id="allCount">200+</span>
+                </button>
+            </div>
+
+            <div class="test-info">
+                <strong>Status:</strong> <span id="staticStatus">Both buttons are visible</span>
+            </div>
+        </div>
+
+        <!-- Test Section 2: Modal Simulation -->
+        <div class="test-section">
+            <h2>
+                <span class="status-indicator status-visible"></span>
+                Test 2: Modal Context Simulation
+            </h2>
+            <p>Simulating the ingredient finder modal context:</p>
+
+            <div class="modal-simulation">
+                <div class="ingredient-search-section" id="searchSection">
+                    <h3 style="color: rgba(212, 175, 55, 1); margin-bottom: 15px;">🔍 Ingredient Discovery</h3>
+
+                    <div class="selected-ingredients-display" id="selectedDisplay">
+                        <!-- Selected ingredients will appear here -->
+                    </div>
+
+                    <div class="search-action">
+                        <button class="enhanced-search-btn" id="modalDiscoverBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <span class="btn-text">Discover Fragrances</span>
+                            <span class="btn-count" id="modalDiscoverCount">0</span>
+                        </button>
+                        <button class="enhanced-search-btn show-all-btn" id="modalShowAllBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <path d="M21 15l-5-5L5 21"/>
+                            </svg>
+                            <span class="btn-text">Show All Fragrances</span>
+                            <span class="btn-count" id="modalAllCount">200+</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="ingredient-results-section" id="resultsSection">
+                    <h3>Results would appear here...</h3>
+                </div>
+            </div>
+
+            <div class="test-controls">
+                <button class="test-btn" onclick="addIngredient()">Add Ingredient</button>
+                <button class="test-btn" onclick="removeIngredient()">Remove Ingredient</button>
+                <button class="test-btn" onclick="showResults()">Show Results</button>
+                <button class="test-btn" onclick="showSearch()">Show Search</button>
+                <button class="test-btn" onclick="resetModal()">Reset</button>
+            </div>
+
+            <div class="test-info">
+                <strong>Modal Status:</strong> <span id="modalStatus">Search section visible, both buttons should be visible</span>
+            </div>
+        </div>
+
+        <!-- Test Section 3: CSS Debugging -->
+        <div class="test-section">
+            <h2>
+                <span class="status-indicator status-visible"></span>
+                Test 3: CSS Property Analysis
+            </h2>
+            <p>Checking CSS properties that might affect button visibility:</p>
+
+            <div class="test-info">
+                <h4>Button Properties Analysis:</h4>
+                <div id="cssAnalysis"></div>
+            </div>
+        </div>
+
+        <!-- Test Section 4: JavaScript Debugging -->
+        <div class="test-section">
+            <h2>
+                <span class="status-indicator status-visible"></span>
+                Test 4: JavaScript Event Testing
+            </h2>
+            <p>Testing button functionality and event handling:</p>
+
+            <div class="test-controls">
+                <button class="test-btn" onclick="testButtonClick('discover')">Test Discover Button</button>
+                <button class="test-btn" onclick="testButtonClick('showAll')">Test Show All Button</button>
+                <button class="test-btn" onclick="checkEventListeners()">Check Event Listeners</button>
+            </div>
+
+            <div id="jsTestResults"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedIngredients = [];
+
+        // Initialize the test
+        document.addEventListener('DOMContentLoaded', function() {
+            checkButtonVisibility();
+            analyzeCSSProperties();
+            updateModalStatus();
+        });
+
+        function checkButtonVisibility() {
+            const buttons = [
+                { id: 'showAllBtn', name: 'Static Show All Button' },
+                { id: 'modalShowAllBtn', name: 'Modal Show All Button' },
+                { id: 'discoverBtn', name: 'Static Discover Button' },
+                { id: 'modalDiscoverBtn', name: 'Modal Discover Button' }
+            ];
+
+            buttons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    const isVisible = window.getComputedStyle(element).display !== 'none' &&
+                                    window.getComputedStyle(element).visibility !== 'hidden' &&
+                                    window.getComputedStyle(element).opacity !== '0';
+                    console.log(`${button.name}: ${isVisible ? 'VISIBLE' : 'HIDDEN'}`);
+                }
+            });
+        }
+
+        function addIngredient() {
+            selectedIngredients.push(`Ingredient ${selectedIngredients.length + 1}`);
+            updateSelectedDisplay();
+            updateModalStatus();
+            updateButtonCounts();
+        }
+
+        function removeIngredient() {
+            selectedIngredients.pop();
+            updateSelectedDisplay();
+            updateModalStatus();
+            updateButtonCounts();
+        }
+
+        function updateSelectedDisplay() {
+            const display = document.getElementById('selectedDisplay');
+            if (selectedIngredients.length > 0) {
+                display.innerHTML = `<div style="background: rgba(212, 175, 55, 0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                    Selected: ${selectedIngredients.join(', ')}
+                </div>`;
+            } else {
+                display.innerHTML = '';
+            }
+        }
+
+        function updateButtonCounts() {
+            const discoverCount = Math.max(0, selectedIngredients.length * 5);
+            document.getElementById('modalDiscoverCount').textContent = discoverCount || '0';
+        }
+
+        function showResults() {
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            updateModalStatus();
+        }
+
+        function showSearch() {
+            document.getElementById('searchSection').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+            updateModalStatus();
+        }
+
+        function resetModal() {
+            selectedIngredients = [];
+            updateSelectedDisplay();
+            showSearch();
+            updateButtonCounts();
+            updateModalStatus();
+        }
+
+        function updateModalStatus() {
+            const searchVisible = document.getElementById('searchSection').style.display !== 'none';
+            const resultsVisible = document.getElementById('resultsSection').style.display !== 'none';
+            const status = document.getElementById('modalStatus');
+
+            let statusText = '';
+            if (searchVisible) {
+                statusText = `Search section visible, ${selectedIngredients.length} ingredients selected. Both buttons should be visible.`;
+            } else if (resultsVisible) {
+                statusText = 'Results section visible. Buttons might be hidden in this state.';
+            }
+
+            status.textContent = statusText;
+            checkButtonVisibility();
+        }
+
+        function analyzeCSSProperties() {
+            const showAllBtn = document.getElementById('modalShowAllBtn');
+            const analysisDiv = document.getElementById('cssAnalysis');
+
+            if (showAllBtn) {
+                const style = window.getComputedStyle(showAllBtn);
+                const properties = [
+                    'display',
+                    'visibility',
+                    'opacity',
+                    'position',
+                    'z-index',
+                    'transform'
+                ];
+
+                let html = '<ul>';
+                properties.forEach(prop => {
+                    const value = style[prop];
+                    html += `<li><code>${prop}</code>: ${value}</li>`;
+                });
+                html += '</ul>';
+
+                analysisDiv.innerHTML = html;
+            }
+        }
+
+        function testButtonClick(buttonType) {
+            const resultsDiv = document.getElementById('jsTestResults');
+            let message = '';
+
+            if (buttonType === 'discover') {
+                message = '✅ Discover Fragrances button clicked - would search for matching fragrances';
+            } else if (buttonType === 'showAll') {
+                message = '✅ Show All Fragrances button clicked - would display all fragrances in collection';
+            }
+
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.innerHTML = `<div class="test-info">
+                <strong>[${timestamp}]</strong> ${message}
+            </div>` + (resultsDiv.innerHTML || '');
+        }
+
+        function checkEventListeners() {
+            const resultsDiv = document.getElementById('jsTestResults');
+            const buttons = document.querySelectorAll('.enhanced-search-btn');
+
+            let html = '<div class="test-info"><strong>Event Listener Check:</strong><ul>';
+            buttons.forEach((btn, index) => {
+                const hasClick = btn.onclick !== null || btn.addEventListener !== undefined;
+                html += `<li>Button ${index + 1} (${btn.id}): ${hasClick ? '✅ Has click handler' : '❌ No click handler'}</li>`;
+            });
+            html += '</ul></div>';
+
+            resultsDiv.innerHTML = html + (resultsDiv.innerHTML || '');
+        }
+
+        // Test button functionality
+        document.getElementById('modalShowAllBtn').addEventListener('click', () => testButtonClick('showAll'));
+        document.getElementById('modalDiscoverBtn').addEventListener('click', () => testButtonClick('discover'));
+        document.getElementById('showAllBtn').addEventListener('click', () => testButtonClick('showAll'));
+        document.getElementById('discoverBtn').addEventListener('click', () => testButtonClick('discover'));
+    </script>
+</body>
+</html>

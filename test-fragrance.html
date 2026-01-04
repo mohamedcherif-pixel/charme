@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragrance API Service Tests</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-controls {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .console-output {
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 20px;
+            min-height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            max-height: 600px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background-color: rgba(76, 175, 80, 0.2);
+            border-left: 4px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .status.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            border-left: 4px solid #f44336;
+            color: #f44336;
+        }
+
+        .status.warning {
+            background-color: rgba(255, 152, 0, 0.2);
+            border-left: 4px solid #ff9800;
+            color: #ff9800;
+        }
+
+        .manual-test {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+        }
+
+        .ingredient-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #3a3a3a;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .ingredient-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .results-area {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Fragrance API Service Test Suite</h1>
+        <p>Testing the comprehensive fragrance database and ingredient search functionality</p>
+    </div>
+
+    <div class="test-controls">
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="testDatabaseStats()">📊 Database Stats</button>
+        <button onclick="testIngredientSearch()">🔍 Ingredient Search</button>
+        <button onclick="testPopularIngredients()">🌟 Popular Ingredients</button>
+        <button onclick="clearConsole()">🧹 Clear Console</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Console Output:</h3>
+        <div id="console" class="console-output">
+            Ready to run tests...\n
+        </div>
+    </div>
+
+    <div class="manual-test">
+        <h3>🔬 Manual Ingredient Search Test</h3>
+        <p>Enter ingredients separated by commas to test the search functionality:</p>
+        <input type="text"
+               id="manualIngredients"
+               class="ingredient-input"
+               placeholder="e.g. bergamot, vanilla, cedar"
+               onkeypress="if(event.key==='Enter') manualSearch()">
+        <button onclick="manualSearch()">Search Fragrances</button>
+
+        <div id="manualResults" class="results-area">
+            <em>Search results will appear here...</em>
+        </div>
+    </div>
+
+    <!-- Load the fragrance service -->
+    <script src="js/fragrance-api-service.js"></script>
+    <script src="test-fragrance-service.js"></script>
+
+    <script>
+        // Console override to capture output
+        const consoleDiv = document.getElementById('console');
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+
+        function appendToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            let prefix = '';
+            let className = '';
+
+            switch(type) {
+                case 'error':
+                    prefix = '❌ ';
+                    className = 'error';
+                    break;
+                case 'warn':
+                    prefix = '⚠️ ';
+                    className = 'warning';
+                    break;
+                case 'success':
+                    prefix = '✅ ';
+                    className = 'success';
+                    break;
+                default:
+                    prefix = '';
+                    break;
+            }
+
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = `[${timestamp}] ${prefix}${message}`;
+            consoleDiv.appendChild(div);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Override console methods
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            const message = args.map(arg =>
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+
+            if (message.includes('✅')) {
+                appendToConsole(message, 'success');
+            } else if (message.includes('❌')) {
+                appendToConsole(message, 'error');
+            } else if (message.includes('⚠️')) {
+                appendToConsole(message, 'warn');
+            } else {
+                appendToConsole(message);
+            }
+        };
+
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            const message = args.join(' ');
+            appendToConsole(message, 'error');
+        };
+
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            const message = args.join(' ');
+            appendToConsole(message, 'warn');
+        };
+
+        function clearConsole() {
+            consoleDiv.innerHTML = 'Console cleared...\n';
+        }
+
+        // Test functions that can be called directly
+        async function runAllTests() {
+            clearConsole();
+            console.log('🚀 Starting comprehensive test suite...');
+
+            if (typeof window.testFragranceService !== 'undefined') {
+                await window.testFragranceService.runAllTests();
+            } else {
+                console.error('Test suite not loaded properly');
+            }
+        }
+
+        async function testDatabaseStats() {
+            console.log('📊 Testing database statistics...');
+            if (typeof window.testFragranceService !== 'undefined') {
+                window.testFragranceService.testDatabaseStats();
+            } else {
+                console.error('Test suite not loaded');
+            }
+        }
+
+        async function testIngredientSearch() {
+            console.log('🔍 Testing ingredient search...');
+            if (typeof window.testFragranceService !== 'undefined') {
+                await window.testFragranceService.testIngredientSearch();
+            } else {
+                console.error('Test suite not loaded');
+            }
+        }
+
+        async function testPopularIngredients() {
+            console.log('🌟 Testing popular ingredients...');
+            if (typeof window.testFragranceService !== 'undefined') {
+                window.testFragranceService.testPopularIngredients();
+            } else {
+                console.error('Test suite not loaded');
+            }
+        }
+
+        // Manual search function
+        async function manualSearch() {
+            const input = document.getElementById('manualIngredients');
+            const resultsDiv = document.getElementById('manualResults');
+            const ingredients = input.value.split(',').map(i => i.trim()).filter(i => i);
+
+            if (ingredients.length === 0) {
+                resultsDiv.innerHTML = '<em style="color: #ff9800;">Please enter at least one ingredient</em>';
+                return;
+            }
+
+            resultsDiv.innerHTML = '<em>Searching...</em>';
+
+            try {
+                const fragranceService = new FragranceAPIService();
+                const results = await fragranceService.searchByIngredients(ingredients);
+
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<em style="color: #ff9800;">No fragrances found for these ingredients</em>';
+                    return;
+                }
+
+                let html = `<strong>Found ${results.length} matching fragrances:</strong><br><br>`;
+
+                results.slice(0, 10).forEach((result, index) => {
+                    html += `
+                        <div style="margin-bottom: 15px; padding: 10px; background-color: #3a3a3a; border-radius: 5px;">
+                            <strong>${index + 1}. ${result.fragrance}</strong>
+                            <br><span style="color: #aaa;">by ${result.profile?.brand || 'Unknown'}</span>
+                            <br><span style="color: #667eea;">${result.percentage}% match (${result.matchCount}/${ingredients.length} ingredients)</span>
+                            <br><small style="color: #999;">Matched: ${result.matchedIngredients.join(', ')}</small>
+                        </div>
+                    `;
+                });
+
+                if (results.length > 10) {
+                    html += `<em style="color: #aaa;">... and ${results.length - 10} more results</em>`;
+                }
+
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error('Manual search error:', error);
+                resultsDiv.innerHTML = '<em style="color: #f44336;">Error occurred during search</em>';
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Test page initialized');
+            console.log('📋 Available test functions: runAllTests(), testDatabaseStats(), testIngredientSearch(), testPopularIngredients()');
+
+            // Check if fragrance service is available
+            if (typeof FragranceAPIService !== 'undefined') {
+                console.log('✅ FragranceAPIService loaded successfully');
+
+                // Quick initialization test
+                try {
+                    const testService = new FragranceAPIService();
+                    const stats = testService.getStatistics();
+                    console.log(`✅ Database initialized: ${stats.totalFragrances} fragrances, ${stats.totalIngredients} ingredients`);
+                } catch (error) {
+                    console.error('❌ Failed to initialize FragranceAPIService:', error);
+                }
+            } else {
+                console.error('❌ FragranceAPIService not found - check if js/fragrance-api-service.js is loaded');
+            }
+        });
+    </script>
+</body>
+</html>

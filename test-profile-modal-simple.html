@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Profile Modal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        button {
+            padding: 15px 25px;
+            margin: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success { background: rgba(40, 167, 69, 0.2); color: #28a745; }
+        .error { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
+        .info { background: rgba(23, 162, 184, 0.2); color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>Profile Modal Test</h1>
+    
+    <div>
+        <button onclick="testModalExists()">1. Check if Modal System Exists</button>
+        <button onclick="testModalFunction()">2. Test Modal Function</button>
+        <button onclick="testDirectModal()">3. Test Direct Modal Creation</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script src="script.js"></script>
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function testModalExists() {
+            addResult('Testing if profile modal system exists...', 'info');
+            
+            // Check if window.profileModal exists
+            if (typeof window.profileModal !== 'undefined') {
+                addResult('✅ window.profileModal exists', 'success');
+                
+                if (typeof window.profileModal.showProfileModal === 'function') {
+                    addResult('✅ showProfileModal method exists', 'success');
+                } else {
+                    addResult('❌ showProfileModal method missing', 'error');
+                }
+            } else {
+                addResult('❌ window.profileModal does not exist', 'error');
+            }
+            
+            // Check test function
+            if (typeof window.testProfileModal === 'function') {
+                addResult('✅ testProfileModal function exists', 'success');
+            } else {
+                addResult('❌ testProfileModal function missing', 'error');
+            }
+        }
+
+        function testModalFunction() {
+            addResult('Testing modal function call...', 'info');
+            
+            try {
+                if (typeof window.testProfileModal === 'function') {
+                    addResult('Calling testProfileModal("test@example.com")...', 'info');
+                    window.testProfileModal("test@example.com");
+                    addResult('✅ Function called without error', 'success');
+                } else {
+                    addResult('❌ testProfileModal function not available', 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Error calling function: ${error.message}`, 'error');
+                console.error('Modal test error:', error);
+            }
+        }
+
+        function testDirectModal() {
+            addResult('Testing direct modal creation...', 'info');
+            
+            try {
+                if (window.profileModal && window.profileModal.showProfileModal) {
+                    addResult('Calling profileModal.showProfileModal directly...', 'info');
+                    window.profileModal.showProfileModal("test_user_123", "direct@test.com");
+                    addResult('✅ Direct call completed', 'success');
+                } else {
+                    addResult('❌ profileModal.showProfileModal not available', 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Error in direct call: ${error.message}`, 'error');
+                console.error('Direct modal error:', error);
+            }
+        }
+
+        // Auto-run tests when page loads
+        setTimeout(() => {
+            addResult('=== AUTO-RUNNING TESTS ===', 'info');
+            testModalExists();
+            setTimeout(() => {
+                testModalFunction();
+            }, 1000);
+        }, 500);
+    </script>
+</body>
+</html>

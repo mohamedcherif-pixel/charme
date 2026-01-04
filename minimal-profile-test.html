@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Search Minimal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .search-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-tab {
+            padding: 10px 20px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .search-tab.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .search-input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #quickSearchInput {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .quick-search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
+        .quick-search-dropdown.show {
+            display: block;
+        }
+
+        .profile-suggestion {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-suggestion:hover {
+            background: #f8f9fa;
+        }
+
+        .profile-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #ddd;
+            position: relative;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #007bff;
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 50%;
+            border: 2px solid white;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .profile-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .profile-badge.admin {
+            background: #dc3545;
+            color: white;
+        }
+
+        .profile-badge.member {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .search-suggestion {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+
+        .search-suggestion:hover {
+            background: #f8f9fa;
+        }
+
+        .debug-info {
+            margin-top: 30px;
+            padding: 15px;
+            background: #000;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <h1>🔍 Profile Search Minimal Test</h1>
+
+        <div class="status" id="statusBar">Ready to test...</div>
+
+        <div class="search-tabs">
+            <button class="search-tab active" data-search-type="fragrances">Fragrances</button>
+            <button class="search-tab" data-search-type="profiles">Profiles</button>
+        </div>
+
+        <div class="search-input-container">
+            <input
+                type="text"
+                id="quickSearchInput"
+                placeholder="Search fragrances..."
+                data-fragrance-placeholder="Search fragrances..."
+                data-profile-placeholder="Search user profiles..."
+            />
+            <div class="quick-search-dropdown" id="quickSearchDropdown">
+                <div id="quickSearchResults"></div>
+            </div>
+        </div>
+
+        <div class="debug-info" id="debugLog">Debug log will appear here...</div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSearchType = "fragrances";
+        const quickSearchInput = document.getElementById("quickSearchInput");
+        const quickSearchDropdown = document.getElementById("quickSearchDropdown");
+        const quickSearchResults = document.getElementById("quickSearchResults");
+        const searchTabs = document.querySelectorAll(".search-tab");
+        const debugLog = document.getElementById("debugLog");
+        const statusBar = document.getElementById("statusBar");
+
+        // Debug logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            debugLog.textContent += logEntry;
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(`[Profile Test] ${message}`);
+        }
+
+        function setStatus(message, type = 'success') {
+            statusBar.textContent = message;
+            statusBar.className = `status ${type}`;
+        }
+
+        // Initialize
+        log('🚀 Initializing profile search test');
+        log(`Found ${searchTabs.length} search tabs`);
+        log(`Search input: ${quickSearchInput ? 'Found' : 'Missing'}`);
+        log(`Results container: ${quickSearchResults ? 'Found' : 'Missing'}`);
+
+        // Tab switching
+        searchTabs.forEach((tab) => {
+            tab.addEventListener("click", function () {
+                log(`🔄 Tab clicked: ${this.dataset.searchType}`);
+
+                // Update active tab
+                searchTabs.forEach((t) => t.classList.remove("active"));
+                this.classList.add("active");
+
+                // Update search type
+                currentSearchType = this.dataset.searchType;
+                log(`✅ Search type updated to: ${currentSearchType}`);
+
+                // Update placeholder
+                const placeholder = currentSearchType === "fragrances"
+                    ? quickSearchInput.dataset.fragrancePlaceholder
+                    : quickSearchInput.dataset.profilePlaceholder;
+                quickSearchInput.placeholder = placeholder;
+                log(`📝 Placeholder updated: ${placeholder}`);
+
+                // Clear search
+                quickSearchInput.value = "";
+                hideDropdown();
+                setStatus(`Switched to ${currentSearchType} search`);
+            });
+        });
+
+        // Profile search function
+        async function searchProfiles(query) {
+            log(`🔍 Searching profiles for: "${query}"`);
+
+            try {
+                const url = `/api/search/users?q=${encodeURIComponent(query)}`;
+                log(`📡 Making request to: ${url}`);
+
+                const response = await fetch(url);
+                log(`📊 Response status: ${response.status}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const profiles = await response.json();
+                log(`👥 Received ${profiles.length} profiles`);
+
+                if (profiles.length > 0) {
+                    profiles.forEach((profile, i) => {
+                        const name = profile.display_name || `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email;
+                        log(`   ${i+1}. ${name} (ID: ${profile.id}, Level: ${profile.level || 1})`);
+                    });
+                }
+
+                return profiles;
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                setStatus(`Error: ${error.message}`, 'error');
+                return [];
+            }
+        }
+
+        // Mock fragrance search
+        function searchFragrances(query) {
+            log(`🌸 Searching fragrances for: "${query}"`);
+            const mockFragrances = [
+                { name: "Layton", brand: "Parfums de Marly" },
+                { name: "Haltane", brand: "Parfums de Marly" },
+                { name: "Pegasus", brand: "Parfums de Marly" }
+            ];
+
+            return mockFragrances.filter(f =>
+                f.name.toLowerCase().includes(query.toLowerCase()) ||
+                f.brand.toLowerCase().includes(query.toLowerCase())
+            );
+        }
+
+        // Show dropdown
+        function showDropdown() {
+            quickSearchDropdown.style.display = "block";
+            setTimeout(() => {
+                quickSearchDropdown.classList.add("show");
+            }, 10);
+        }
+
+        // Hide dropdown
+        function hideDropdown() {
+            quickSearchDropdown.classList.remove("show");
+            setTimeout(() => {
+                quickSearchDropdown.style.display = "none";
+            }, 300);
+        }
+
+        // Main search function
+        async function performSearch(query) {
+            if (!query || query.length < 2) {
+                log(`⚠️ Query too short: "${query}"`);
+                hideDropdown();
+                return;
+            }
+
+            log(`🔍 Performing ${currentSearchType} search for: "${query}"`);
+            setStatus(`Searching for "${query}"...`, 'warning');
+
+            if (currentSearchType === "fragrances") {
+                // Handle fragrance search
+                const fragrances = searchFragrances(query);
+
+                if (fragrances.length === 0) {
+                    quickSearchResults.innerHTML = '<div class="no-results">No fragrances found</div>';
+                    showDropdown();
+                    setStatus('No fragrances found');
+                    return;
+                }
+
+                const html = fragrances.map(f => `
+                    <div class="search-suggestion">
+                        <strong>${f.name}</strong> by ${f.brand}
+                    </div>
+                `).join('');
+
+                quickSearchResults.innerHTML = html;
+                showDropdown();
+                setStatus(`Found ${fragrances.length} fragrances`);
+
+            } else if (currentSearchType === "profiles") {
+                // Handle profile search
+                const profiles = await searchProfiles(query);
+
+                if (profiles.length === 0) {
+                    log('📝 No profiles found, showing no results');
+                    quickSearchResults.innerHTML = '<div class="no-results">No users found</div>';
+                    showDropdown();
+                    setStatus('No users found');
+                    return;
+                }
+
+                log('🏗️ Building profile HTML...');
+
+                const html = profiles.map(profile => {
+                    const displayName = profile.display_name ||
+                        `${profile.first_name || ''} ${profile.last_name || ''}`.trim() ||
+                        profile.email;
+
+                    const avatarUrl = (profile.avatar_url && profile.avatar_url !== 'default.jpg')
+                        ? profile.avatar_url
+                        : 'default.jpg';
+
+                    const html = `
+                        <div class="profile-suggestion" data-user-id="${profile.id}">
+                            <div class="profile-avatar">
+                                <img src="${avatarUrl}" alt="${displayName}" onerror="this.src='default.jpg'">
+                                ${profile.level && profile.level > 1 ? `<div class="level-badge">${profile.level}</div>` : ''}
+                            </div>
+                            <div class="profile-info">
+                                <div class="profile-name">${displayName}</div>
+                                <div class="profile-meta">
+                                    <span class="profile-badge ${profile.is_admin ? 'admin' : 'member'}">
+                                        ${profile.badge || (profile.is_admin ? 'Admin' : 'Member')}
+                                    </span>
+                                    ${profile.member_since ? `<span>Since ${new Date(profile.member_since).getFullYear()}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    log(`   Generated HTML for ${displayName} (${html.length} chars)`);
+                    return html;
+                }).join('');
+
+                log(`✅ Final HTML length: ${html.length} characters`);
+                quickSearchResults.innerHTML = html;
+
+                // Add click listeners
+                const suggestions = quickSearchResults.querySelectorAll('.profile-suggestion');
+                log(`🖱️ Adding click listeners to ${suggestions.length} suggestions`);
+
+                suggestions.forEach(suggestion => {
+                    suggestion.addEventListener('click', function() {
+                        const userId = this.dataset.userId;
+                        const name = this.querySelector('.profile-name').textContent;
+                        log(`👤 User clicked: ${name} (ID: ${userId})`);
+                        quickSearchInput.value = name;
+                        hideDropdown();
+                        setStatus(`Selected user: ${name}`);
+                    });
+                });
+
+                showDropdown();
+                setStatus(`Found ${profiles.length} users`);
+            }
+        }
+
+        // Input events
+        quickSearchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            log(`📝 Input changed: "${query}"`);
+            performSearch(query);
+        });
+
+        quickSearchInput.addEventListener('focus', function() {
+            const query = this.value.trim();
+            if (query) {
+                log(`🎯 Input focused with existing query: "${query}"`);
+                performSearch(query);
+            }
+        });
+
+        quickSearchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                log('👋 Input blurred, hiding dropdown');
+                hideDropdown();
+            }, 200);
+        });
+
+        // Click outside to close
+        document.addEventListener('click', function(e) {
+            if (!quickSearchInput.contains(e.target) && !quickSearchDropdown.contains(e.target)) {
+                hideDropdown();
+            }
+        });
+
+        // Initial status
+        setStatus('Ready to test profile search');
+        log('🎉 Profile search test initialized successfully');
+    </script>
+</body>
+</html>
