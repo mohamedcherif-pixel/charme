@@ -1,0 +1,11 @@
+{
+  "uniqueQueries": [
+    ".content",
+    ".haltane-section-container",
+    ".pegasus-image",
+    ".haltane-image",
+    ".haltane-notes",
+    ".perfume-rating"
+  ],
+  "rectCallCount": 1
+}

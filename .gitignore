@@ -31,6 +31,10 @@ build/
 # Uploads
 /uploads/
 
+# Generated image import artifacts
+/scripts/fragrance-image-manifest.csv
+/scripts/image-import-report.json
+
 # Misc
 .config/
 _pgbackup/

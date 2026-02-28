@@ -5,20 +5,20 @@
 
 :root {
     /* Favorites Color Palette */
-    --favorite-primary: #d4af37;
+    --favorite-primary: rgb(var(--selector-accent-rgb));
     --favorite-primary-hover: #ffd700;
-    --favorite-secondary: rgba(212, 175, 55, 0.1);
-    --favorite-secondary-hover: rgba(212, 175, 55, 0.2);
-    --favorite-border: rgba(212, 175, 55, 0.6);
-    --favorite-border-hover: rgba(212, 175, 55, 0.8);
-    --favorite-text: rgba(212, 175, 55, 0.9);
-    --favorite-text-hover: rgba(212, 175, 55, 1);
+    --favorite-secondary: rgba(var(--selector-accent-rgb), );
+    --favorite-secondary-hover: rgba(var(--selector-accent-rgb), );
+    --favorite-border: rgba(var(--selector-accent-rgb), );
+    --favorite-border-hover: rgba(var(--selector-accent-rgb), );
+    --favorite-text: rgba(var(--selector-accent-rgb), );
+    --favorite-text-hover: rgba(var(--selector-accent-rgb), );
     --favorite-text-active: rgba(0, 0, 0, 0.9);
 
     /* Favorites Shadows */
-    --favorite-shadow: 0 4px 20px rgba(212, 175, 55, 0.15);
-    --favorite-shadow-hover: 0 12px 35px rgba(212, 175, 55, 0.3);
-    --favorite-shadow-active: 0 8px 30px rgba(212, 175, 55, 0.5);
+    --favorite-shadow: 0 4px 20px rgba(var(--selector-accent-rgb), );
+    --favorite-shadow-hover: 0 12px 35px rgba(var(--selector-accent-rgb), );
+    --favorite-shadow-active: 0 8px 30px rgba(var(--selector-accent-rgb), );
 
     /* Favorites Animation */
     --favorite-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -64,7 +64,7 @@ button[class*="favorite"],
     background: linear-gradient(
         135deg,
         var(--favorite-secondary),
-        rgba(212, 175, 55, 0.05)
+        rgba(var(--selector-accent-rgb), )
     ) !important;
     border: 2px solid var(--favorite-border) !important;
     border-radius: var(--favorite-radius) !important;
@@ -109,7 +109,7 @@ button[class*="favorite"]:hover,
     background: linear-gradient(
         135deg,
         var(--favorite-secondary-hover),
-        rgba(212, 175, 55, 0.15)
+        rgba(var(--selector-accent-rgb), )
     ) !important;
     border-color: var(--favorite-border-hover) !important;
     color: var(--favorite-text-hover) !important;
@@ -163,7 +163,7 @@ button[class*="favorite"].active:hover,
     transform: translateY(-4px) scale(1.05) !important;
     box-shadow:
         0 12px 40px rgba(255, 215, 0, 0.6),
-        0 6px 25px rgba(212, 175, 55, 0.4),
+        0 6px 25px rgba(var(--selector-accent-rgb), ),
         inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 
@@ -432,17 +432,17 @@ button[class*="favorite"].locked:hover {
 .theme-dark .favorite-button,
 body.theme-dark .favorite-btn,
 body.theme-dark .favorite-button {
-    background: rgba(212, 175, 55, 0.1) !important;
-    border-color: rgba(212, 175, 55, 0.5) !important;
-    color: rgba(212, 175, 55, 0.9) !important;
+    background: rgba(var(--selector-accent-rgb), ) !important;
+    border-color: rgba(var(--selector-accent-rgb), ) !important;
+    color: rgba(var(--selector-accent-rgb), ) !important;
 }
 
 .theme-dark .favorite-btn:hover,
 .theme-dark .favorite-button:hover,
 body.theme-dark .favorite-btn:hover,
 body.theme-dark .favorite-button:hover {
-    background: rgba(212, 175, 55, 0.2) !important;
-    border-color: rgba(212, 175, 55, 0.7) !important;
+    background: rgba(var(--selector-accent-rgb), ) !important;
+    border-color: rgba(var(--selector-accent-rgb), ) !important;
     color: rgba(255, 255, 255, 1) !important;
 }
 
@@ -452,8 +452,8 @@ body.theme-dark .favorite-button:hover {
 body.theme-light .favorite-btn,
 body.theme-light .favorite-button {
     background: rgba(255, 255, 255, 0.9) !important;
-    border-color: rgba(212, 175, 55, 0.6) !important;
-    color: rgba(212, 175, 55, 0.9) !important;
+    border-color: rgba(var(--selector-accent-rgb), ) !important;
+    color: rgba(var(--selector-accent-rgb), ) !important;
 }
 
 /* Cream Theme */
@@ -720,7 +720,7 @@ body.theme-cream .favorite-button {
 .favorite-button:focus-visible {
     box-shadow:
         var(--favorite-shadow-hover),
-        0 0 0 3px rgba(212, 175, 55, 0.3) !important;
+        0 0 0 3px rgba(var(--selector-accent-rgb), ) !important;
 }
 
 /* Reduced Motion */

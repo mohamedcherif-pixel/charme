@@ -7,7 +7,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/init-database.js",
-    "update-avatars": "node scripts/update-avatars.js"
+    "update-avatars": "node scripts/update-avatars.js",
+    "gen-image-manifest": "node scripts/generate-fragrance-image-manifest.cjs",
+    "import-fragrance-images": "node scripts/import-fragrance-images.cjs",
+    "gen-fragrance-placeholders": "node scripts/generate-fragrance-placeholders.cjs",
+    "import-fragrance-images-derived": "node scripts/import-fragrance-images-derived.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

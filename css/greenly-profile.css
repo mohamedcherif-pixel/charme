@@ -251,47 +251,6 @@
     font-weight: 600;
 }
 
-/* Greenly Favorite Button */
-.greenly-theme .product-actions-buttons .favorite-btn {
-    background: linear-gradient(135deg, #f0f9f4, #e6f4ea) !important;
-    border: 1px solid rgba(40, 167, 69, 0.4) !important;
-    color: #155724 !important;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.1) !important;
-}
-
-.greenly-theme .product-actions-buttons .favorite-btn:hover {
-    background: linear-gradient(135deg, #e6f4ea, #dcf0e0) !important;
-    border-color: #28a745 !important;
-    color: #1c7430 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2) !important;
-}
-
-.greenly-theme .product-actions-buttons .favorite-btn.favorited {
-    background: linear-gradient(135deg, #155724, #1c7430) !important;
-    border-color: #28a745 !important;
-    color: #f0f9f4 !important;
-}
-
-.greenly-theme .product-actions-buttons .favorite-btn.favorited .heart-filled {
-    color: #f0f9f4 !important;
-}
-
-/* Greenly Add to Cart Button */
-.greenly-theme .product-actions-buttons .add-to-cart-btn {
-    background: linear-gradient(135deg, #155724, #1c7430) !important;
-    border: 1px solid rgba(40, 167, 69, 0.6) !important;
-    color: #f0f9f4 !important;
-    box-shadow: 0 4px 15px rgba(21, 87, 36, 0.2) !important;
-}
-
-.greenly-theme .product-actions-buttons .add-to-cart-btn:hover {
-    background: linear-gradient(135deg, #1c7430, #218838) !important;
-    border-color: #28a745 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3) !important;
-}
-
 /* Remove text glow from Greenly product title */
 .greenly-theme .product-info .brand-name,
 .greenly-theme .product-info .brand-location,
@@ -741,4 +700,181 @@
         flex-wrap: wrap;
         gap: 15px;
     }
+}
+
+/* =====================================================================
+   GREENLY — THEMED BUTTONS & CARD ENHANCEMENTS
+   Fresh natural green elegance
+   ===================================================================== */
+
+/* Favourite Button — Green theme */
+.greenly-theme .favorite-btn,
+.greenly-main-container .favorite-btn {
+    color: #155724 !important;
+    border: 1px solid rgba(40, 167, 69, 0.3) !important;
+    background: transparent !important;
+}
+
+.greenly-theme .favorite-btn:hover,
+.greenly-main-container .favorite-btn:hover {
+    background: rgba(40, 167, 69, 0.08) !important;
+    border-color: #28a745 !important;
+    color: #155724 !important;
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.15) !important;
+}
+
+.greenly-theme .favorite-btn .heart-outline,
+.greenly-theme .favorite-btn .heart-filled,
+.greenly-main-container .favorite-btn .heart-outline,
+.greenly-main-container .favorite-btn .heart-filled {
+    color: #28a745 !important;
+}
+
+.greenly-theme .favorite-btn.favorited,
+.greenly-main-container .favorite-btn.favorited {
+    background: rgba(40, 167, 69, 0.06) !important;
+    border-color: #28a745 !important;
+    color: #155724 !important;
+}
+
+/* Add to Cart Button — Green */
+.greenly-theme .add-to-cart-btn,
+.greenly-main-container .add-to-cart-btn {
+    color: #155724 !important;
+    border: 1px solid rgba(40, 167, 69, 0.3) !important;
+    background: transparent !important;
+}
+
+.greenly-theme .add-to-cart-btn:hover,
+.greenly-main-container .add-to-cart-btn:hover {
+    background: rgba(40, 167, 69, 0.08) !important;
+    border-color: #28a745 !important;
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.15) !important;
+}
+
+.greenly-theme .add-to-cart-btn .cart-icon svg,
+.greenly-main-container .add-to-cart-btn .cart-icon svg {
+    color: #155724 !important;
+    stroke: #155724 !important;
+}
+
+.greenly-theme .add-to-cart-btn.added,
+.greenly-main-container .add-to-cart-btn.added {
+    border-color: rgba(229, 72, 77, 0.3) !important;
+    color: #dc3545 !important;
+}
+
+/* Price Section — Green */
+.greenly-theme .price-subtitle,
+.greenly-main-container .price-subtitle {
+    color: rgba(21, 87, 36, 0.5) !important;
+    letter-spacing: 3px !important;
+}
+
+.greenly-theme .price-ornament,
+.greenly-main-container .price-ornament {
+    border-color: rgba(40, 167, 69, 0.3) !important;
+}
+
+.greenly-theme .price-badge:hover .price-ornament,
+.greenly-main-container .price-badge:hover .price-ornament {
+    border-color: #28a745 !important;
+}
+
+/* Card Enhancements — Green Accent Line */
+.greenly-theme .product-actions-buttons,
+.greenly-main-container .product-actions-buttons {
+    position: relative !important;
+}
+
+.greenly-theme .product-actions-buttons::before,
+.greenly-main-container .product-actions-buttons::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -15px !important;
+    left: 15% !important;
+    right: 15% !important;
+    height: 1px !important;
+    background: linear-gradient(90deg, transparent, rgba(40, 167, 69, 0.2), transparent) !important;
+}
+
+
+/* Quality Selector Theme Overrides */
+.greenly-section .quality-badge:hover {
+    border-color: rgba(21, 87, 36, 0.3) !important;
+    background: rgba(21, 87, 36, 0.05) !important;
+}
+
+.greenly-section .quality-option input[type="radio"]:checked + .quality-label .quality-badge {
+    border-color: rgba(21, 87, 36, 0.5) !important;
+    background: rgba(21, 87, 36, 0.08) !important;
+    box-shadow: none !important; /* Removed glow */
+}
+
+.greenly-section .quality-option[data-quality="top"] input[type="radio"]:checked + .quality-label .quality-badge {
+    border-color: rgba(40, 167, 69, 0.5) !important;
+    background: rgba(40, 167, 69, 0.08) !important;
+    box-shadow: none !important; /* Removed glow */
+}
+
+.greenly-section .quality-option input[type="radio"]:checked + .quality-label .quality-name,
+.greenly-section .quality-option input[type="radio"]:checked + .quality-label .quality-description {
+    color: #155724 !important;
+}
+
+.greenly-section .quality-option[data-quality="top"] input[type="radio"]:checked + .quality-label .quality-name,
+.greenly-section .quality-option[data-quality="top"] input[type="radio"]:checked + .quality-label .quality-description {
+    color: #28a745 !important;
+}
+
+.greenly-section .quality-option input[type="radio"]:checked + .quality-label .quality-radio {
+    border-color: #155724 !important;
+}
+
+.greenly-section .quality-option[data-quality="top"] input[type="radio"]:checked + .quality-label .quality-radio {
+    border-color: #28a745 !important;
+}
+
+.greenly-section .quality-radio::after {
+    background: #155724 !important;
+}
+
+.greenly-section .quality-option[data-quality="top"] .quality-radio::after {
+    background: #28a745 !important;
+}
+
+
+/* Additional Quality Selector Overrides (Ornaments & Glow) */
+.greenly-section .quality-option input[type="radio"]:checked + .quality-label .quality-ornament {
+    border-color: #155724 !important;
+    box-shadow: none !important;
+}
+
+.greenly-section .quality-option[data-quality="top"] input[type="radio"]:checked + .quality-label .quality-ornament {
+    border-color: #28a745 !important;
+    box-shadow: none !important;
+}
+
+.greenly-section .quality-glow {
+    display: none !important;
+}
+
+
+/* Unselected State Theme Overrides */
+.greenly-section .quality-badge {
+    border-color: rgba(21, 87, 36, 0.15) !important;
+    background: rgba(21, 87, 36, 0.02) !important;
+}
+
+.greenly-section .quality-option[data-quality="top"] .quality-badge {
+    border-color: rgba(40, 167, 69, 0.15) !important;
+    background: rgba(40, 167, 69, 0.02) !important;
+}
+
+.greenly-section .quality-ornament {
+    border-color: rgba(21, 87, 36, 0.3) !important;
+}
+
+.greenly-section .quality-option[data-quality="top"] .quality-ornament {
+    border-color: rgba(40, 167, 69, 0.3) !important;
 }

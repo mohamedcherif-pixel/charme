@@ -21,7 +21,7 @@
     width: 50px;
     height: 50px;
     border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top: 3px solid rgba(212, 175, 55, 0.8);
+    border-top: 3px solid rgba(var(--selector-accent-rgb), );
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 24px;
@@ -90,8 +90,8 @@
 
 .sort-select:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    border-color: rgba(var(--selector-accent-rgb), );
+    box-shadow: 0 0 0 2px rgba(var(--selector-accent-rgb), );
 }
 
 /* ==========================================
@@ -324,13 +324,13 @@
 /* Highlight animation */
 @keyframes highlight {
     0% {
-        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+        box-shadow: 0 0 0 0 rgba(var(--selector-accent-rgb), );
     }
     50% {
-        box-shadow: 0 0 0 20px rgba(212, 175, 55, 0.3);
+        box-shadow: 0 0 0 20px rgba(var(--selector-accent-rgb), );
     }
     100% {
-        box-shadow: 0 0 0 40px rgba(212, 175, 55, 0);
+        box-shadow: 0 0 0 40px rgba(var(--selector-accent-rgb), );
     }
 }
 
@@ -474,8 +474,8 @@
 .filter-select:focus,
 .filter-input:focus {
     outline: none;
-    border-color: rgba(212, 175, 55, 0.5);
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    border-color: rgba(var(--selector-accent-rgb), );
+    box-shadow: 0 0 0 2px rgba(var(--selector-accent-rgb), );
 }
 
 .filter-tags {
@@ -486,9 +486,9 @@
 }
 
 .filter-tag {
-    background: rgba(212, 175, 55, 0.15);
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    color: rgba(212, 175, 55, 0.9);
+    background: rgba(var(--selector-accent-rgb), );
+    border: 1px solid rgba(var(--selector-accent-rgb), );
+    color: rgba(var(--selector-accent-rgb), );
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 0.8rem;
@@ -500,8 +500,8 @@
 }
 
 .filter-tag:hover {
-    background: rgba(212, 175, 55, 0.25);
-    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(var(--selector-accent-rgb), );
+    border-color: rgba(var(--selector-accent-rgb), );
 }
 
 .filter-tag .remove-filter {
@@ -520,7 +520,7 @@
 }
 
 .filter-tag .remove-filter:hover {
-    background: rgba(212, 175, 55, 0.3);
+    background: rgba(var(--selector-accent-rgb), );
 }
 
 /* ==========================================
@@ -658,7 +658,7 @@
 .filter-select:focus-visible,
 .filter-input:focus-visible,
 .sort-select:focus-visible {
-    outline: 2px solid rgba(212, 175, 55, 0.8);
+    outline: 2px solid rgba(var(--selector-accent-rgb), );
     outline-offset: 2px;
 }
 
@@ -684,7 +684,7 @@
     .loading-spinner {
         animation: none;
         border: 3px solid rgba(255, 255, 255, 0.3);
-        border-top: 3px solid rgba(212, 175, 55, 0.8);
+        border-top: 3px solid rgba(var(--selector-accent-rgb), );
     }
 
     .fragrance-notification {
@@ -747,7 +747,7 @@ body.theme-dark .pagination-controls {
 
 body.theme-dark .loading-spinner {
     border-color: rgba(255, 255, 255, 0.15);
-    border-top-color: rgba(212, 175, 55, 0.9);
+    border-top-color: rgba(var(--selector-accent-rgb), );
 }
 
 body.theme-dark .pagination-btn,

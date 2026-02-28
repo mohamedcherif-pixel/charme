@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     lastScrollTop = scrollTop;
-  });
+  }, { passive: true });
   const video = document.getElementById("background-video");
   const navbar = document.querySelector(".navbar");
   let ticking = false;
@@ -126,483 +126,113 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchResults = document.getElementById("searchResults");
 
   // Comprehensive fragrance data for search suggestions
-  const fragrances = [
-    // Parfums de Marly
-    {
-      name: "Layton",
-      brand: "Parfums de Marly",
-      notes: ["Apple", "Lavender", "Geranium", "Vanilla", "Cardamom"],
-      type: "Oriental Woody",
-      available: true,
-    },
-    {
-      name: "Herod",
-      brand: "Parfums de Marly",
-      notes: ["Cinnamon", "Pepper", "Osmanthus", "Tobacco", "Vanilla"],
-      type: "Oriental Spicy",
-      available: false,
-    },
-    {
-      name: "Pegasus",
-      brand: "Parfums de Marly",
-      notes: [
-        "Bergamot",
-        "Heliotrope",
-        "Bitter Almond",
-        "Vanilla",
-        "Sandalwood",
-      ],
-      type: "Oriental Gourmand",
-      available: true,
-    },
-    {
-      name: "Greenly",
-      brand: "Parfums de Marly",
-      notes: ["Lemon", "Green Apple", "Mint", "Vetiver", "Sage", "Cedarwood"],
-      type: "Fresh Green",
-      available: true,
-    },
-    {
-      name: "Galloway",
-      brand: "Parfums de Marly",
-      notes: ["Elemi", "Lavender", "Geranium", "Cashmere Wood", "Ambergris"],
-      type: "Woody Aromatic",
-      available: false,
-    },
-    {
-      name: "Godolphin",
-      brand: "Parfums de Marly",
-      notes: ["Thyme", "Saffron", "Cypress", "Rose", "Cedarwood"],
-      type: "Woody Spicy",
-      available: false,
-    },
-    {
-      name: "Haltane",
-      brand: "Parfums de Marly",
-      notes: ["Praline", "Vanilla", "Oud", "Amber", "Saffron"],
-      type: "Oriental Gourmand",
-      available: true,
-    },
-    {
-      name: "Percival",
-      brand: "Parfums de Marly",
-      notes: ["Lavender", "Geranium", "Iris", "Ambroxan", "Cinnamon"],
-      type: "Woody Spicy",
-      available: false,
-    },
+  // Build lazily to avoid blocking initial page load
+  let fragranceService = null;
+  let searchFragrances = null;
 
-    // Tom Ford
-    {
-      name: "Tom Ford Black Orchid",
-      brand: "Tom Ford",
-      notes: ["Black Orchid", "Chocolate", "Vanilla", "Patchouli", "Amber"],
-      type: "Oriental Floral",
-      available: false,
-    },
-    {
-      name: "Tom Ford Oud Wood",
-      brand: "Tom Ford",
-      notes: ["Oud", "Rosewood", "Cardamom", "Pink Pepper", "Sandalwood"],
-      type: "Woody Oriental",
-      available: false,
-    },
-    {
-      name: "Tom Ford Grey Vetiver",
-      brand: "Tom Ford",
-      notes: ["Bergamot", "Lemon", "Mint", "Vetiver", "Sandalwood"],
-      type: "Woody Aromatic",
-      available: false,
-    },
-    {
-      name: "Tom Ford Tobacco Vanille",
-      brand: "Tom Ford",
-      notes: ["Tobacco", "Vanilla", "Ginger", "Fig", "Cocoa"],
-      type: "Oriental Spicy",
-      available: false,
-    },
+  function getSearchFragrances() {
+    if (searchFragrances) return searchFragrances;
+    try {
+      fragranceService = fragranceService || new FragranceAPIService();
+      const db = fragranceService.comprehensiveDatabase || {};
+      const results = [];
+      for (const name in db) {
+        if (!Object.prototype.hasOwnProperty.call(db, name)) continue;
+        const profile = db[name] || {};
+        results.push({
+          name,
+          brand: profile.brand || "Unknown Brand",
+          notes: profile.ingredients || [],
+          type: profile.family || "Unknown",
+          available: profile.available !== false,
+        });
+      }
+      searchFragrances = results;
+    } catch (e) {
+      console.error("Failed to build search fragrance list", e);
+      searchFragrances = [];
+    }
+    return searchFragrances;
+  }
 
-    // Creed
-    {
-      name: "Creed Aventus",
-      brand: "Creed",
-      notes: ["Pineapple", "Bergamot", "Apple", "Birch", "Musk", "Vanilla"],
-      type: "Woody Fruity",
-      available: false,
-    },
-    {
-      name: "Creed Green Irish Tweed",
-      brand: "Creed",
-      notes: ["Lemon", "Mint", "Violet Leaves", "Sandalwood", "Ambergris"],
-      type: "Woody Aromatic",
-      available: false,
-    },
-    {
-      name: "Creed Silver Mountain Water",
-      brand: "Creed",
-      notes: ["Bergamot", "Mandarin", "Blackcurrant", "Green Tea", "Musk"],
-      type: "Citrus Aromatic",
-      available: false,
-    },
+  function normalizeFragranceName(value) {
+    return (value || "")
+      .toString()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+  }
 
-    // Chanel
-    {
-      name: "Chanel Bleu de Chanel",
-      brand: "Chanel",
-      notes: ["Grapefruit", "Lemon", "Mint", "Ginger", "Cedar", "Sandalwood"],
-      type: "Woody Aromatic",
-      available: false,
-    },
-    {
-      name: "Chanel Allure Homme Sport",
-      brand: "Chanel",
-      notes: ["Orange", "Neroli", "Cedar", "Tonka Bean", "White Musk"],
-      type: "Woody Spicy",
-      available: false,
-    },
-    {
-      name: "Chanel Coco Mademoiselle",
-      brand: "Chanel",
-      notes: ["Orange", "Bergamot", "Rose", "Jasmine", "Patchouli", "Vanilla"],
-      type: "Oriental Floral",
-      available: false,
-    },
-    {
-      name: "Chanel No 5",
-      brand: "Chanel",
-      notes: ["Bergamot", "Lemon", "Rose", "Jasmine", "Sandalwood", "Vanilla"],
-      type: "Floral Aldehyde",
-      available: false,
-    },
+  function escapeHtml(value) {
+    return (value || "")
+      .toString()
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
 
-    // Dior
-    {
-      name: "Dior Sauvage",
-      brand: "Dior",
-      notes: ["Bergamot", "Pepper", "Sichuan Pepper", "Lavender", "Ambroxan"],
-      type: "Aromatic Fougere",
-      available: false,
-    },
-    {
-      name: "Dior Homme",
-      brand: "Dior",
-      notes: ["Bergamot", "Lavender", "Iris", "Vetiver", "Patchouli"],
-      type: "Woody Floral Musk",
-      available: false,
-    },
-    {
-      name: "Dior Miss Dior",
-      brand: "Dior",
-      notes: ["Blood Orange", "Lily of the Valley", "Rose", "Patchouli"],
-      type: "Floral Chypre",
-      available: false,
-    },
+  function renderRemainingDatabaseFragrances() {
+    const section = document.getElementById("databaseFragrancesSection");
+    const grid = document.getElementById("databaseFragranceGrid");
+    const countEl = document.getElementById("databaseFragranceCount");
+    if (!section || !grid || !countEl) return;
 
-    // Yves Saint Laurent
-    {
-      name: "YSL La Nuit de l'Homme",
-      brand: "Yves Saint Laurent",
-      notes: ["Cardamom", "Bergamot", "Lavender", "Cedar", "Coumarin"],
-      type: "Oriental Spicy",
-      available: false,
-    },
-    {
-      name: "YSL Y",
-      brand: "Yves Saint Laurent",
-      notes: ["Apple", "Ginger", "Bergamot", "Sage", "Cedarwood", "Amberwood"],
-      type: "Woody Aromatic",
-      available: false,
-    },
-    {
-      name: "YSL Black Opium",
-      brand: "Yves Saint Laurent",
-      notes: [
-        "Pink Pepper",
-        "Orange Blossom",
-        "Coffee",
-        "Vanilla",
-        "White Florals",
-      ],
-      type: "Oriental Gourmand",
-      available: false,
-    },
+    const allFragrances = getSearchFragrances();
+    const renderedProductNames = new Set(
+      Array.from(document.querySelectorAll(".product-name"))
+        .map((el) => normalizeFragranceName(el.textContent))
+        .filter(Boolean),
+    );
 
-    // Giorgio Armani
-    {
-      name: "Armani Code",
-      brand: "Giorgio Armani",
-      notes: [
-        "Bergamot",
-        "Lemon",
-        "Olive Blossom",
-        "Guaiac Wood",
-        "Tonka Bean",
-      ],
-      type: "Oriental Spicy",
-      available: false,
-    },
-    {
-      name: "Acqua di Gio",
-      brand: "Giorgio Armani",
-      notes: [
-        "Bergamot",
-        "Neroli",
-        "Green Tangerine",
-        "Jasmine",
-        "Cedar",
-        "White Musk",
-      ],
-      type: "Aquatic Aromatic",
-      available: false,
-    },
+    const uniqueRemaining = [];
+    const seen = new Set();
 
-    // Versace
-    {
-      name: "Versace Eros",
-      brand: "Versace",
-      notes: [
-        "Mint",
-        "Green Apple",
-        "Lemon",
-        "Tonka Bean",
-        "Geranium",
-        "Vanilla",
-      ],
-      type: "Oriental Fougere",
-      available: false,
-    },
-    {
-      name: "Versace Dylan Blue",
-      brand: "Versace",
-      notes: [
-        "Bergamot",
-        "Grapefruit",
-        "Fig Leaves",
-        "Violet Leaves",
-        "Papyrus",
-        "Musk",
-      ],
-      type: "Aromatic Fougere",
-      available: false,
-    },
+    allFragrances
+      .slice()
+      .sort(
+        (a, b) =>
+          a.brand.localeCompare(b.brand) || a.name.localeCompare(b.name),
+      )
+      .forEach((fragrance) => {
+        const key = normalizeFragranceName(fragrance.name);
+        if (!key || seen.has(key) || renderedProductNames.has(key)) return;
+        seen.add(key);
+        uniqueRemaining.push(fragrance);
+      });
 
-    // Paco Rabanne
-    {
-      name: "Paco Rabanne 1 Million",
-      brand: "Paco Rabanne",
-      notes: [
-        "Blood Mandarin",
-        "Peppermint",
-        "Rose",
-        "Cinnamon",
-        "Leather",
-        "Amber",
-      ],
-      type: "Oriental Spicy",
-      available: false,
-    },
-    {
-      name: "Paco Rabanne Invictus",
-      brand: "Paco Rabanne",
-      notes: [
-        "Grapefruit",
-        "Marine Accord",
-        "Bay Leaves",
-        "Jasmine",
-        "Guaiac Wood",
-        "Ambergris",
-      ],
-      type: "Aquatic Woody",
-      available: false,
-    },
+    if (!uniqueRemaining.length) {
+      countEl.textContent = "All database perfumes are already displayed.";
+      grid.innerHTML = "";
+      return;
+    }
 
-    // Jean Paul Gaultier
-    {
-      name: "JPG Le Male",
-      brand: "Jean Paul Gaultier",
-      notes: [
-        "Mint",
-        "Lavender",
-        "Cardamom",
-        "Cinnamon",
-        "Vanilla",
-        "Sandalwood",
-      ],
-      type: "Oriental Fougere",
-      available: false,
-    },
-    {
-      name: "JPG Ultra Male",
-      brand: "Jean Paul Gaultier",
-      notes: [
-        "Bergamot",
-        "Black Currant",
-        "Mint",
-        "Cinnamon",
-        "Vanilla",
-        "Cedar",
-      ],
-      type: "Oriental Spicy",
-      available: false,
-    },
+    countEl.textContent = `${uniqueRemaining.length} additional perfumes from the database`;
+    grid.innerHTML = uniqueRemaining
+      .map(
+        (fragrance) => `
+          <article class="database-fragrance-card">
+            <h3 class="database-fragrance-name">${escapeHtml(fragrance.name)}</h3>
+            <p class="database-fragrance-brand">${escapeHtml(fragrance.brand || "Unknown Brand")}</p>
+            <p class="database-fragrance-family">${escapeHtml(fragrance.type || "Unknown Family")}</p>
+          </article>
+        `,
+      )
+      .join("");
+  }
 
-    // Calvin Klein
-    {
-      name: "Calvin Klein Eternity",
-      brand: "Calvin Klein",
-      notes: [
-        "Mandarin",
-        "Lavender",
-        "Basil",
-        "Geranium",
-        "Sandalwood",
-        "Amber",
-      ],
-      type: "Aromatic Fougere",
-      available: false,
-    },
-    {
-      name: "Calvin Klein Euphoria",
-      brand: "Calvin Klein",
-      notes: [
-        "Pomegranate",
-        "Persimmon",
-        "Black Orchid",
-        "Lotus Blossom",
-        "Amber",
-        "Mahogany",
-      ],
-      type: "Oriental Floral",
-      available: false,
-    },
-
-    // Viktor & Rolf
-    {
-      name: "Viktor & Rolf Spicebomb",
-      brand: "Viktor & Rolf",
-      notes: [
-        "Pink Pepper",
-        "Elemi",
-        "Bergamot",
-        "Cinnamon",
-        "Saffron",
-        "Tobacco",
-      ],
-      type: "Oriental Spicy",
-      available: false,
-    },
-    {
-      name: "Viktor & Rolf Flowerbomb",
-      brand: "Viktor & Rolf",
-      notes: ["Tea", "Bergamot", "Freesia", "Orchid", "Rose", "Patchouli"],
-      type: "Oriental Floral",
-      available: false,
-    },
-
-    // Dolce & Gabbana
-    {
-      name: "D&G The One",
-      brand: "Dolce & Gabbana",
-      notes: ["Grapefruit", "Coriander", "Basil", "Cardamom", "Cedar", "Amber"],
-      type: "Oriental Spicy",
-      available: false,
-    },
-    {
-      name: "D&G Light Blue",
-      brand: "Dolce & Gabbana",
-      notes: [
-        "Sicilian Lemon",
-        "Apple",
-        "Cedar",
-        "Bamboo",
-        "White Rose",
-        "Jasmine",
-      ],
-      type: "Floral Fruity",
-      available: false,
-    },
-
-    // Maison Francis Kurkdjian
-    {
-      name: "MFK Baccarat Rouge 540",
-      brand: "Maison Francis Kurkdjian",
-      notes: ["Saffron", "Jasmine", "Amberwood", "Ambergris", "Cedar"],
-      type: "Oriental Floral",
-      available: false,
-    },
-    {
-      name: "MFK Aqua Celestia",
-      brand: "Maison Francis Kurkdjian",
-      notes: [
-        "Blackcurrant",
-        "Lime",
-        "Mimosa",
-        "Jasmine",
-        "Sandalwood",
-        "Musk",
-      ],
-      type: "Citrus Aromatic",
-      available: false,
-    },
-
-    // Montale
-    {
-      name: "Montale Black Aoud",
-      brand: "Montale",
-      notes: ["Aoud", "Rose", "Patchouli", "White Florals", "Vanilla", "Amber"],
-      type: "Oriental Woody",
-      available: false,
-    },
-
-    // By Kilian
-    {
-      name: "Kilian Love Don't Be Shy",
-      brand: "By Kilian",
-      notes: [
-        "Neroli",
-        "Orange Blossom",
-        "Marshmallow",
-        "White Florals",
-        "Sugar",
-        "Musk",
-      ],
-      type: "Oriental Gourmand",
-      available: false,
-    },
-
-    // Amouage
-    {
-      name: "Amouage Reflection Man",
-      brand: "Amouage",
-      notes: ["Pink Pepper", "Sandalwood", "Jasmine", "Cedar", "Birch"],
-      type: "Woody Spicy",
-      available: false,
-    },
-
-    // Le Labo
-    {
-      name: "Le Labo Santal 33",
-      brand: "Le Labo",
-      notes: ["Violet", "Cardamom", "Iris", "Papyrus", "Sandalwood", "Cedar"],
-      type: "Woody Aromatic",
-      available: false,
-    },
-
-    // Byredo
-    {
-      name: "Byredo Gypsy Water",
-      brand: "Byredo",
-      notes: [
-        "Bergamot",
-        "Lemon",
-        "Pepper",
-        "Juniper Berries",
-        "Pine Needles",
-        "Sandalwood",
-      ],
-      type: "Woody Aromatic",
-      available: false,
-    },
-  ];
+  // Warm up search data after first paint
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(() => {
+      getSearchFragrances();
+      renderRemainingDatabaseFragrances();
+    }, { timeout: 2500 });
+  } else {
+    setTimeout(() => {
+      getSearchFragrances();
+      renderRemainingDatabaseFragrances();
+    }, 2000);
+  }
 
   // Function to open search modal
   function openSearchModal() {
@@ -630,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function showQuickSearchSuggestions(query) {
     if (!quickSearchResults || !quickSearchDropdown) return;
 
-    const filteredFragrances = fragrances.filter(
+    const filteredFragrances = getSearchFragrances().filter(
       (fragrance) =>
         fragrance.name.toLowerCase().includes(query.toLowerCase()) ||
         fragrance.brand.toLowerCase().includes(query.toLowerCase()) ||
@@ -1368,7 +998,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const results = fragrances.filter(
+    const results = getSearchFragrances().filter(
       (fragrance) =>
         fragrance.name.toLowerCase().includes(query) ||
         fragrance.brand.toLowerCase().includes(query) ||
@@ -1451,16 +1081,185 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Function to update colors and vignette based on scroll position
-  function updateColors() {
+  
+// --- OPTIMIZED SCROLL CACHING ---
+let _cachedOffsets = new Map();
+let _cachedHeights = new Map();
+let _cachedRects = new Map();
+let _cachedElements = new Map();
+let _lastCacheTime = 0;
+let _lastAppliedBackgroundColor = null;
+let _lastAppliedTextColor = null;
+let _lastScrollProgressRounded = -1;  // guards navbar/video/vignette writes
+let _navbarScrollFxDisabledApplied = false;
+// Pre-built sorted breakpoint table for background transitions
+let _bgBreakpoints = null;
+
+function _getEl(id, classSelector) {
+  const key = id + '|' + classSelector;
+  if (!_cachedElements.has(key)) {
+    _cachedElements.set(key, document.getElementById(id) || document.querySelector(classSelector));
+  }
+  return _cachedElements.get(key);
+}
+
+function _getAll(selector) {
+  if (!_cachedElements.has(selector)) {
+    _cachedElements.set(selector, Array.from(document.querySelectorAll(selector)));
+  }
+  return _cachedElements.get(selector);
+}
+
+function _getOffsetTop(el) {
+  if (!el) return 0;
+  if (!_cachedOffsets.has(el)) {
+    _cachedOffsets.set(el, el.offsetTop);
+  }
+  return _cachedOffsets.get(el);
+}
+
+function _getOffsetHeight(el) {
+  if (!el) return 0;
+  if (!_cachedHeights.has(el)) {
+    _cachedHeights.set(el, el.offsetHeight);
+  }
+  return _cachedHeights.get(el);
+}
+
+function _getBoundingClientRect(el) {
+  if (!el) return { top: 0, height: 0, bottom: 0, left: 0, right: 0, width: 0 };
+  if (!_cachedRects.has(el)) {
+    _cachedRects.set(el, el.getBoundingClientRect());
+  }
+  return _cachedRects.get(el);
+}
+
+function invalidateScrollCache() {
+  _cachedOffsets.clear();
+  _cachedHeights.clear();
+  _cachedRects.clear();
+  _lastAppliedBackgroundColor = null;
+  _lastAppliedTextColor = null;
+  _bgBreakpoints = null; // force rebuild of background breakpoint table
+  _lastCacheTime = Date.now();
+}
+
+// Invalidate cache on resize
+window.addEventListener('resize', invalidateScrollCache, { passive: true });
+
+// Also invalidate periodically just in case layout changes (e.g. images load)
+setInterval(() => {
+  if (Date.now() - _lastCacheTime > 3000) {
+    invalidateScrollCache();
+  }
+}, 3000);
+
+// ---- DATA-DRIVEN BACKGROUND TRANSITION TABLE ----
+// Instead of 50+ _getOffsetTop calls per frame, we build a sorted list of
+// {scrollStart, scrollEnd, colorFrom, colorTo} entries ONCE, then binary-search per frame.
+const _sectionColorMap = [
+  // id/selector, colorFrom, colorTo
+  ['baccaratrouge', '.baccaratrouge-section', '#f0f8f0', '#fdf2f2'],
+  ['blackorchid', '.blackorchid-section', '#fdf2f2', '#0a0a0f'],
+  ['aventus', '.aventus-section', '#0a0a0f', '#e8e8ec'],
+  ['sauvage', '.sauvage-section', '#e8e8ec', '#d6dde6'],
+  ['bleudechanel', '.bleudechanel-section', '#d6dde6', '#0d1b2a'],
+  ['tobaccovanille', '.tobaccovanille-section', '#0d1b2a', '#2c1810'],
+  ['oudwood', '.oudwood-section', '#2c1810', '#1a1f16'],
+  ['lanuit', '.lanuit-section', '#1a1f16', '#0f0a1a'],
+  ['lostcherry', '.lostcherry-section', '#0f0a1a', '#2d0a0a'],
+  ['yvsl', '.yvsl-section', '#2d0a0a', '#0a0a1e'],
+  ['aquadigio', '.aquadigio-section', '#0a0a1e', '#0a1a2a'],
+  ['dy', '.dy-section', '#0a1a2a', '#1e150d'],
+  ['versaceeros', '.versaceeros-section', '#1e150d', '#051a1a'],
+  ['jpgultramale', '.jpgultramale-section', '#051a1a', '#120a24'],
+  ['invictus', '.invictus-section', '#120a24', '#1a1e22'],
+  ['valentinouomo', '.valentinouomo-section', '#1a1e22', '#1e0f0f'],
+  ['spicebomb', '.spicebomb-section', '#1e0f0f', '#0d0505'],
+  ['explorer', '.explorer-section', '#0d0505', '#0d1318'],
+  ['blv', '.blv-section', '#0d1318', '#0a0804'],
+  ['diorhomme', '.diorhomme-section', '#0a0804', '#0a0a14'],
+  ['allure', '.allure-section', '#0a0a14', '#0f0f0f'],
+  ['tuscanleather', '.tuscanleather-section', '#0f0f0f', '#1a0e08'],
+  ['armanicode', '.armanicode-section', '#1a0e08', '#12060e'],
+  ['lhommeideal', '.lhommeideal-section', '#12060e', '#140d06'],
+  ['terredhermes', '.terredhermes-section', '#140d06', '#1a0e04'],
+  ['gentleman', '.gentleman-section', '#1a0e04', '#0a0a14'],
+  ['wantedbynight', '.wantedbynight-section', '#0a0a14', '#1a0505'],
+  ['kbyDG', '.kbyDG-section', '#1a0505', '#14100a'],
+  ['leaudissey', '.leaudissey-section', '#14100a', '#04101a'],
+  ['chbadboy', '.chbadboy-section', '#04101a', '#04080e'],
+  ['ysllibre', '.ysllibre-section', '#04080e', '#140e08'],
+  ['fireplace', '.fireplace-section', '#140e08', '#1a0e04'],
+  ['pradacarbon', '.pradacarbon-section', '#1a0e04', '#0a0a0a'],
+  ['burberryhero', '.burberryhero-section', '#0a0a0a', '#120e0a'],
+  ['narcisoforhim', '.narcisoforhim-section', '#120e0a', '#060a14'],
+  ['cketernity', '.cketernity-section', '#060a14', '#0a120a'],
+  ['gucciguilty', '.gucciguilty-section', '#0a120a', '#110e0a'],
+  ['valentinodonna', '.valentinodonna-section', '#110e0a', '#1a0810'],
+  ['greenirish', '.greenirish-section', '#1a0810', '#060e04'],
+  ['egoiste', '.egoiste-section', '#060e04', '#0e0e12'],
+  ['amenpure', '.amenpure-section', '#0e0e12', '#120a02'],
+  ['declarationcartier', '.declarationcartier-section', '#120a02', '#14060a'],
+  ['laween', '.laween-section', '#14060a', '#140806'],
+  ['cedarsmancera', '.cedarsmancera-section', '#140806', '#0a1206'],
+  ['reflectionman', '.reflectionman-section', '#0a1206', '#0a0a18'],
+  ['sedley', '.sedley-section', '#0a0a18', '#061208'],
+  ['sideeffect', '.sideeffect-section', '#061208', '#180606'],
+  ['naxos', '.naxos-section', '#180606', '#140e04'],
+  ['grandSoir', '.grandSoir-section', '#140e04', '#120e04'],
+];
+
+function _buildBgBreakpoints(windowHeight) {
+  const bp = [];
+  for (let i = 0; i < _sectionColorMap.length; i++) {
+    const [id, selector, colorFrom, colorTo] = _sectionColorMap[i];
+    const el = _getEl(id, selector);
+    if (!el) continue;
+    const top = _getOffsetTop(el);
+    const transStart = top - windowHeight * 0.7;
+    const transEnd = transStart + windowHeight * 0.5;
+    bp.push({ start: transStart, end: transEnd, colorFrom, colorTo });
+  }
+  return bp;
+}
+
+function _lookupSectionBgColor(scrollTop, breakpoints) {
+  // breakpoints is sorted by .start ascending (sections appear in DOM order)
+  // Find the relevant zone with a simple scan (already fast for ~50 items,
+  // and most frames hit an early exit since user is in ONE zone)
+  for (let i = 0; i < breakpoints.length; i++) {
+    const bp = breakpoints[i];
+    if (scrollTop < bp.start) {
+      // We're before this section's transition — return the "from" color as static
+      return bp.colorFrom;
+    }
+    if (scrollTop < bp.end) {
+      // We're inside this transition
+      const progress = Math.pow((scrollTop - bp.start) / (bp.end - bp.start), 0.6);
+      return interpolateColor(bp.colorFrom, bp.colorTo, progress);
+    }
+  }
+  // Past all sections
+  if (breakpoints.length > 0) {
+    return breakpoints[breakpoints.length - 1].colorTo;
+  }
+  return '#120e04';
+}
+// --------------------------------
+
+function updateColors() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const documentHeight =
       document.documentElement.scrollHeight - window.innerHeight;
     const windowHeight = window.innerHeight;
 
+    const getSectionEl = _getEl;
+
     // Calculate when user has scrolled past the video section (100vh)
     const videoSectionHeight = windowHeight; // 100vh
     const contentHeight =
-      document.querySelector(".content")?.offsetHeight || windowHeight * 3;
+      _getOffsetHeight(_getEl("", ".content")) || windowHeight * 3;
 
     // Define transition zones - black stays much longer
     const blackDuration = contentHeight * 0.92; // Black stays for 92% of content height (was 85%)
@@ -1469,26 +1268,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const transitionEnd = transitionStart + transitionRange;
 
     // Start cream transition later into the Haltane section
-    const haltaneSection = document.querySelector(".haltane-section-container");
+    const haltaneSection = _getEl("", ".haltane-section-container");
     const creamTransitionStart = haltaneSection
-      ? haltaneSection.offsetTop + 500
+      ? _getOffsetTop(haltaneSection) + 500
       : transitionEnd;
     const creamTransitionRange = windowHeight * 0.3; // Transition over 30% of viewport height
     const creamTransitionEnd = creamTransitionStart + creamTransitionRange;
 
     // Start light grey transition at Pegasus section
-    const pegasusSection = document.querySelector(".pegasus-image");
+    const pegasusSection = _getEl("", ".pegasus-image");
     const greyTransitionStart = pegasusSection
-      ? pegasusSection.closest(".content").offsetTop - 800
+      ? _getOffsetTop(pegasusSection.closest(".content")) - 800
       : creamTransitionEnd + windowHeight;
     const greyTransitionRange = windowHeight * 0.5; // Transition over 50% of viewport height
     const greyTransitionEnd = greyTransitionStart + greyTransitionRange;
 
     // Calculate transition points relative to the white transition section
-    const whiteTransitionSection = document.querySelector(
-      ".white-transition-section",
-    );
-    const whiteTransitionRect = whiteTransitionSection.getBoundingClientRect();
+    const whiteTransitionSection = _getEl("", ".white-transition-section",);
+    const whiteTransitionRect = _getBoundingClientRect(whiteTransitionSection);
     const whiteTransitionTop = window.scrollY + whiteTransitionRect.top;
     const whiteTransitionHeight = whiteTransitionRect.height;
 
@@ -1542,23 +1339,30 @@ document.addEventListener("DOMContentLoaded", function () {
         "#f0f8f0",
         easedProgress,
       );
-    } else {
-      // Past transition zone - stay light green
-      backgroundColor = "#f0f8f0";
+        } else {
+      // Past Greenly - use data-driven transition table
+      // Build breakpoint table lazily (only when cache is invalidated)
+      if (!_bgBreakpoints) {
+        _bgBreakpoints = _buildBgBreakpoints(windowHeight);
+      }
+      if (_bgBreakpoints.length > 0) {
+        backgroundColor = _lookupSectionBgColor(scrollTop, _bgBreakpoints);
+      } else {
+        backgroundColor = "#f0f8f0";
+      }
     }
 
-    // Apply the color
-    body.style.backgroundColor = backgroundColor;
+    // Apply the color (avoid redundant style writes)
+    if (_lastAppliedBackgroundColor !== backgroundColor) {
+      body.style.backgroundColor = backgroundColor;
+      _lastAppliedBackgroundColor = backgroundColor;
+    }
 
     // Haltane section fade-in effect aligned with cream transition
-    const haltaneImage = document.querySelector(".haltane-image");
-    const haltaneProductTitle = document.querySelector(
-      ".haltane-section-container .product-title",
-    );
-    const haltaneNotes = document.querySelector(".haltane-notes");
-    const haltaneFragranceNotes = document.querySelector(
-      ".haltane-fragrance-notes",
-    );
+    const haltaneImage = _getEl("", ".haltane-image");
+    const haltaneProductTitle = _getEl("", ".haltane-section-container .product-title",);
+    const haltaneNotes = _getEl("", ".haltane-notes");
+    const haltaneFragranceNotes = _getEl("", ".haltane-fragrance-notes",);
 
     if (
       haltaneImage ||
@@ -1566,41 +1370,40 @@ document.addEventListener("DOMContentLoaded", function () {
       haltaneNotes ||
       haltaneFragranceNotes
     ) {
-      let haltaneOpacity = 0;
+      // Only compute haltane fade when near the transition zone
+      if (scrollTop < creamTransitionEnd + 200) {
+        let haltaneOpacity = 0;
 
-      // Start fade-in very late in the cream transition (at 95% progress)
-      const fadeInStart = creamTransitionStart + creamTransitionRange * 0.95;
-      const fadeInRange = creamTransitionRange * 0.05; // Use only last 5% for fade-in
+        // Start fade-in very late in the cream transition (at 95% progress)
+        const fadeInStart = creamTransitionStart + creamTransitionRange * 0.95;
+        const fadeInRange = creamTransitionRange * 0.05; // Use only last 5% for fade-in
 
-      if (scrollTop < fadeInStart) {
-        // Before fade-in starts - elements hidden
-        haltaneOpacity = 0;
-      } else if (scrollTop < creamTransitionEnd) {
-        // During fade-in - fade in elements
-        const progress = (scrollTop - fadeInStart) / fadeInRange;
-        const easedProgress = Math.pow(progress, 0.15); // Very slow, smooth fade
-        haltaneOpacity = easedProgress;
-      } else {
-        // After cream transition - elements fully visible
-        haltaneOpacity = 1;
-      }
+        if (scrollTop < fadeInStart) {
+          haltaneOpacity = 0;
+        } else if (scrollTop < creamTransitionEnd) {
+          const progress = (scrollTop - fadeInStart) / fadeInRange;
+          const easedProgress = Math.pow(progress, 0.15);
+          haltaneOpacity = easedProgress;
+        } else {
+          haltaneOpacity = 1;
+        }
 
-      // Apply fade-in effect to Haltane elements
-      if (haltaneImage) {
-        haltaneImage.style.opacity = haltaneOpacity;
-        haltaneImage.style.transform = `translateY(${20 * (1 - haltaneOpacity)}px)`;
-      }
-      if (haltaneProductTitle) {
-        haltaneProductTitle.style.opacity = haltaneOpacity;
-        haltaneProductTitle.style.transform = `translateY(${15 * (1 - haltaneOpacity)}px)`;
-      }
-      if (haltaneNotes) {
-        haltaneNotes.style.opacity = haltaneOpacity;
-        haltaneNotes.style.transform = `translateY(${25 * (1 - haltaneOpacity)}px)`;
-      }
-      if (haltaneFragranceNotes) {
-        haltaneFragranceNotes.style.opacity = haltaneOpacity;
-        haltaneFragranceNotes.style.transform = `translateY(${30 * (1 - haltaneOpacity)}px)`;
+        if (haltaneImage) {
+          haltaneImage.style.opacity = haltaneOpacity;
+          haltaneImage.style.transform = `translateY(${20 * (1 - haltaneOpacity)}px)`;
+        }
+        if (haltaneProductTitle) {
+          haltaneProductTitle.style.opacity = haltaneOpacity;
+          haltaneProductTitle.style.transform = `translateY(${15 * (1 - haltaneOpacity)}px)`;
+        }
+        if (haltaneNotes) {
+          haltaneNotes.style.opacity = haltaneOpacity;
+          haltaneNotes.style.transform = `translateY(${25 * (1 - haltaneOpacity)}px)`;
+        }
+        if (haltaneFragranceNotes) {
+          haltaneFragranceNotes.style.opacity = haltaneOpacity;
+          haltaneFragranceNotes.style.transform = `translateY(${30 * (1 - haltaneOpacity)}px)`;
+        }
       }
     }
 
@@ -1624,7 +1427,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Keep perfume rating section visible - remove problematic opacity manipulation
-    const perfumeRatingSection = document.querySelector(".perfume-rating");
+    const perfumeRatingSection = _getEl("", ".perfume-rating");
     if (perfumeRatingSection) {
       // Ensure rating section stays visible
       perfumeRatingSection.style.opacity = "1";
@@ -1649,120 +1452,90 @@ document.addEventListener("DOMContentLoaded", function () {
       ".season-indicators .indicator-label",
     ];
 
-    textElements.forEach((selector) => {
-      const elements = document.querySelectorAll(selector);
-      elements.forEach((element) => {
-        // Skip elements that should maintain their special colors
-        if (
-          (!element.classList.contains("score") &&
-            !element.classList.contains("votes") &&
-            !element.tagName.toLowerCase() === "strong") ||
-          element.closest(".perfume-description strong")
-        ) {
-          element.style.color = textColor;
-          element.style.transition = "color 0.3s ease";
+    // Avoid re-styling dozens of nodes if color didn't change
+    if (_lastAppliedTextColor !== textColor) {
+      textElements.forEach((selector) => {
+        const elements = _getAll(selector);
+        elements.forEach((element) => {
+          // Skip elements that should maintain their special colors
+          if (
+            (!element.classList.contains("score") &&
+              !element.classList.contains("votes") &&
+              !element.tagName.toLowerCase() === "strong") ||
+            element.closest(".perfume-description strong")
+          ) {
+            element.style.color = textColor;
+            element.style.transition = "color 0.3s ease";
+          }
+        });
+      });
+      _lastAppliedTextColor = textColor;
+    }
+
+    // Handle special colored elements — only during the transition zone
+    if (scrollTop >= transitionStart - 100 && scrollTop <= transitionEnd + 100) {
+      const specialElements = _getAll(".perfume-description strong",);
+      specialElements.forEach((element) => {
+        if (scrollTop < transitionStart) {
+          element.style.color = "#ffd43b";
+        } else if (scrollTop < transitionEnd) {
+          const rawProgress = (scrollTop - transitionStart) / transitionRange;
+          const easedProgress = Math.pow(rawProgress, 0.7);
+          element.style.color = interpolateColor("#ffd43b", "#d4a017", easedProgress);
+        } else {
+          element.style.color = "#b8860b";
         }
       });
-    });
 
-    // Handle special colored elements separately
-    const specialElements = document.querySelectorAll(
-      ".perfume-description strong",
-    );
-    specialElements.forEach((element) => {
-      if (scrollTop < transitionStart) {
-        element.style.color = "#ffd43b"; // Original gold color
-      } else if (scrollTop < transitionEnd) {
-        const rawProgress = (scrollTop - transitionStart) / transitionRange;
-        const easedProgress = Math.pow(rawProgress, 0.7);
-        element.style.color = interpolateColor(
-          "#ffd43b",
-          "#d4a017",
-          easedProgress,
-        ); // Gold to darker gold
-      } else {
-        element.style.color = "#b8860b"; // Dark gold for white background
-      }
-      element.style.transition = "color 0.3s ease";
-    });
+      const scoreElements = _getAll(".rating-title .score");
+      scoreElements.forEach((element) => {
+        if (scrollTop < transitionStart) {
+          element.style.color = "#ffd43b";
+        } else if (scrollTop < transitionEnd) {
+          const rawProgress = (scrollTop - transitionStart) / transitionRange;
+          const easedProgress = Math.pow(rawProgress, 0.7);
+          element.style.color = interpolateColor("#ffd43b", "#d4a017", easedProgress);
+        } else {
+          element.style.color = "#b8860b";
+        }
+      });
 
-    // Handle score and votes elements
-    const scoreElements = document.querySelectorAll(".rating-title .score");
-    scoreElements.forEach((element) => {
-      if (scrollTop < transitionStart) {
-        element.style.color = "#ffd43b"; // Original gold
-      } else if (scrollTop < transitionEnd) {
-        const rawProgress = (scrollTop - transitionStart) / transitionRange;
-        const easedProgress = Math.pow(rawProgress, 0.7);
-        element.style.color = interpolateColor(
-          "#ffd43b",
-          "#d4a017",
-          easedProgress,
-        );
-      } else {
-        element.style.color = "#b8860b"; // Dark gold
-      }
-      element.style.transition = "color 0.3s ease";
-    });
+      const votesElements = _getAll(".rating-title .votes");
+      votesElements.forEach((element) => {
+        if (scrollTop < transitionStart) {
+          element.style.color = "#74c0fc";
+        } else if (scrollTop < transitionEnd) {
+          const rawProgress = (scrollTop - transitionStart) / transitionRange;
+          const easedProgress = Math.pow(rawProgress, 0.7);
+          element.style.color = interpolateColor("#74c0fc", "#1c7ed6", easedProgress);
+        } else {
+          element.style.color = "#1864ab";
+        }
+      });
+    }
 
-    const votesElements = document.querySelectorAll(".rating-title .votes");
-    votesElements.forEach((element) => {
-      if (scrollTop < transitionStart) {
-        element.style.color = "#74c0fc"; // Original blue
-      } else if (scrollTop < transitionEnd) {
-        const rawProgress = (scrollTop - transitionStart) / transitionRange;
-        const easedProgress = Math.pow(rawProgress, 0.7);
-        element.style.color = interpolateColor(
-          "#74c0fc",
-          "#1c7ed6",
-          easedProgress,
-        ); // Blue to darker blue
-      } else {
-        element.style.color = "#1864ab"; // Dark blue for white background
-      }
-      element.style.transition = "color 0.3s ease";
-    });
-
-    // Enhanced navbar fade effect with dynamic visual effects
-    // Start fading immediately, completely gone by 6% scroll (much faster)
+    // Scroll-driven navbar animation disabled (keep navbar static)
+    // Note: we still compute scrollProgress for vignette/other effects below.
     const navbarFadeEnd = 0.06;
     const scrollProgress = Math.min(
       scrollTop / (documentHeight * navbarFadeEnd),
       1,
     );
 
-    // Apply gentle easing for smooth fade-out
-    const navbarOpacity =
-      1 - scrollProgress * scrollProgress * (3 - 2 * scrollProgress); // Smoothstep
+    // ---- SKIP navbar/video/vignette writes when scrollProgress hasn't changed ----
+    const _rounded = Math.round(scrollProgress * 500); // ~0.002 precision
+    if (_rounded !== _lastScrollProgressRounded) {
+      _lastScrollProgressRounded = _rounded;
 
-    // Calculate dynamic visual effects based on scroll progress
-    const navbarBlur = scrollProgress * 8; // Blur increases as navbar fades
-    const scaleAmount = 1 - scrollProgress * 0.05; // Slight scale down (95% at full fade)
-    const backdropBlur = scrollProgress * 15; // Backdrop blur increases
-
-    // Apply enhanced navbar effects
-    if (navbar) {
-      navbar.style.opacity = navbarOpacity;
-      navbar.style.transform = `scale(${scaleAmount})`;
-      navbar.style.filter = `blur(${navbarBlur}px)`;
-      navbar.style.backdropFilter = `blur(${backdropBlur}px) saturate(${1 + scrollProgress * 0.5})`;
-      navbar.style.transition =
-        "opacity 0.1s ease, transform 0.1s ease, filter 0.1s ease, backdrop-filter 0.1s ease";
-
-      // Add subtle glow effect as it fades
-      const glowIntensity = scrollProgress * 0.3;
-      navbar.style.boxShadow = `0 0 ${glowIntensity * 30}px rgba(255, 255, 255, ${glowIntensity})`;
-
-      // Add CSS classes for state management
-      if (scrollProgress > 0.1 && scrollProgress < 0.9) {
-        navbar.classList.add("fading");
-        navbar.classList.remove("fade-complete");
-      } else if (scrollProgress >= 0.9) {
-        navbar.classList.add("fade-complete");
-        navbar.classList.remove("fading");
-      } else {
-        navbar.classList.remove("fading", "fade-complete");
-      }
+    // One-time cleanup: remove any inline styles previously applied by older builds
+    if (navbar && !_navbarScrollFxDisabledApplied) {
+      navbar.style.opacity = "";
+      navbar.style.transform = "";
+      navbar.style.filter = "";
+      navbar.style.backdropFilter = "";
+      navbar.style.boxShadow = "";
+      navbar.style.transition = "";
+      _navbarScrollFxDisabledApplied = true;
     }
 
     // Top vignette effect with blur (disappears faster and more gently)
@@ -1806,21 +1579,12 @@ document.addEventListener("DOMContentLoaded", function () {
       videoBlurProgress * videoBlurProgress * (3 - 2 * videoBlurProgress); // Smoothstep
 
     // Calculate blur amount (0px to 25px for stronger effect)
-    const videoBlurAmount = videoBlurEased * 25;
+    const videoBlurAmount = Math.round(videoBlurEased * 25 * 10) / 10; // round to 1 decimal
 
-    // Apply blur to all videos
-    const allVideos = [
-      document.getElementById("background-video"),
-      document.getElementById("background-video-2"),
-      document.getElementById("background-video-3"),
-    ];
-
-    allVideos.forEach((vid) => {
-      if (vid) {
-        vid.style.filter = `blur(${videoBlurAmount}px)`;
-        vid.style.transition = "filter 0.1s ease, opacity 1s ease-in-out";
-      }
-    });
+    // Apply blur to videos (use cached elements)
+    const vid1 = _getEl('background-video', '#background-video');
+    if (vid1) vid1.style.filter = 'blur(' + videoBlurAmount + 'px)';
+    // video-2 and video-3 have preload="none", skip blur
 
     // Dynamic bottom vignette effect (increases with scroll)
     // Start vignette immediately, reach full intensity at 40% scroll for faster effect
@@ -1839,6 +1603,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Bottom blur effect (increases with scroll for more pronounced bottom blur)
     const bottomBlurAmount = vignetteEase * 15; // Max 15px additional blur at bottom
+
+    // Toggle blur-active class on hero to avoid GPU compositing at blur(0)
+    const heroEl = _getEl('', '.hero');
+    if (heroEl) {
+      if (bottomBlurAmount > 0.5) {
+        heroEl.classList.add('blur-active');
+      } else {
+        heroEl.classList.remove('blur-active');
+      }
+    }
 
     // Update vignette intensity and bottom blur
     document.documentElement.style.setProperty(
@@ -1863,6 +1637,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "--vignette-opacity",
       easedVignetteProgress,
     );
+
+    } // end scrollProgress change guard
 
     ticking = false;
   }
@@ -2130,7 +1906,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const contentHeight =
-        document.querySelector(".content")?.offsetHeight ||
+        _getOffsetHeight(_getEl("", ".content")) ||
         window.innerHeight * 3;
       const windowHeight = window.innerHeight;
 
@@ -2141,18 +1917,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const transitionEnd = transitionStart + transitionRange;
 
       // Start cream transition later into the Haltane section
-      const haltaneSection = document.querySelector(
-        ".haltane-section-container",
-      );
+      const haltaneSection = _getEl("", ".haltane-section-container");
       const creamTransitionStart = haltaneSection
-        ? haltaneSection.offsetTop + 500
+        ? _getOffsetTop(haltaneSection) + 500
         : transitionEnd;
       const creamTransitionRange = windowHeight * 0.3;
       const creamTransitionEnd = creamTransitionStart + creamTransitionRange;
 
-      const pegasusSection = document.querySelector(".pegasus-image");
+      const pegasusSection = _getEl("", ".pegasus-image");
       const greyTransitionStart = pegasusSection
-        ? pegasusSection.closest(".content").offsetTop - 800
+        ? _getOffsetTop(pegasusSection.closest(".content")) - 800
         : creamTransitionEnd + windowHeight;
       const greyTransitionRange = windowHeight * 0.4;
       const greyTransitionEnd = greyTransitionStart + greyTransitionRange;
@@ -2184,23 +1958,21 @@ document.addEventListener("DOMContentLoaded", function () {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const contentHeight =
-        document.querySelector(".content")?.offsetHeight ||
+        _getOffsetHeight(_getEl("", ".content")) ||
         window.innerHeight * 3;
       const windowHeight = window.innerHeight;
 
       // Calculate background transition points (same as in updateColors)
-      const haltaneSection = document.querySelector(
-        ".haltane-section-container",
-      );
+      const haltaneSection = _getEl("", ".haltane-section-container");
       const creamTransitionStart = haltaneSection
-        ? haltaneSection.offsetTop + 500
+        ? _getOffsetTop(haltaneSection) + 500
         : windowHeight * 2;
       const creamTransitionRange = windowHeight * 0.3;
       const creamTransitionEnd = creamTransitionStart + creamTransitionRange;
 
-      const pegasusSection = document.querySelector(".pegasus-image");
+      const pegasusSection = _getEl("", ".pegasus-image");
       const greyTransitionStart = pegasusSection
-        ? pegasusSection.closest(".content").offsetTop - 800
+        ? _getOffsetTop(pegasusSection.closest(".content")) - 800
         : creamTransitionEnd + windowHeight;
       const greyTransitionRange = windowHeight * 0.4;
       const greyTransitionEnd = greyTransitionStart + greyTransitionRange;
@@ -2336,9 +2108,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!topVignette) return;
 
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const haltaneSection = document.querySelector(".haltane-section-container");
+    const haltaneSection = _getEl("", ".haltane-section-container");
     const creamTransitionStart = haltaneSection
-      ? haltaneSection.offsetTop + 500
+      ? _getOffsetTop(haltaneSection) + 500
       : window.innerHeight * 2;
     const creamTransitionRange = window.innerHeight * 0.3;
     const creamTransitionEnd = creamTransitionStart + creamTransitionRange;
@@ -2424,20 +2196,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Quality Selector Functionality
   function initializeQualitySelectors() {
-    // Handle all quality selectors (Layton, Haltane, and Pegasus)
+    // Handle all quality selectors
     const qualitySelectors = document.querySelectorAll(".quality-selector");
 
     qualitySelectors.forEach((selector) => {
       const qualityOptions = selector.querySelectorAll(".quality-option");
-      const priceContainer = selector.closest(".product-price-container");
+      const productInfoSection =
+        selector.closest(".product-info-section") ||
+        selector.closest(".product-info") ||
+        selector.closest(".content");
+
+      const priceContainer = productInfoSection
+        ? productInfoSection.querySelector(".product-price-container")
+        : null;
       const priceBadge = priceContainer
         ? priceContainer.querySelector(".price-badge")
         : null;
-      const priceAmount = priceBadge
-        ? priceBadge.querySelector(".price-amount")
+      const priceAmount = priceBadge ? priceBadge.querySelector(".price-amount") : null;
+      const priceCurrency = priceBadge
+        ? priceBadge.querySelector(".price-currency")
         : null;
+      const priceElement = priceAmount || priceCurrency;
 
-      if (!priceAmount) return;
+      const cartButton = productInfoSection
+        ? productInfoSection.querySelector('.add-to-cart-btn[data-product]')
+        : selector.closest(".content")?.querySelector('.add-to-cart-btn[data-product]');
+
+      if (!priceElement) return;
 
       qualityOptions.forEach((option) => {
         option.addEventListener("click", function () {
@@ -2450,9 +2235,17 @@ document.addEventListener("DOMContentLoaded", function () {
           // Get the new price from data attribute
           const newPrice = this.getAttribute("data-price");
 
-          if (newPrice && priceAmount) {
+          const radio = this.querySelector('input[type="radio"]');
+          if (radio) radio.checked = true;
+
+          if (newPrice && priceElement) {
             // Animate price change
-            animatePriceChange(priceAmount, newPrice);
+            animatePriceChange(priceElement, newPrice);
+
+            // Keep cart price in sync with the selected option
+            if (cartButton) {
+              cartButton.setAttribute("data-price", newPrice);
+            }
           }
         });
       });
@@ -2496,9 +2289,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateBrandImageParallax() {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
-      const heroSection = document.querySelector(".hero");
+      const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
-        ? heroSection.offsetHeight
+        ? _getOffsetHeight(heroSection)
         : window.innerHeight;
 
       // Start parallax effect much later in scroll sequence (60% of hero height)
@@ -2561,9 +2354,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateLaytonParallax() {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
-      const heroSection = document.querySelector(".hero");
+      const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
-        ? heroSection.offsetHeight
+        ? _getOffsetHeight(heroSection)
         : window.innerHeight;
 
       // Start parallax effect after scrolling past the hero section
@@ -2603,9 +2396,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateLaytonNotesParallax() {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
-      const heroSection = document.querySelector(".hero");
+      const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
-        ? heroSection.offsetHeight
+        ? _getOffsetHeight(heroSection)
         : window.innerHeight;
 
       // Start parallax effect much later than other elements
@@ -2645,9 +2438,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateProductTitleParallax() {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
-      const heroSection = document.querySelector(".hero");
+      const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
-        ? heroSection.offsetHeight
+        ? _getOffsetHeight(heroSection)
         : window.innerHeight;
 
       // Start parallax effect much later than other elements
@@ -2687,9 +2480,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateFragranceNotesParallax() {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
-      const heroSection = document.querySelector(".hero");
+      const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
-        ? heroSection.offsetHeight
+        ? _getOffsetHeight(heroSection)
         : window.innerHeight;
 
       // Start parallax effect much later than other elements
@@ -2729,9 +2522,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updatePerfumeRatingParallax() {
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
-      const heroSection = document.querySelector(".hero");
+      const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
-        ? heroSection.offsetHeight
+        ? _getOffsetHeight(heroSection)
         : window.innerHeight;
 
       // Start parallax effect much later than other elements
@@ -2844,7 +2637,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (pegasusSection) {
         // Start parallax effect exactly when light grey background transition starts (ultra-smooth and gentle)
-        const triggerPoint = pegasusSection.offsetTop - 600; // Start even earlier
+        const triggerPoint = _getOffsetTop(pegasusSection) - 600; // Start even earlier
         const parallaxRange = 1000; // Shorter range for quicker completion
         const endPoint = triggerPoint + parallaxRange;
 
@@ -2943,7 +2736,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (pegasusSection) {
         // Start parallax effect between image and profile (staggered timing, ultra-smooth)
-        const triggerPoint = pegasusSection.offsetTop - 500; // Start even earlier
+        const triggerPoint = _getOffsetTop(pegasusSection) - 500; // Start even earlier
         const endPoint = triggerPoint + parallaxRange;
 
         if (scrollTop >= triggerPoint && scrollTop <= endPoint) {
@@ -3058,7 +2851,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (pegasusSection) {
         // Start parallax effect much earlier for scent profile
-        const triggerPoint = pegasusSection.offsetTop - 600; // Start much sooner
+        const triggerPoint = _getOffsetTop(pegasusSection) - 600; // Start much sooner
         const parallaxRange = 700; // Shorter range for quicker completion
         const endPoint = triggerPoint + parallaxRange;
 
@@ -3174,7 +2967,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (pegasusSection) {
         // Start parallax effect much earlier for ingredients
-        const triggerPoint = pegasusSection.offsetTop - 600; // Start much sooner
+        const triggerPoint = _getOffsetTop(pegasusSection) - 600; // Start much sooner
         const parallaxRange = 600; // Shorter range for quicker completion
         const endPoint = triggerPoint + parallaxRange;
 
@@ -3285,8 +3078,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const pegasusSection = pegasusPerfumeRating.closest(".content");
 
       if (pegasusSection) {
-        const sectionTop = pegasusSection.offsetTop;
-        const sectionHeight = pegasusSection.offsetHeight;
+        const sectionTop = _getOffsetTop(pegasusSection);
+        const sectionHeight = _getOffsetHeight(pegasusSection);
         const windowHeight = window.innerHeight;
 
         if (
@@ -3397,8 +3190,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const greenlySection = greenlyImage.closest(".content");
 
       if (greenlySection) {
-        const sectionTop = greenlySection.offsetTop;
-        const sectionHeight = greenlySection.offsetHeight;
+        const sectionTop = _getOffsetTop(greenlySection);
+        const sectionHeight = _getOffsetHeight(greenlySection);
         const windowHeight = window.innerHeight;
         const triggerPoint = sectionTop - windowHeight * 0.6;
         const parallaxRange = 400;
@@ -3434,8 +3227,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const greenlySection = greenlyProductInfo.closest(".content");
 
       if (greenlySection) {
-        const sectionTop = greenlySection.offsetTop;
-        const sectionHeight = greenlySection.offsetHeight;
+        const sectionTop = _getOffsetTop(greenlySection);
+        const sectionHeight = _getOffsetHeight(greenlySection);
         const windowHeight = window.innerHeight;
         const triggerPoint = sectionTop - windowHeight * 0.5;
         const parallaxRange = 350;
@@ -3471,8 +3264,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const greenlySection = greenlyScentProfile.closest(".content");
 
       if (greenlySection) {
-        const sectionTop = greenlySection.offsetTop;
-        const sectionHeight = greenlySection.offsetHeight;
+        const sectionTop = _getOffsetTop(greenlySection);
+        const sectionHeight = _getOffsetHeight(greenlySection);
         const windowHeight = window.innerHeight;
         const triggerPoint = sectionTop - windowHeight * 0.4;
         const parallaxRange = 400;
@@ -3508,8 +3301,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const greenlySection = greenlyIngredients.closest(".content");
 
       if (greenlySection) {
-        const sectionTop = greenlySection.offsetTop;
-        const sectionHeight = greenlySection.offsetHeight;
+        const sectionTop = _getOffsetTop(greenlySection);
+        const sectionHeight = _getOffsetHeight(greenlySection);
         const windowHeight = window.innerHeight;
         const triggerPoint = sectionTop - windowHeight * 0.4;
         const parallaxRange = 400;
@@ -3547,8 +3340,8 @@ document.addEventListener("DOMContentLoaded", function () {
       );
 
       if (greenlySection) {
-        const sectionTop = greenlySection.offsetTop;
-        const sectionHeight = greenlySection.offsetHeight;
+        const sectionTop = _getOffsetTop(greenlySection);
+        const sectionHeight = _getOffsetHeight(greenlySection);
         const windowHeight = window.innerHeight;
         const triggerPoint = sectionTop - windowHeight * 0.2;
         const parallaxRange = 300;
@@ -3671,6 +3464,1184 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Baccarat Rouge 540 Parallax Effects
+  const baccaratrougeImage = document.querySelector(".baccaratrouge-image");
+  const baccaratrougeProductInfo = document.querySelector(
+    ".baccaratrouge-theme .product-info-section",
+  );
+  const baccaratrougeScentProfile = document.querySelector(".baccaratrouge-scent-profile");
+  const baccaratrougeIngredients = document.querySelector(".baccaratrouge-ingredients");
+  const baccaratrougeFragranceDescription = document.querySelector(
+    ".baccaratrouge-fragrance-description",
+  );
+
+  // Baccarat Rouge 540 Image Parallax Effect
+  if (baccaratrougeImage) {
+    function updateBaccaratrougeImageParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const baccaratrougeSection = baccaratrougeImage.closest(".content");
+
+      if (baccaratrougeSection) {
+        const sectionTop = _getOffsetTop(baccaratrougeSection);
+        const sectionHeight = _getOffsetHeight(baccaratrougeSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.6;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          baccaratrougeImage.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = -35 + 35 * easeOutQuart;
+          const scale = 0.96 + 0.04 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          baccaratrougeImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          baccaratrougeImage.style.opacity = opacity;
+        } else {
+          baccaratrougeImage.classList.remove("parallax-active");
+          baccaratrougeImage.style.transform = "translateX(-35px) scale(0.96)";
+          baccaratrougeImage.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Baccarat Rouge 540 Product Info Parallax Effect
+  if (baccaratrougeProductInfo) {
+    function updateBaccaratrougeProductInfoParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const baccaratrougeSection = baccaratrougeProductInfo.closest(".content");
+
+      if (baccaratrougeSection) {
+        const sectionTop = _getOffsetTop(baccaratrougeSection);
+        const sectionHeight = _getOffsetHeight(baccaratrougeSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.5;
+        const parallaxRange = 350;
+
+        if (scrollTop > triggerPoint) {
+          baccaratrougeProductInfo.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateY = 30 - 30 * easeOutQuart;
+          const scale = 0.9 + 0.1 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          baccaratrougeProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
+          baccaratrougeProductInfo.style.opacity = opacity;
+        } else {
+          baccaratrougeProductInfo.classList.remove("parallax-active");
+          baccaratrougeProductInfo.style.transform = "translateY(30px) scale(0.9)";
+          baccaratrougeProductInfo.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Baccarat Rouge 540 Scent Profile Parallax Effect
+  if (baccaratrougeScentProfile) {
+    function updateBaccaratrougeScentProfileParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const baccaratrougeSection = baccaratrougeScentProfile.closest(".content");
+
+      if (baccaratrougeSection) {
+        const sectionTop = _getOffsetTop(baccaratrougeSection);
+        const sectionHeight = _getOffsetHeight(baccaratrougeSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.4;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          baccaratrougeScentProfile.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = 150 - 150 * easeOutQuart;
+          const scale = 0.8 + 0.2 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          baccaratrougeScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          baccaratrougeScentProfile.style.opacity = opacity;
+        } else {
+          baccaratrougeScentProfile.classList.remove("parallax-active");
+          baccaratrougeScentProfile.style.transform = "translateX(150px) scale(0.8)";
+          baccaratrougeScentProfile.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Baccarat Rouge 540 Ingredients Parallax Effect
+  if (baccaratrougeIngredients) {
+    function updateBaccaratrougeIngredientsParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const baccaratrougeSection = baccaratrougeIngredients.closest(".content");
+
+      if (baccaratrougeSection) {
+        const sectionTop = _getOffsetTop(baccaratrougeSection);
+        const sectionHeight = _getOffsetHeight(baccaratrougeSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.4;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          baccaratrougeIngredients.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = -150 + 150 * easeOutQuart;
+          const scale = 0.8 + 0.2 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          baccaratrougeIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          baccaratrougeIngredients.style.opacity = opacity;
+        } else {
+          baccaratrougeIngredients.classList.remove("parallax-active");
+          baccaratrougeIngredients.style.transform = "translateX(-150px) scale(0.8)";
+          baccaratrougeIngredients.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Baccarat Rouge 540 Fragrance Description Parallax Effect
+  if (baccaratrougeFragranceDescription) {
+    function updateBaccaratrougeFragranceDescriptionParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const baccaratrougeSection = baccaratrougeFragranceDescription.closest(
+        ".baccaratrouge-main-container",
+      );
+
+      if (baccaratrougeSection) {
+        const sectionTop = _getOffsetTop(baccaratrougeSection);
+        const sectionHeight = _getOffsetHeight(baccaratrougeSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.2;
+        const parallaxRange = 300;
+
+        if (scrollTop > triggerPoint) {
+          baccaratrougeFragranceDescription.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateY = 50 - 50 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          baccaratrougeFragranceDescription.style.transform = `translateY(${translateY}px)`;
+          baccaratrougeFragranceDescription.style.opacity = opacity;
+        } else {
+          baccaratrougeFragranceDescription.classList.remove("parallax-active");
+          baccaratrougeFragranceDescription.style.transform = "translateY(50px)";
+          baccaratrougeFragranceDescription.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Update the main scroll handler to include Baccarat Rouge 540 parallax functions
+  if (
+    baccaratrougeImage ||
+    baccaratrougeProductInfo ||
+    baccaratrougeScentProfile ||
+    baccaratrougeIngredients ||
+    baccaratrougeFragranceDescription
+  ) {
+    // Add Baccarat Rouge 540 parallax update to scroll handler
+    const originalOnScrollWithBaccaratrouge = onScroll;
+    onScroll = function () {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateColors();
+          if (backToTopBtn && progressRing) {
+            updateBackToTop();
+          }
+          if (floatingSearch) {
+            updateFloatingElements();
+          }
+          updateSocialLinks();
+          if (brandImage) {
+            updateBrandImageParallax();
+          }
+          updateLaytonParallax();
+          if (laytonNotes) {
+            updateLaytonNotesParallax();
+          }
+          if (productTitle) {
+            updateProductTitleParallax();
+          }
+          if (fragranceNotes) {
+            updateFragranceNotesParallax();
+          }
+          if (perfumeRating) {
+            updatePerfumeRatingParallax();
+          }
+          // Pegasus parallax functions
+          if (pegasusImage) {
+            updatePegasusImageParallax();
+          }
+          if (pegasusProductTitle) {
+            updatePegasusProductTitleParallax();
+          }
+          if (pegasusFragranceProfile) {
+            updatePegasusFragranceProfileParallax();
+          }
+          if (pegasusFragranceNotes) {
+            updatePegasusFragranceNotesParallax();
+          }
+          if (pegasusPerfumeRating) {
+            updatePegasusPerfumeRatingParallax();
+          }
+          // Baccarat Rouge 540 parallax functions
+          if (baccaratrougeImage) {
+            updateBaccaratrougeImageParallax();
+          }
+          if (baccaratrougeProductInfo) {
+            updateBaccaratrougeProductInfoParallax();
+          }
+          if (baccaratrougeScentProfile) {
+            updateBaccaratrougeScentProfileParallax();
+          }
+          if (baccaratrougeIngredients) {
+            updateBaccaratrougeIngredientsParallax();
+          }
+          if (baccaratrougeFragranceDescription) {
+            updateBaccaratrougeFragranceDescriptionParallax();
+          }
+        });
+        ticking = true;
+      }
+    };
+
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithBaccaratrouge);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Baccarat Rouge 540 parallax calls
+    if (baccaratrougeImage) {
+      updateBaccaratrougeImageParallax();
+    }
+    if (baccaratrougeProductInfo) {
+      updateBaccaratrougeProductInfoParallax();
+    }
+    if (baccaratrougeScentProfile) {
+      updateBaccaratrougeScentProfileParallax();
+    }
+    if (baccaratrougeIngredients) {
+      updateBaccaratrougeIngredientsParallax();
+    }
+    if (baccaratrougeFragranceDescription) {
+      updateBaccaratrougeFragranceDescriptionParallax();
+    }
+  }
+
+
+  // Black Orchid Parallax Effects
+  const blackorchidImage = document.querySelector(".blackorchid-image");
+  const blackorchidProductInfo = document.querySelector(
+    ".blackorchid-theme .product-info-section",
+  );
+  const blackorchidScentProfile = document.querySelector(".blackorchid-scent-profile");
+  const blackorchidIngredients = document.querySelector(".blackorchid-ingredients");
+  const blackorchidFragranceDescription = document.querySelector(
+    ".blackorchid-fragrance-description",
+  );
+
+  // Black Orchid Image Parallax Effect
+  if (blackorchidImage) {
+    function updateBlackorchidImageParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const blackorchidSection = blackorchidImage.closest(".content");
+
+      if (blackorchidSection) {
+        const sectionTop = _getOffsetTop(blackorchidSection);
+        const sectionHeight = _getOffsetHeight(blackorchidSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.6;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          blackorchidImage.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = -35 + 35 * easeOutQuart;
+          const scale = 0.96 + 0.04 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          blackorchidImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          blackorchidImage.style.opacity = opacity;
+        } else {
+          blackorchidImage.classList.remove("parallax-active");
+          blackorchidImage.style.transform = "translateX(-35px) scale(0.96)";
+          blackorchidImage.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Black Orchid Product Info Parallax Effect
+  if (blackorchidProductInfo) {
+    function updateBlackorchidProductInfoParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const blackorchidSection = blackorchidProductInfo.closest(".content");
+
+      if (blackorchidSection) {
+        const sectionTop = _getOffsetTop(blackorchidSection);
+        const sectionHeight = _getOffsetHeight(blackorchidSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.5;
+        const parallaxRange = 350;
+
+        if (scrollTop > triggerPoint) {
+          blackorchidProductInfo.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateY = 30 - 30 * easeOutQuart;
+          const scale = 0.9 + 0.1 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          blackorchidProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
+          blackorchidProductInfo.style.opacity = opacity;
+        } else {
+          blackorchidProductInfo.classList.remove("parallax-active");
+          blackorchidProductInfo.style.transform = "translateY(30px) scale(0.9)";
+          blackorchidProductInfo.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Black Orchid Scent Profile Parallax Effect
+  if (blackorchidScentProfile) {
+    function updateBlackorchidScentProfileParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const blackorchidSection = blackorchidScentProfile.closest(".content");
+
+      if (blackorchidSection) {
+        const sectionTop = _getOffsetTop(blackorchidSection);
+        const sectionHeight = _getOffsetHeight(blackorchidSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.4;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          blackorchidScentProfile.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = 150 - 150 * easeOutQuart;
+          const scale = 0.8 + 0.2 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          blackorchidScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          blackorchidScentProfile.style.opacity = opacity;
+        } else {
+          blackorchidScentProfile.classList.remove("parallax-active");
+          blackorchidScentProfile.style.transform = "translateX(150px) scale(0.8)";
+          blackorchidScentProfile.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Black Orchid Ingredients Parallax Effect
+  if (blackorchidIngredients) {
+    function updateBlackorchidIngredientsParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const blackorchidSection = blackorchidIngredients.closest(".content");
+
+      if (blackorchidSection) {
+        const sectionTop = _getOffsetTop(blackorchidSection);
+        const sectionHeight = _getOffsetHeight(blackorchidSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.4;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          blackorchidIngredients.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = -150 + 150 * easeOutQuart;
+          const scale = 0.8 + 0.2 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          blackorchidIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          blackorchidIngredients.style.opacity = opacity;
+        } else {
+          blackorchidIngredients.classList.remove("parallax-active");
+          blackorchidIngredients.style.transform = "translateX(-150px) scale(0.8)";
+          blackorchidIngredients.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Black Orchid Fragrance Description Parallax Effect
+  if (blackorchidFragranceDescription) {
+    function updateBlackorchidFragranceDescriptionParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const blackorchidSection = blackorchidFragranceDescription.closest(
+        ".blackorchid-main-container",
+      );
+
+      if (blackorchidSection) {
+        const sectionTop = _getOffsetTop(blackorchidSection);
+        const sectionHeight = _getOffsetHeight(blackorchidSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.2;
+        const parallaxRange = 300;
+
+        if (scrollTop > triggerPoint) {
+          blackorchidFragranceDescription.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateY = 50 - 50 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          blackorchidFragranceDescription.style.transform = `translateY(${translateY}px)`;
+          blackorchidFragranceDescription.style.opacity = opacity;
+        } else {
+          blackorchidFragranceDescription.classList.remove("parallax-active");
+          blackorchidFragranceDescription.style.transform = "translateY(50px)";
+          blackorchidFragranceDescription.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Update the main scroll handler to include Black Orchid parallax functions
+  if (
+    blackorchidImage ||
+    blackorchidProductInfo ||
+    blackorchidScentProfile ||
+    blackorchidIngredients ||
+    blackorchidFragranceDescription
+  ) {
+    // Add Black Orchid parallax update to scroll handler
+    const originalOnScrollWithBlackorchid = onScroll;
+    onScroll = function () {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateColors();
+          if (backToTopBtn && progressRing) {
+            updateBackToTop();
+          }
+          if (floatingSearch) {
+            updateFloatingElements();
+          }
+          updateSocialLinks();
+          if (brandImage) {
+            updateBrandImageParallax();
+          }
+          updateLaytonParallax();
+          if (laytonNotes) {
+            updateLaytonNotesParallax();
+          }
+          if (productTitle) {
+            updateProductTitleParallax();
+          }
+          if (fragranceNotes) {
+            updateFragranceNotesParallax();
+          }
+          if (perfumeRating) {
+            updatePerfumeRatingParallax();
+          }
+          // Pegasus parallax functions
+          if (pegasusImage) {
+            updatePegasusImageParallax();
+          }
+          if (pegasusProductTitle) {
+            updatePegasusProductTitleParallax();
+          }
+          if (pegasusFragranceProfile) {
+            updatePegasusFragranceProfileParallax();
+          }
+          if (pegasusFragranceNotes) {
+            updatePegasusFragranceNotesParallax();
+          }
+          if (pegasusPerfumeRating) {
+            updatePegasusPerfumeRatingParallax();
+          }
+          // Black Orchid parallax functions
+          if (blackorchidImage) {
+            updateBlackorchidImageParallax();
+          }
+          if (blackorchidProductInfo) {
+            updateBlackorchidProductInfoParallax();
+          }
+          if (blackorchidScentProfile) {
+            updateBlackorchidScentProfileParallax();
+          }
+          if (blackorchidIngredients) {
+            updateBlackorchidIngredientsParallax();
+          }
+          if (blackorchidFragranceDescription) {
+            updateBlackorchidFragranceDescriptionParallax();
+          }
+        });
+        ticking = true;
+      }
+    };
+
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithBlackorchid);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Black Orchid parallax calls
+    if (blackorchidImage) {
+      updateBlackorchidImageParallax();
+    }
+    if (blackorchidProductInfo) {
+      updateBlackorchidProductInfoParallax();
+    }
+    if (blackorchidScentProfile) {
+      updateBlackorchidScentProfileParallax();
+    }
+    if (blackorchidIngredients) {
+      updateBlackorchidIngredientsParallax();
+    }
+    if (blackorchidFragranceDescription) {
+      updateBlackorchidFragranceDescriptionParallax();
+    }
+  }
+
+
+  // Aventus Parallax Effects
+  const aventusImage = document.querySelector(".aventus-image");
+  const aventusProductInfo = document.querySelector(
+    ".aventus-theme .product-info-section",
+  );
+  const aventusScentProfile = document.querySelector(".aventus-scent-profile");
+  const aventusIngredients = document.querySelector(".aventus-ingredients");
+  const aventusFragranceDescription = document.querySelector(
+    ".aventus-fragrance-description",
+  );
+
+  // Aventus Image Parallax Effect
+  if (aventusImage) {
+    function updateAventusImageParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const aventusSection = aventusImage.closest(".content");
+
+      if (aventusSection) {
+        const sectionTop = _getOffsetTop(aventusSection);
+        const sectionHeight = _getOffsetHeight(aventusSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.6;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          aventusImage.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = -35 + 35 * easeOutQuart;
+          const scale = 0.96 + 0.04 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          aventusImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          aventusImage.style.opacity = opacity;
+        } else {
+          aventusImage.classList.remove("parallax-active");
+          aventusImage.style.transform = "translateX(-35px) scale(0.96)";
+          aventusImage.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Aventus Product Info Parallax Effect
+  if (aventusProductInfo) {
+    function updateAventusProductInfoParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const aventusSection = aventusProductInfo.closest(".content");
+
+      if (aventusSection) {
+        const sectionTop = _getOffsetTop(aventusSection);
+        const sectionHeight = _getOffsetHeight(aventusSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.5;
+        const parallaxRange = 350;
+
+        if (scrollTop > triggerPoint) {
+          aventusProductInfo.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateY = 30 - 30 * easeOutQuart;
+          const scale = 0.9 + 0.1 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          aventusProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
+          aventusProductInfo.style.opacity = opacity;
+        } else {
+          aventusProductInfo.classList.remove("parallax-active");
+          aventusProductInfo.style.transform = "translateY(30px) scale(0.9)";
+          aventusProductInfo.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Aventus Scent Profile Parallax Effect
+  if (aventusScentProfile) {
+    function updateAventusScentProfileParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const aventusSection = aventusScentProfile.closest(".content");
+
+      if (aventusSection) {
+        const sectionTop = _getOffsetTop(aventusSection);
+        const sectionHeight = _getOffsetHeight(aventusSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.4;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          aventusScentProfile.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = 150 - 150 * easeOutQuart;
+          const scale = 0.8 + 0.2 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          aventusScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          aventusScentProfile.style.opacity = opacity;
+        } else {
+          aventusScentProfile.classList.remove("parallax-active");
+          aventusScentProfile.style.transform = "translateX(150px) scale(0.8)";
+          aventusScentProfile.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Aventus Ingredients Parallax Effect
+  if (aventusIngredients) {
+    function updateAventusIngredientsParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const aventusSection = aventusIngredients.closest(".content");
+
+      if (aventusSection) {
+        const sectionTop = _getOffsetTop(aventusSection);
+        const sectionHeight = _getOffsetHeight(aventusSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.4;
+        const parallaxRange = 400;
+
+        if (scrollTop > triggerPoint) {
+          aventusIngredients.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateX = -150 + 150 * easeOutQuart;
+          const scale = 0.8 + 0.2 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          aventusIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
+          aventusIngredients.style.opacity = opacity;
+        } else {
+          aventusIngredients.classList.remove("parallax-active");
+          aventusIngredients.style.transform = "translateX(-150px) scale(0.8)";
+          aventusIngredients.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Aventus Fragrance Description Parallax Effect
+  if (aventusFragranceDescription) {
+    function updateAventusFragranceDescriptionParallax() {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const aventusSection = aventusFragranceDescription.closest(
+        ".aventus-main-container",
+      );
+
+      if (aventusSection) {
+        const sectionTop = _getOffsetTop(aventusSection);
+        const sectionHeight = _getOffsetHeight(aventusSection);
+        const windowHeight = window.innerHeight;
+        const triggerPoint = sectionTop - windowHeight * 0.2;
+        const parallaxRange = 300;
+
+        if (scrollTop > triggerPoint) {
+          aventusFragranceDescription.classList.add("parallax-active");
+          const progress = Math.min(
+            (scrollTop - triggerPoint) / parallaxRange,
+            1,
+          );
+          const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+
+          const translateY = 50 - 50 * easeOutQuart;
+          const opacity = easeOutQuart;
+
+          aventusFragranceDescription.style.transform = `translateY(${translateY}px)`;
+          aventusFragranceDescription.style.opacity = opacity;
+        } else {
+          aventusFragranceDescription.classList.remove("parallax-active");
+          aventusFragranceDescription.style.transform = "translateY(50px)";
+          aventusFragranceDescription.style.opacity = "0";
+        }
+      }
+    }
+  }
+
+  // Update the main scroll handler to include Aventus parallax functions
+  if (
+    aventusImage ||
+    aventusProductInfo ||
+    aventusScentProfile ||
+    aventusIngredients ||
+    aventusFragranceDescription
+  ) {
+    // Add Aventus parallax update to scroll handler
+    const originalOnScrollWithAventus = onScroll;
+    onScroll = function () {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateColors();
+          if (backToTopBtn && progressRing) {
+            updateBackToTop();
+          }
+          if (floatingSearch) {
+            updateFloatingElements();
+          }
+          updateSocialLinks();
+          if (brandImage) {
+            updateBrandImageParallax();
+          }
+          updateLaytonParallax();
+          if (laytonNotes) {
+            updateLaytonNotesParallax();
+          }
+          if (productTitle) {
+            updateProductTitleParallax();
+          }
+          if (fragranceNotes) {
+            updateFragranceNotesParallax();
+          }
+          if (perfumeRating) {
+            updatePerfumeRatingParallax();
+          }
+          // Pegasus parallax functions
+          if (pegasusImage) {
+            updatePegasusImageParallax();
+          }
+          if (pegasusProductTitle) {
+            updatePegasusProductTitleParallax();
+          }
+          if (pegasusFragranceProfile) {
+            updatePegasusFragranceProfileParallax();
+          }
+          if (pegasusFragranceNotes) {
+            updatePegasusFragranceNotesParallax();
+          }
+          if (pegasusPerfumeRating) {
+            updatePegasusPerfumeRatingParallax();
+          }
+          // Greenly parallax functions
+          if (typeof greenlyImage !== 'undefined' && greenlyImage) {
+            updateGreenlyImageParallax();
+          }
+          if (typeof greenlyProductInfo !== 'undefined' && greenlyProductInfo) {
+            updateGreenlyProductInfoParallax();
+          }
+          if (typeof greenlyScentProfile !== 'undefined' && greenlyScentProfile) {
+            updateGreenlyScentProfileParallax();
+          }
+          if (typeof greenlyIngredients !== 'undefined' && greenlyIngredients) {
+            updateGreenlyIngredientsParallax();
+          }
+          if (typeof greenlyFragranceDescription !== 'undefined' && greenlyFragranceDescription) {
+            updateGreenlyFragranceDescriptionParallax();
+          }
+          // Baccarat Rouge 540 parallax functions
+          if (typeof baccaratrougeImage !== 'undefined' && baccaratrougeImage) {
+            updateBaccaratrougeImageParallax();
+          }
+          if (typeof baccaratrougeProductInfo !== 'undefined' && baccaratrougeProductInfo) {
+            updateBaccaratrougeProductInfoParallax();
+          }
+          if (typeof baccaratrougeScentProfile !== 'undefined' && baccaratrougeScentProfile) {
+            updateBaccaratrougeScentProfileParallax();
+          }
+          if (typeof baccaratrougeIngredients !== 'undefined' && baccaratrougeIngredients) {
+            updateBaccaratrougeIngredientsParallax();
+          }
+          if (typeof baccaratrougeFragranceDescription !== 'undefined' && baccaratrougeFragranceDescription) {
+            updateBaccaratrougeFragranceDescriptionParallax();
+          }
+          // Black Orchid parallax functions
+          if (typeof blackorchidImage !== 'undefined' && blackorchidImage) {
+            updateBlackorchidImageParallax();
+          }
+          if (typeof blackorchidProductInfo !== 'undefined' && blackorchidProductInfo) {
+            updateBlackorchidProductInfoParallax();
+          }
+          if (typeof blackorchidScentProfile !== 'undefined' && blackorchidScentProfile) {
+            updateBlackorchidScentProfileParallax();
+          }
+          if (typeof blackorchidIngredients !== 'undefined' && blackorchidIngredients) {
+            updateBlackorchidIngredientsParallax();
+          }
+          if (typeof blackorchidFragranceDescription !== 'undefined' && blackorchidFragranceDescription) {
+            updateBlackorchidFragranceDescriptionParallax();
+          }
+          // Aventus parallax functions
+          if (aventusImage) {
+            updateAventusImageParallax();
+          }
+          if (aventusProductInfo) {
+            updateAventusProductInfoParallax();
+          }
+          if (aventusScentProfile) {
+            updateAventusScentProfileParallax();
+          }
+          if (aventusIngredients) {
+            updateAventusIngredientsParallax();
+          }
+          if (aventusFragranceDescription) {
+            updateAventusFragranceDescriptionParallax();
+          }
+        });
+        ticking = true;
+      }
+    };
+
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithAventus);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Aventus parallax calls
+    if (aventusImage) {
+      updateAventusImageParallax();
+    }
+    if (aventusProductInfo) {
+      updateAventusProductInfoParallax();
+    }
+    if (aventusScentProfile) {
+      updateAventusScentProfileParallax();
+    }
+    if (aventusIngredients) {
+      updateAventusIngredientsParallax();
+    }
+    if (aventusFragranceDescription) {
+      updateAventusFragranceDescriptionParallax();
+    }
+  }
+
+  // ===== NEW SECTIONS PARALLAX (Sauvage, Bleu de Chanel, Tobacco Vanille, Oud Wood, La Nuit, Lost Cherry) =====
+  const newSectionParallaxConfigs = [
+    { id: 'sauvage', imageClass: '.sauvage-image', infoSelector: '.sauvage-theme .product-info-section', scentClass: '.sauvage-scent-profile', ingredientsClass: '.sauvage-ingredients', descClass: '.sauvage-fragrance-description', containerClass: '.sauvage-main-container' },
+    { id: 'bleudechanel', imageClass: '.bleudechanel-image', infoSelector: '.bleudechanel-theme .product-info-section', scentClass: '.bleudechanel-scent-profile', ingredientsClass: '.bleudechanel-ingredients', descClass: '.bleudechanel-fragrance-description', containerClass: '.bleudechanel-main-container' },
+    { id: 'tobaccovanille', imageClass: '.tobaccovanille-image', infoSelector: '.tobaccovanille-theme .product-info-section', scentClass: '.tobaccovanille-scent-profile', ingredientsClass: '.tobaccovanille-ingredients', descClass: '.tobaccovanille-fragrance-description', containerClass: '.tobaccovanille-main-container' },
+    { id: 'oudwood', imageClass: '.oudwood-image', infoSelector: '.oudwood-theme .product-info-section', scentClass: '.oudwood-scent-profile', ingredientsClass: '.oudwood-ingredients', descClass: '.oudwood-fragrance-description', containerClass: '.oudwood-main-container' },
+    { id: 'lanuit', imageClass: '.lanuit-image', infoSelector: '.lanuit-theme .product-info-section', scentClass: '.lanuit-scent-profile', ingredientsClass: '.lanuit-ingredients', descClass: '.lanuit-fragrance-description', containerClass: '.lanuit-main-container' },
+    { id: 'lostcherry', imageClass: '.lostcherry-image', infoSelector: '.lostcherry-theme .product-info-section', scentClass: '.lostcherry-scent-profile', ingredientsClass: '.lostcherry-ingredients', descClass: '.lostcherry-fragrance-description', containerClass: '.lostcherry-main-container' },
+    { id: 'yvsl', imageClass: '.yvsl-image', infoSelector: '.yvsl-theme .product-info-section', scentClass: '.yvsl-scent-profile', ingredientsClass: '.yvsl-ingredients', descClass: '.yvsl-fragrance-description', containerClass: '.yvsl-main-container' },
+    { id: 'aquadigio', imageClass: '.aquadigio-image', infoSelector: '.aquadigio-theme .product-info-section', scentClass: '.aquadigio-scent-profile', ingredientsClass: '.aquadigio-ingredients', descClass: '.aquadigio-fragrance-description', containerClass: '.aquadigio-main-container' },
+    { id: 'dy', imageClass: '.dy-image', infoSelector: '.dy-theme .product-info-section', scentClass: '.dy-scent-profile', ingredientsClass: '.dy-ingredients', descClass: '.dy-fragrance-description', containerClass: '.dy-main-container' },
+    { id: 'versaceeros', imageClass: '.versaceeros-image', infoSelector: '.versaceeros-theme .product-info-section', scentClass: '.versaceeros-scent-profile', ingredientsClass: '.versaceeros-ingredients', descClass: '.versaceeros-fragrance-description', containerClass: '.versaceeros-main-container' },
+    { id: 'jpgultramale', imageClass: '.jpgultramale-image', infoSelector: '.jpgultramale-theme .product-info-section', scentClass: '.jpgultramale-scent-profile', ingredientsClass: '.jpgultramale-ingredients', descClass: '.jpgultramale-fragrance-description', containerClass: '.jpgultramale-main-container' },
+    { id: 'invictus', imageClass: '.invictus-image', infoSelector: '.invictus-theme .product-info-section', scentClass: '.invictus-scent-profile', ingredientsClass: '.invictus-ingredients', descClass: '.invictus-fragrance-description', containerClass: '.invictus-main-container' },
+    { id: 'valentinouomo', imageClass: '.valentinouomo-image', infoSelector: '.valentinouomo-theme .product-info-section', scentClass: '.valentinouomo-scent-profile', ingredientsClass: '.valentinouomo-ingredients', descClass: '.valentinouomo-fragrance-description', containerClass: '.valentinouomo-main-container' },
+    { id: 'spicebomb', imageClass: '.spicebomb-image', infoSelector: '.spicebomb-theme .product-info-section', scentClass: '.spicebomb-scent-profile', ingredientsClass: '.spicebomb-ingredients', descClass: '.spicebomb-fragrance-description', containerClass: '.spicebomb-main-container' },
+    { id: 'explorer', imageClass: '.explorer-image', infoSelector: '.explorer-theme .product-info-section', scentClass: '.explorer-scent-profile', ingredientsClass: '.explorer-ingredients', descClass: '.explorer-fragrance-description', containerClass: '.explorer-main-container' },
+    { id: 'blv', imageClass: '.blv-image', infoSelector: '.blv-theme .product-info-section', scentClass: '.blv-scent-profile', ingredientsClass: '.blv-ingredients', descClass: '.blv-fragrance-description', containerClass: '.blv-main-container' },
+    { id: 'diorhomme', imageClass: '.diorhomme-image', infoSelector: '.diorhomme-theme .product-info-section', scentClass: '.diorhomme-scent-profile', ingredientsClass: '.diorhomme-ingredients', descClass: '.diorhomme-fragrance-description', containerClass: '.diorhomme-main-container' },
+    { id: 'allure', imageClass: '.allure-image', infoSelector: '.allure-theme .product-info-section', scentClass: '.allure-scent-profile', ingredientsClass: '.allure-ingredients', descClass: '.allure-fragrance-description', containerClass: '.allure-main-container' },
+    { id: 'tuscanleather', imageClass: '.tuscanleather-image', infoSelector: '.tuscanleather-theme .product-info-section', scentClass: '.tuscanleather-scent-profile', ingredientsClass: '.tuscanleather-ingredients', descClass: '.tuscanleather-fragrance-description', containerClass: '.tuscanleather-main-container' },
+    { id: 'armanicode', imageClass: '.armanicode-image', infoSelector: '.armanicode-theme .product-info-section', scentClass: '.armanicode-scent-profile', ingredientsClass: '.armanicode-ingredients', descClass: '.armanicode-fragrance-description', containerClass: '.armanicode-main-container' },
+    { id: 'lhommeideal', imageClass: '.lhommeideal-image', infoSelector: '.lhommeideal-theme .product-info-section', scentClass: '.lhommeideal-scent-profile', ingredientsClass: '.lhommeideal-ingredients', descClass: '.lhommeideal-fragrance-description', containerClass: '.lhommeideal-main-container' },
+    { id: 'terredhermes', imageClass: '.terredhermes-image', infoSelector: '.terredhermes-theme .product-info-section', scentClass: '.terredhermes-scent-profile', ingredientsClass: '.terredhermes-ingredients', descClass: '.terredhermes-fragrance-description', containerClass: '.terredhermes-main-container' },
+    { id: 'gentleman', imageClass: '.gentleman-image', infoSelector: '.gentleman-theme .product-info-section', scentClass: '.gentleman-scent-profile', ingredientsClass: '.gentleman-ingredients', descClass: '.gentleman-fragrance-description', containerClass: '.gentleman-main-container' },
+    { id: 'wantedbynight', imageClass: '.wantedbynight-image', infoSelector: '.wantedbynight-theme .product-info-section', scentClass: '.wantedbynight-scent-profile', ingredientsClass: '.wantedbynight-ingredients', descClass: '.wantedbynight-fragrance-description', containerClass: '.wantedbynight-main-container' },
+    { id: 'kbyDG', imageClass: '.kbyDG-image', infoSelector: '.kbyDG-theme .product-info-section', scentClass: '.kbyDG-scent-profile', ingredientsClass: '.kbyDG-ingredients', descClass: '.kbyDG-fragrance-description', containerClass: '.kbyDG-main-container' },
+    { id: 'leaudissey', imageClass: '.leaudissey-image', infoSelector: '.leaudissey-theme .product-info-section', scentClass: '.leaudissey-scent-profile', ingredientsClass: '.leaudissey-ingredients', descClass: '.leaudissey-fragrance-description', containerClass: '.leaudissey-main-container' },
+    { id: 'chbadboy', imageClass: '.chbadboy-image', infoSelector: '.chbadboy-theme .product-info-section', scentClass: '.chbadboy-scent-profile', ingredientsClass: '.chbadboy-ingredients', descClass: '.chbadboy-fragrance-description', containerClass: '.chbadboy-main-container' },
+    { id: 'ysllibre', imageClass: '.ysllibre-image', infoSelector: '.ysllibre-theme .product-info-section', scentClass: '.ysllibre-scent-profile', ingredientsClass: '.ysllibre-ingredients', descClass: '.ysllibre-fragrance-description', containerClass: '.ysllibre-main-container' },
+    { id: 'fireplace', imageClass: '.fireplace-image', infoSelector: '.fireplace-theme .product-info-section', scentClass: '.fireplace-scent-profile', ingredientsClass: '.fireplace-ingredients', descClass: '.fireplace-fragrance-description', containerClass: '.fireplace-main-container' },
+    { id: 'pradacarbon', imageClass: '.pradacarbon-image', infoSelector: '.pradacarbon-theme .product-info-section', scentClass: '.pradacarbon-scent-profile', ingredientsClass: '.pradacarbon-ingredients', descClass: '.pradacarbon-fragrance-description', containerClass: '.pradacarbon-main-container' },
+    { id: 'burberryhero', imageClass: '.burberryhero-image', infoSelector: '.burberryhero-theme .product-info-section', scentClass: '.burberryhero-scent-profile', ingredientsClass: '.burberryhero-ingredients', descClass: '.burberryhero-fragrance-description', containerClass: '.burberryhero-main-container' },
+    { id: 'narcisoforhim', imageClass: '.narcisoforhim-image', infoSelector: '.narcisoforhim-theme .product-info-section', scentClass: '.narcisoforhim-scent-profile', ingredientsClass: '.narcisoforhim-ingredients', descClass: '.narcisoforhim-fragrance-description', containerClass: '.narcisoforhim-main-container' },
+    { id: 'cketernity', imageClass: '.cketernity-image', infoSelector: '.cketernity-theme .product-info-section', scentClass: '.cketernity-scent-profile', ingredientsClass: '.cketernity-ingredients', descClass: '.cketernity-fragrance-description', containerClass: '.cketernity-main-container' },
+    { id: 'gucciguilty', imageClass: '.gucciguilty-image', infoSelector: '.gucciguilty-theme .product-info-section', scentClass: '.gucciguilty-scent-profile', ingredientsClass: '.gucciguilty-ingredients', descClass: '.gucciguilty-fragrance-description', containerClass: '.gucciguilty-main-container' },
+    { id: 'valentinodonna', imageClass: '.valentinodonna-image', infoSelector: '.valentinodonna-theme .product-info-section', scentClass: '.valentinodonna-scent-profile', ingredientsClass: '.valentinodonna-ingredients', descClass: '.valentinodonna-fragrance-description', containerClass: '.valentinodonna-main-container' },
+    { id: 'greenirish', imageClass: '.greenirish-image', infoSelector: '.greenirish-theme .product-info-section', scentClass: '.greenirish-scent-profile', ingredientsClass: '.greenirish-ingredients', descClass: '.greenirish-fragrance-description', containerClass: '.greenirish-main-container' },
+    { id: 'egoiste', imageClass: '.egoiste-image', infoSelector: '.egoiste-theme .product-info-section', scentClass: '.egoiste-scent-profile', ingredientsClass: '.egoiste-ingredients', descClass: '.egoiste-fragrance-description', containerClass: '.egoiste-main-container' },
+    { id: 'amenpure', imageClass: '.amenpure-image', infoSelector: '.amenpure-theme .product-info-section', scentClass: '.amenpure-scent-profile', ingredientsClass: '.amenpure-ingredients', descClass: '.amenpure-fragrance-description', containerClass: '.amenpure-main-container' },
+    { id: 'declarationcartier', imageClass: '.declarationcartier-image', infoSelector: '.declarationcartier-theme .product-info-section', scentClass: '.declarationcartier-scent-profile', ingredientsClass: '.declarationcartier-ingredients', descClass: '.declarationcartier-fragrance-description', containerClass: '.declarationcartier-main-container' },
+    { id: 'laween', imageClass: '.laween-image', infoSelector: '.laween-theme .product-info-section', scentClass: '.laween-scent-profile', ingredientsClass: '.laween-ingredients', descClass: '.laween-fragrance-description', containerClass: '.laween-main-container' },
+    { id: 'cedarsmancera', imageClass: '.cedarsmancera-image', infoSelector: '.cedarsmancera-theme .product-info-section', scentClass: '.cedarsmancera-scent-profile', ingredientsClass: '.cedarsmancera-ingredients', descClass: '.cedarsmancera-fragrance-description', containerClass: '.cedarsmancera-main-container' },
+    { id: 'reflectionman', imageClass: '.reflectionman-image', infoSelector: '.reflectionman-theme .product-info-section', scentClass: '.reflectionman-scent-profile', ingredientsClass: '.reflectionman-ingredients', descClass: '.reflectionman-fragrance-description', containerClass: '.reflectionman-main-container' },
+    { id: 'sedley', imageClass: '.sedley-image', infoSelector: '.sedley-theme .product-info-section', scentClass: '.sedley-scent-profile', ingredientsClass: '.sedley-ingredients', descClass: '.sedley-fragrance-description', containerClass: '.sedley-main-container' },
+    { id: 'sideeffect', imageClass: '.sideeffect-image', infoSelector: '.sideeffect-theme .product-info-section', scentClass: '.sideeffect-scent-profile', ingredientsClass: '.sideeffect-ingredients', descClass: '.sideeffect-fragrance-description', containerClass: '.sideeffect-main-container' },
+    { id: 'naxos', imageClass: '.naxos-image', infoSelector: '.naxos-theme .product-info-section', scentClass: '.naxos-scent-profile', ingredientsClass: '.naxos-ingredients', descClass: '.naxos-fragrance-description', containerClass: '.naxos-main-container' },
+    { id: 'grandSoir', imageClass: '.grandSoir-image', infoSelector: '.grandSoir-theme .product-info-section', scentClass: '.grandSoir-scent-profile', ingredientsClass: '.grandSoir-ingredients', descClass: '.grandSoir-fragrance-description', containerClass: '.grandSoir-main-container' }
+  ];
+
+  // Generic parallax function factory
+  function createParallaxUpdater(element, triggerOffset, range, transformFn) {
+    let _lastEased = -1; // skip redundant style writes
+    return function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const section = element.closest('.content') || element.parentElement;
+      if (!section) return;
+      const sectionTop = _getOffsetTop(section);
+      const windowH = window.innerHeight;
+
+      // Skip elements far from viewport (2 screens away)
+      if (scrollTop + windowH * 2 < sectionTop || scrollTop > sectionTop + section.offsetHeight + windowH) return;
+
+      const triggerPoint = sectionTop - windowH * triggerOffset;
+      let eased;
+      if (scrollTop > triggerPoint) {
+        const progress = Math.min((scrollTop - triggerPoint) / range, 1);
+        eased = 1 - Math.pow(1 - progress, 4);
+      } else {
+        eased = 0;
+      }
+      // Round to 3 decimals to reduce redundant writes
+      eased = Math.round(eased * 1000) / 1000;
+      if (eased === _lastEased) return;
+      _lastEased = eased;
+      if (eased > 0) {
+        element.classList.add('parallax-active');
+      } else {
+        element.classList.remove('parallax-active');
+      }
+      const { transform, opacity } = transformFn(eased);
+      element.style.transform = transform;
+      element.style.opacity = opacity;
+    };
+  }
+
+  const newSectionParallaxUpdaters = [];
+
+  newSectionParallaxConfigs.forEach(config => {
+    const img = document.querySelector(config.imageClass);
+    const info = document.querySelector(config.infoSelector);
+    const scent = document.querySelector(config.scentClass);
+    const ingredients = document.querySelector(config.ingredientsClass);
+    const desc = document.querySelector(config.descClass);
+
+    if (img) {
+      const fn = createParallaxUpdater(img, 0.6, 400, (e) => ({
+        transform: `translateX(${-35 + 35 * e}px) scale(${0.96 + 0.04 * e})`,
+        opacity: e
+      }));
+      newSectionParallaxUpdaters.push(fn);
+      fn();
+    }
+    if (info) {
+      const fn = createParallaxUpdater(info, 0.5, 350, (e) => ({
+        transform: `translateY(${30 - 30 * e}px) scale(${0.9 + 0.1 * e})`,
+        opacity: e
+      }));
+      newSectionParallaxUpdaters.push(fn);
+      fn();
+    }
+    if (scent) {
+      const fn = createParallaxUpdater(scent, 0.4, 400, (e) => ({
+        transform: `translateX(${150 - 150 * e}px) scale(${0.8 + 0.2 * e})`,
+        opacity: e
+      }));
+      newSectionParallaxUpdaters.push(fn);
+      fn();
+    }
+    if (ingredients) {
+      const fn = createParallaxUpdater(ingredients, 0.4, 400, (e) => ({
+        transform: `translateX(${-150 + 150 * e}px) scale(${0.8 + 0.2 * e})`,
+        opacity: e
+      }));
+      newSectionParallaxUpdaters.push(fn);
+      fn();
+    }
+    if (desc) {
+      const fn = createParallaxUpdater(desc, 0.2, 300, (e) => ({
+        transform: `translateY(${50 - 50 * e}px)`,
+        opacity: e
+      }));
+      newSectionParallaxUpdaters.push(fn);
+      fn();
+    }
+  });
+
+  // Inject new section parallax into scroll handler
+  if (newSectionParallaxUpdaters.length > 0) {
+    const previousOnScroll = onScroll;
+    onScroll = function () {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          try {
+            const _st = window.pageYOffset || document.documentElement.scrollTop;
+            const _wh = window.innerHeight;
+
+            updateColors();
+            if (backToTopBtn && progressRing) { updateBackToTop(); }
+            if (floatingSearch) { updateFloatingElements(); }
+            updateSocialLinks();
+
+            // ---------- Viewport-culled parallax groups ----------
+            // Each group only runs if user is within ~2 screens of that section
+
+            // Layton group (near top of page)
+            const _laytonTop = brandImage ? _getOffsetTop(brandImage.closest('.content') || brandImage) : 0;
+            if (_st < _laytonTop + _wh * 3) {
+              if (brandImage) { updateBrandImageParallax(); }
+              updateLaytonParallax();
+              if (laytonNotes) { updateLaytonNotesParallax(); }
+              if (productTitle) { updateProductTitleParallax(); }
+              if (fragranceNotes) { updateFragranceNotesParallax(); }
+              if (perfumeRating) { updatePerfumeRatingParallax(); }
+            }
+
+            // Pegasus group
+            if (pegasusImage) {
+              const _pegTop = _getOffsetTop(pegasusImage.closest('.content') || pegasusImage);
+              if (_st + _wh * 2 > _pegTop && _st < _pegTop + _wh * 3) {
+                updatePegasusImageParallax();
+                if (pegasusProductTitle) { updatePegasusProductTitleParallax(); }
+                if (pegasusFragranceProfile) { updatePegasusFragranceProfileParallax(); }
+                if (pegasusFragranceNotes) { updatePegasusFragranceNotesParallax(); }
+                if (pegasusPerfumeRating) { updatePegasusPerfumeRatingParallax(); }
+              }
+            }
+
+            // Greenly group
+            if (typeof greenlyImage !== 'undefined' && greenlyImage) {
+              const _grTop = _getOffsetTop(greenlyImage.closest('.content') || greenlyImage);
+              if (_st + _wh * 2 > _grTop && _st < _grTop + _wh * 3) {
+                updateGreenlyImageParallax();
+                if (typeof greenlyProductInfo !== 'undefined' && greenlyProductInfo) { updateGreenlyProductInfoParallax(); }
+                if (typeof greenlyScentProfile !== 'undefined' && greenlyScentProfile) { updateGreenlyScentProfileParallax(); }
+                if (typeof greenlyIngredients !== 'undefined' && greenlyIngredients) { updateGreenlyIngredientsParallax(); }
+                if (typeof greenlyFragranceDescription !== 'undefined' && greenlyFragranceDescription) { updateGreenlyFragranceDescriptionParallax(); }
+              }
+            }
+
+            // Baccarat Rouge group
+            if (typeof baccaratrougeImage !== 'undefined' && baccaratrougeImage) {
+              const _brTop = _getOffsetTop(baccaratrougeImage.closest('.content') || baccaratrougeImage);
+              if (_st + _wh * 2 > _brTop && _st < _brTop + _wh * 3) {
+                updateBaccaratrougeImageParallax();
+                if (typeof baccaratrougeProductInfo !== 'undefined' && baccaratrougeProductInfo) { updateBaccaratrougeProductInfoParallax(); }
+                if (typeof baccaratrougeScentProfile !== 'undefined' && baccaratrougeScentProfile) { updateBaccaratrougeScentProfileParallax(); }
+                if (typeof baccaratrougeIngredients !== 'undefined' && baccaratrougeIngredients) { updateBaccaratrougeIngredientsParallax(); }
+                if (typeof baccaratrougeFragranceDescription !== 'undefined' && baccaratrougeFragranceDescription) { updateBaccaratrougeFragranceDescriptionParallax(); }
+              }
+            }
+
+            // Black Orchid group
+            if (typeof blackorchidImage !== 'undefined' && blackorchidImage) {
+              const _boTop = _getOffsetTop(blackorchidImage.closest('.content') || blackorchidImage);
+              if (_st + _wh * 2 > _boTop && _st < _boTop + _wh * 3) {
+                updateBlackorchidImageParallax();
+                if (typeof blackorchidProductInfo !== 'undefined' && blackorchidProductInfo) { updateBlackorchidProductInfoParallax(); }
+                if (typeof blackorchidScentProfile !== 'undefined' && blackorchidScentProfile) { updateBlackorchidScentProfileParallax(); }
+                if (typeof blackorchidIngredients !== 'undefined' && blackorchidIngredients) { updateBlackorchidIngredientsParallax(); }
+                if (typeof blackorchidFragranceDescription !== 'undefined' && blackorchidFragranceDescription) { updateBlackorchidFragranceDescriptionParallax(); }
+              }
+            }
+
+            // Aventus group
+            if (aventusImage) {
+              const _avTop = _getOffsetTop(aventusImage.closest('.content') || aventusImage);
+              if (_st + _wh * 2 > _avTop && _st < _avTop + _wh * 3) {
+                updateAventusImageParallax();
+                if (aventusProductInfo) { updateAventusProductInfoParallax(); }
+                if (aventusScentProfile) { updateAventusScentProfileParallax(); }
+                if (aventusIngredients) { updateAventusIngredientsParallax(); }
+                if (aventusFragranceDescription) { updateAventusFragranceDescriptionParallax(); }
+              }
+            }
+
+            // New sections parallax (already has viewport culling in createParallaxUpdater)
+            newSectionParallaxUpdaters.forEach(fn => fn());
+          } finally {
+            ticking = false;
+          }
+        });
+        ticking = true;
+      }
+    };
+
+    window.removeEventListener("scroll", previousOnScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
+
+    requestAnimationFrame(() => {
+      // Ensure cached layout values start fresh after initial render
+      try {
+        invalidateScrollCache();
+      } catch (e) {
+        // ignore
+      }
+      updateColors();
+    });
   // Initialize Authentication System
   initializeAuth();
 
@@ -7717,7 +8688,7 @@ async function refreshAllCommentSections() {
     updateProfileModalData(currentUser);
 
     // Refresh all review sections and replies
-    const fragrances = ["layton", "haltane", "pegasus", "greenly"];
+    const fragrances = ["layton", "haltane", "pegasus", "greenly", "baccaratrouge", "blackorchid", "aventus", "sauvage", "bleudechanel", "tobaccovanille", "oudwood", "lanuit", "lostcherry", "yvsl", "aquadigio", "dy", "versaceeros", "jpgultramale", "invictus", "valentinouomo", "spicebomb", "explorer", "blv", "diorhomme", "allure", "tuscanleather", "armanicode", "lhommeideal", "terredhermes", "gentleman", "wantedbynight", "kbyDG", "leaudissey", "chbadboy", "ysllibre", "fireplace", "pradacarbon", "burberryhero", "narcisoforhim", "cketernity", "gucciguilty", "valentinodonna", "greenirish", "egoiste", "amenpure", "declarationcartier", "laween", "cedarsmancera", "reflectionman", "sedley", "sideeffect", "naxos", "grandSoir"];
 
     for (const fragrance of fragrances) {
       console.log(`ðŸ”„ Refreshing ${fragrance} reviews and replies...`);
@@ -10864,7 +11835,7 @@ class CartManager {
 
   initializeCartButtons() {
     // Check which products are already in cart and update button states
-    const productIds = ["layton", "haltane", "pegasus", "greenly"];
+    const productIds = ["layton", "haltane", "pegasus", "greenly", "baccaratrouge", "blackorchid", "aventus", "sauvage", "bleudechanel", "tobaccovanille", "oudwood", "lanuit", "lostcherry", "yvsl", "aquadigio", "dy", "versaceeros", "jpgultramale", "invictus", "valentinouomo", "spicebomb", "explorer", "blv", "diorhomme", "allure", "tuscanleather", "armanicode", "lhommeideal", "terredhermes", "gentleman", "wantedbynight", "kbyDG", "leaudissey", "chbadboy", "ysllibre", "fireplace", "pradacarbon", "burberryhero", "narcisoforhim", "cketernity", "gucciguilty", "valentinodonna", "greenirish", "egoiste", "amenpure", "declarationcartier", "laween", "cedarsmancera", "reflectionman", "sedley", "sideeffect", "naxos", "grandSoir"];
     productIds.forEach((productId) => {
       const inCart = this.cart.some((item) => item.productId === productId);
       this.updateCartButton(productId, inCart);
@@ -10873,21 +11844,59 @@ class CartManager {
 
   getProductDetails(productId) {
     const products = {
-      layton: {
-        name: "Layton",
-        brand: "Parfums de Marly",
-        image: "layton.png",
-      },
-      haltane: {
-        name: "Haltane",
-        brand: "Parfums de Marly",
-        image: "haltane.png",
-      },
-      pegasus: {
-        name: "Pegasus",
-        brand: "Parfums de Marly",
-        image: "pegasus.png",
-      },
+      layton: { name: "Layton", brand: "Parfums de Marly", image: "layton.png" },
+      haltane: { name: "Haltane", brand: "Parfums de Marly", image: "haltane.png" },
+      pegasus: { name: "Pegasus", brand: "Parfums de Marly", image: "pegasus.png" },
+      greenly: { name: "Greenly", brand: "Parfums de Marly", image: "GREENLEY.png" },
+      baccaratrouge: { name: "Baccarat Rouge 540", brand: "Maison Francis Kurkdjian", image: "baccarat-rouge-540.png" },
+      blackorchid: { name: "Black Orchid", brand: "Tom Ford", image: "black-orchid.png" },
+      aventus: { name: "Aventus", brand: "Creed", image: "aventus.png" },
+      sauvage: { name: "Sauvage", brand: "Dior", image: "sauvage.png" },
+      bleudechanel: { name: "Bleu de Chanel", brand: "Chanel", image: "bleudechanel.png" },
+      tobaccovanille: { name: "Tobacco Vanille", brand: "Tom Ford", image: "tobaccovanille.png" },
+      oudwood: { name: "Oud Wood", brand: "Tom Ford", image: "oudwood.png" },
+      lanuit: { name: "La Nuit de L'Homme", brand: "Yves Saint Laurent", image: "lanuit.png" },
+      lostcherry: { name: "Lost Cherry", brand: "Tom Ford", image: "lostcherry.png" },
+      yvsl: { name: "Y Eau de Parfum", brand: "Yves Saint Laurent", image: "ysl-y-edp.png" },
+      aquadigio: { name: "Acqua di Giò Profumo", brand: "Giorgio Armani", image: "acqua-di-gio-profumo.png" },
+      dy: { name: "The One EDP", brand: "Dolce & Gabbana", image: "dg-the-one-edp.png" },
+      versaceeros: { name: "Eros", brand: "Versace", image: "versace-eros.png" },
+      jpgultramale: { name: "Ultra Male", brand: "Jean Paul Gaultier", image: "jpg-ultra-male.png" },
+      invictus: { name: "Invictus", brand: "Paco Rabanne", image: "paco-rabanne-invictus.png" },
+      valentinouomo: { name: "Uomo Born in Roma", brand: "Valentino", image: "valentino-uomo.png" },
+      spicebomb: { name: "Spicebomb Extreme", brand: "Viktor & Rolf", image: "spicebomb-extreme.png" },
+      explorer: { name: "Explorer", brand: "Montblanc", image: "montblanc-explorer.png" },
+      blv: { name: "Man in Black", brand: "Bvlgari", image: "bvlgari-man-in-black.png" },
+      diorhomme: { name: "Homme Intense", brand: "Dior", image: "dior-homme-intense.png" },
+      allure: { name: "Allure Homme Sport", brand: "Chanel", image: "chanel-allure-sport.png" },
+      tuscanleather: { name: "Tuscan Leather", brand: "Tom Ford", image: "tom-ford-tuscan-leather.png" },
+      armanicode: { name: "Armani Code Absolu", brand: "Giorgio Armani", image: "armani-code-absolu.png" },
+      lhommeideal: { name: "L'Homme Idéal EDP", brand: "Guerlain", image: "guerlain-lhomme-ideal.png" },
+      terredhermes: { name: "Terre d'Hermès", brand: "Hermès", image: "terre-dhermes.png" },
+      gentleman: { name: "Gentleman EDP", brand: "Givenchy", image: "givenchy-gentleman.png" },
+      wantedbynight: { name: "The Most Wanted", brand: "Azzaro", image: "azzaro-most-wanted.png" },
+      kbyDG: { name: "K by Dolce & Gabbana", brand: "Dolce & Gabbana", image: "k-by-dg.png" },
+      leaudissey: { name: "L'Eau d'Issey Pour Homme", brand: "Issey Miyake", image: "issey-miyake-pour-homme.png" },
+      chbadboy: { name: "Bad Boy", brand: "Carolina Herrera", image: "carolina-herrera-bad-boy.png" },
+      ysllibre: { name: "Libre EDP", brand: "Yves Saint Laurent", image: "ysl-libre.png" },
+      fireplace: { name: "By the Fireplace", brand: "Maison Margiela", image: "margiela-fireplace.png" },
+      pradacarbon: { name: "Luna Rossa Carbon", brand: "Prada", image: "prada-luna-rossa-carbon.png" },
+      burberryhero: { name: "Hero EDP", brand: "Burberry", image: "burberry-hero.png" },
+      narcisoforhim: { name: "For Him Bleu Noir", brand: "Narciso Rodriguez", image: "narciso-bleu-noir.png" },
+      cketernity: { name: "Eternity for Men", brand: "Calvin Klein", image: "ck-eternity.png" },
+      gucciguilty: { name: "Guilty Pour Homme", brand: "Gucci", image: "gucci-guilty.png" },
+      valentinodonna: { name: "Born in Roma Donna", brand: "Valentino", image: "valentino-donna.png" },
+      greenirish: { name: "Green Irish Tweed", brand: "Creed", image: "creed-green-irish-tweed.png" },
+      egoiste: { name: "Égoïste Platinum", brand: "Chanel", image: "chanel-egoiste.png" },
+      amenpure: { name: "A*Men Pure Havane", brand: "Mugler", image: "mugler-pure-havane.png" },
+      declarationcartier: { name: "Déclaration d'un Soir", brand: "Cartier", image: "cartier-declaration.png" },
+      laween: { name: "La Yuqawam", brand: "Rasasi", image: "rasasi-la-yuqawam.png" },
+      cedarsmancera: { name: "Cedrat Boisé", brand: "Mancera", image: "mancera-cedrat-boise.png" },
+      reflectionman: { name: "Reflection Man", brand: "Amouage", image: "amouage-reflection-man.png" },
+      sedley: { name: "Sedley", brand: "Parfums de Marly", image: "pdm-sedley.png" },
+      sideeffect: { name: "Side Effect", brand: "Initio", image: "initio-side-effect.png" },
+      naxos: { name: "Naxos", brand: "Xerjoff", image: "xerjoff-naxos.png" },
+      grandSoir: { name: "Grand Soir", brand: "Maison Francis Kurkdjian", image: "mfk-grand-soir.png" },
     };
     return products[productId];
   }
@@ -13591,7 +14600,7 @@ window.testGoToSection = function (productId = "layton") {
 window.testAllGoToSections = function () {
   console.log('ðŸŽ¯ Testing "Go to Section" for all products...');
 
-  const products = ["layton", "haltane", "pegasus", "greenly"];
+  const products = ["layton", "haltane", "pegasus", "greenly", "baccaratrouge", "blackorchid", "aventus", "sauvage", "bleudechanel", "tobaccovanille", "oudwood", "lanuit", "lostcherry", "yvsl", "aquadigio", "dy", "versaceeros", "jpgultramale", "invictus", "valentinouomo", "spicebomb", "explorer", "blv", "diorhomme", "allure", "tuscanleather", "armanicode", "lhommeideal", "terredhermes", "gentleman", "wantedbynight", "kbyDG", "leaudissey", "chbadboy", "ysllibre", "fireplace", "pradacarbon", "burberryhero", "narcisoforhim", "cketernity", "gucciguilty", "valentinodonna", "greenirish", "egoiste", "amenpure", "declarationcartier", "laween", "cedarsmancera", "reflectionman", "sedley", "sideeffect", "naxos", "grandSoir"];
   let index = 0;
 
   function testNext() {
@@ -14125,6 +15134,16 @@ class ReviewsManager {
       layton: [],
       haltane: [],
       pegasus: [],
+      greenly: [],
+      baccaratrouge: [],
+      blackorchid: [],
+      aventus: [],
+      sauvage: [],
+      bleudechanel: [],
+      tobaccovanille: [],
+      oudwood: [],
+      lanuit: [],
+      lostcherry: [],
     };
     this.currentUser = null;
     this.replyCache = new Map(); // DOM element cache
@@ -14160,7 +15179,7 @@ class ReviewsManager {
   }
 
   setupEventListeners() {
-    const fragrances = ["layton", "haltane", "pegasus", "greenly"];
+    const fragrances = ["layton", "haltane", "pegasus", "greenly", "baccaratrouge", "blackorchid", "aventus", "sauvage", "bleudechanel", "tobaccovanille", "oudwood", "lanuit", "lostcherry", "yvsl", "aquadigio", "dy", "versaceeros", "jpgultramale", "invictus", "valentinouomo", "spicebomb", "explorer", "blv", "diorhomme", "allure", "tuscanleather", "armanicode", "lhommeideal", "terredhermes", "gentleman", "wantedbynight", "kbyDG", "leaudissey", "chbadboy", "ysllibre", "fireplace", "pradacarbon", "burberryhero", "narcisoforhim", "cketernity", "gucciguilty", "valentinodonna", "greenirish", "egoiste", "amenpure", "declarationcartier", "laween", "cedarsmancera", "reflectionman", "sedley", "sideeffect", "naxos", "grandSoir"];
 
     fragrances.forEach((fragrance) => {
       // Star rating interactions
@@ -14258,7 +15277,7 @@ class ReviewsManager {
 
   updateUIForLoginStatus() {
     const user = this.getCurrentUser();
-    const fragrances = ["layton", "haltane", "pegasus", "greenly"];
+    const fragrances = ["layton", "haltane", "pegasus", "greenly", "baccaratrouge", "blackorchid", "aventus", "sauvage", "bleudechanel", "tobaccovanille", "oudwood", "lanuit", "lostcherry", "yvsl", "aquadigio", "dy", "versaceeros", "jpgultramale", "invictus", "valentinouomo", "spicebomb", "explorer", "blv", "diorhomme", "allure", "tuscanleather", "armanicode", "lhommeideal", "terredhermes", "gentleman", "wantedbynight", "kbyDG", "leaudissey", "chbadboy", "ysllibre", "fireplace", "pradacarbon", "burberryhero", "narcisoforhim", "cketernity", "gucciguilty", "valentinodonna", "greenirish", "egoiste", "amenpure", "declarationcartier", "laween", "cedarsmancera", "reflectionman", "sedley", "sideeffect", "naxos", "grandSoir"];
 
     fragrances.forEach((fragrance) => {
       const addReviewContainer = document.getElementById(
@@ -14601,7 +15620,7 @@ class ReviewsManager {
     console.log("ðŸ”„ Loading all reviews from database...");
 
     // Try to load reviews for each fragrance from database
-    const fragrances = ["layton", "haltane", "pegasus", "greenly"];
+    const fragrances = ["layton", "haltane", "pegasus", "greenly", "baccaratrouge", "blackorchid", "aventus", "sauvage", "bleudechanel", "tobaccovanille", "oudwood", "lanuit", "lostcherry", "yvsl", "aquadigio", "dy", "versaceeros", "jpgultramale", "invictus", "valentinouomo", "spicebomb", "explorer", "blv", "diorhomme", "allure", "tuscanleather", "armanicode", "lhommeideal", "terredhermes", "gentleman", "wantedbynight", "kbyDG", "leaudissey", "chbadboy", "ysllibre", "fireplace", "pradacarbon", "burberryhero", "narcisoforhim", "cketernity", "gucciguilty", "valentinodonna", "greenirish", "egoiste", "amenpure", "declarationcartier", "laween", "cedarsmancera", "reflectionman", "sedley", "sideeffect", "naxos", "grandSoir"];
     let totalLoaded = 0;
 
     for (const fragrance of fragrances) {
@@ -15310,7 +16329,7 @@ class ReviewsManager {
       }
     } catch (error) {
       console.error("Error loading reviews:", error);
-      this.reviews = { layton: [], haltane: [], pegasus: [], greenly: [] };
+      this.reviews = { layton: [], haltane: [], pegasus: [], greenly: [], baccaratrouge: [], blackorchid: [], aventus: [], sauvage: [], bleudechanel: [], tobaccovanille: [], oudwood: [], lanuit: [], lostcherry: [] };
     }
   }
 
@@ -17107,7 +18126,151 @@ class ProfileModalManager {
         brand: 'Parfums de Marly',
         price: '$170',
         image: 'GREENLEY.png'
-      }
+      },
+      baccaratrouge: {
+        name: 'Baccarat Rouge 540',
+        brand: 'Maison Francis Kurkdjian',
+        price: '$325',
+        image: 'baccarat-rouge-540.png'
+      },
+      blackorchid: {
+        name: 'Black Orchid',
+        brand: 'Tom Ford',
+        price: '$150',
+        image: 'black-orchid.png'
+      },
+      aventus: {
+        name: 'Aventus',
+        brand: 'Creed',
+        price: '$445',
+        image: 'aventus.png'
+      },
+      sauvage: {
+        name: 'Sauvage',
+        brand: 'Dior',
+        price: '$105',
+        image: 'sauvage.png'
+      },
+      bleudechanel: {
+        name: 'Bleu de Chanel',
+        brand: 'Chanel',
+        price: '$135',
+        image: 'bleudechanel.png'
+      },
+      tobaccovanille: {
+        name: 'Tobacco Vanille',
+        brand: 'Tom Ford',
+        price: '$275',
+        image: 'tobaccovanille.png'
+      },
+      oudwood: {
+        name: 'Oud Wood',
+        brand: 'Tom Ford',
+        price: '$260',
+        image: 'oudwood.png'
+      },
+      lanuit: {
+        name: "La Nuit de L'Homme",
+        brand: 'Yves Saint Laurent',
+        price: '$95',
+        image: 'lanuit.png'
+      },
+      lostcherry: {
+        name: 'Lost Cherry',
+        brand: 'Tom Ford',
+        price: '$390',
+        image: 'lostcherry.png'
+      },
+      yvsl: {
+        name: 'Y Eau de Parfum',
+        brand: 'Yves Saint Laurent',
+        price: '$50',
+        image: 'ysl-y-edp.png'
+      },
+      aquadigio: {
+        name: 'Acqua di Giò Profumo',
+        brand: 'Giorgio Armani',
+        price: '$55',
+        image: 'acqua-di-gio-profumo.png'
+      },
+      dy: {
+        name: 'The One EDP',
+        brand: 'Dolce & Gabbana',
+        price: '$50',
+        image: 'dg-the-one-edp.png'
+      },
+      versaceeros: {
+        name: 'Eros',
+        brand: 'Versace',
+        price: '$45',
+        image: 'versace-eros.png'
+      },
+      jpgultramale: {
+        name: 'Ultra Male',
+        brand: 'Jean Paul Gaultier',
+        price: '$50',
+        image: 'jpg-ultra-male.png'
+      },
+      invictus: {
+        name: 'Invictus',
+        brand: 'Paco Rabanne',
+        price: '$40',
+        image: 'paco-rabanne-invictus.png'
+      },
+      valentinouomo: {
+        name: 'Uomo Born in Roma',
+        brand: 'Valentino',
+        price: '$55',
+        image: 'valentino-uomo.png'
+      },
+      spicebomb: {
+        name: 'Spicebomb Extreme',
+        brand: 'Viktor & Rolf',
+        price: '$55',
+        image: 'spicebomb-extreme.png'
+      },
+      explorer: {
+        name: 'Explorer',
+        brand: 'Montblanc',
+        price: '$40',
+        image: 'montblanc-explorer.png'
+      },
+      blv: {
+        name: 'Man in Black',
+        brand: 'Bvlgari',
+        price: '$55',
+        image: 'bvlgari-man-in-black.png'
+      },
+      diorhomme: { name: 'Homme Intense', brand: 'Dior', price: '$50', image: 'dior-homme-intense.png' },
+      allure: { name: 'Allure Homme Sport', brand: 'Chanel', price: '$50', image: 'chanel-allure-sport.png' },
+      tuscanleather: { name: 'Tuscan Leather', brand: 'Tom Ford', price: '$65', image: 'tom-ford-tuscan-leather.png' },
+      armanicode: { name: 'Armani Code Absolu', brand: 'Giorgio Armani', price: '$45', image: 'armani-code-absolu.png' },
+      lhommeideal: { name: "L'Homme Idéal EDP", brand: 'Guerlain', price: '$50', image: 'guerlain-lhomme-ideal.png' },
+      terredhermes: { name: "Terre d'Hermès", brand: 'Hermès', price: '$55', image: 'terre-dhermes.png' },
+      gentleman: { name: 'Gentleman EDP', brand: 'Givenchy', price: '$45', image: 'givenchy-gentleman.png' },
+      wantedbynight: { name: 'The Most Wanted', brand: 'Azzaro', price: '$40', image: 'azzaro-most-wanted.png' },
+      kbyDG: { name: 'K by Dolce & Gabbana', brand: 'Dolce & Gabbana', price: '$40', image: 'k-by-dg.png' },
+      leaudissey: { name: "L'Eau d'Issey Pour Homme", brand: 'Issey Miyake', price: '$35', image: 'issey-miyake-pour-homme.png' },
+      chbadboy: { name: 'Bad Boy', brand: 'Carolina Herrera', price: '$45', image: 'carolina-herrera-bad-boy.png' },
+      ysllibre: { name: 'Libre EDP', brand: 'Yves Saint Laurent', price: '$50', image: 'ysl-libre.png' },
+      fireplace: { name: 'By the Fireplace', brand: 'Maison Margiela', price: '$55', image: 'margiela-fireplace.png' },
+      pradacarbon: { name: 'Luna Rossa Carbon', brand: 'Prada', price: '$45', image: 'prada-luna-rossa-carbon.png' },
+      burberryhero: { name: 'Hero EDP', brand: 'Burberry', price: '$45', image: 'burberry-hero.png' },
+      narcisoforhim: { name: 'For Him Bleu Noir', brand: 'Narciso Rodriguez', price: '$45', image: 'narciso-bleu-noir.png' },
+      cketernity: { name: 'Eternity for Men', brand: 'Calvin Klein', price: '$30', image: 'ck-eternity.png' },
+      gucciguilty: { name: 'Guilty Pour Homme', brand: 'Gucci', price: '$45', image: 'gucci-guilty.png' },
+      valentinodonna: { name: 'Born in Roma Donna', brand: 'Valentino', price: '$50', image: 'valentino-donna.png' },
+      greenirish: { name: 'Green Irish Tweed', brand: 'Creed', price: '$65', image: 'creed-green-irish-tweed.png' },
+      egoiste: { name: 'Égoïste Platinum', brand: 'Chanel', price: '$50', image: 'chanel-egoiste.png' },
+      amenpure: { name: "A*Men Pure Havane", brand: 'Mugler', price: '$45', image: 'mugler-pure-havane.png' },
+      declarationcartier: { name: "Déclaration d'un Soir", brand: 'Cartier', price: '$45', image: 'cartier-declaration.png' },
+      laween: { name: 'La Yuqawam', brand: 'Rasasi', price: '$40', image: 'rasasi-la-yuqawam.png' },
+      cedarsmancera: { name: 'Cedrat Boisé', brand: 'Mancera', price: '$45', image: 'mancera-cedrat-boise.png' },
+      reflectionman: { name: 'Reflection Man', brand: 'Amouage', price: '$60', image: 'amouage-reflection-man.png' },
+      sedley: { name: 'Sedley', brand: 'Parfums de Marly', price: '$60', image: 'pdm-sedley.png' },
+      sideeffect: { name: 'Side Effect', brand: 'Initio', price: '$60', image: 'initio-side-effect.png' },
+      naxos: { name: 'Naxos', brand: 'Xerjoff', price: '$65', image: 'xerjoff-naxos.png' },
+      grandSoir: { name: 'Grand Soir', brand: 'Maison Francis Kurkdjian', price: '$65', image: 'mfk-grand-soir.png' }
     };
 
     return fragrances[fragranceId] || {

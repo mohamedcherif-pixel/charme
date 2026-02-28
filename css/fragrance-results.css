@@ -38,7 +38,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(212, 175, 55, 0.1),
+        rgba(var(--selector-accent-rgb), ),
         transparent
     );
     transition: left 0.6s ease;
@@ -51,11 +51,11 @@
         rgba(255, 255, 255, 0.12) 0%,
         rgba(255, 255, 255, 0.08) 100%
     );
-    border-color: rgba(212, 175, 55, 0.3);
+    border-color: rgba(var(--selector-accent-rgb), );
     transform: translateY(-4px) scale(1.015);
     box-shadow:
         0 15px 40px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(212, 175, 55, 0.2),
+        0 0 0 1px rgba(var(--selector-accent-rgb), ),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -178,18 +178,18 @@
     display: inline-flex;
     align-items: center;
     padding: 3px 8px;
-    background: rgba(212, 175, 55, 0.15);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: rgba(var(--selector-accent-rgb), );
+    border: 1px solid rgba(var(--selector-accent-rgb), );
     border-radius: 8px;
     font-size: 0.7rem;
     font-weight: 500;
-    color: rgba(212, 175, 55, 0.95);
+    color: rgba(var(--selector-accent-rgb), );
     transition: all 0.2s ease;
 }
 
 .size-badge:hover {
-    background: rgba(212, 175, 55, 0.25);
-    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(var(--selector-accent-rgb), );
+    border-color: rgba(var(--selector-accent-rgb), );
     transform: scale(1.05);
 }
 
@@ -229,7 +229,7 @@
 
 .fragrance-brand {
     font-size: 0.95rem;
-    color: rgba(212, 175, 55, 0.9);
+    color: rgba(var(--selector-accent-rgb), );
     font-weight: 500;
     margin-bottom: 8px;
     letter-spacing: 0.02em;
@@ -250,9 +250,9 @@
 }
 
 .note-tag {
-    background: rgba(212, 175, 55, 0.15);
-    border: 1px solid rgba(212, 175, 55, 0.25);
-    color: rgba(212, 175, 55, 0.95);
+    background: rgba(var(--selector-accent-rgb), );
+    border: 1px solid rgba(var(--selector-accent-rgb), );
+    color: rgba(var(--selector-accent-rgb), );
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.8rem;
@@ -261,8 +261,8 @@
 }
 
 .note-tag:hover {
-    background: rgba(212, 175, 55, 0.25);
-    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(var(--selector-accent-rgb), );
+    border-color: rgba(var(--selector-accent-rgb), );
     transform: translateY(-1px);
 }
 

@@ -256,858 +256,124 @@ class AIFragranceFinder {
       },
     ];
 
-    this.fragranceDatabase = [
-      // Parfums de Marly Collection
-      {
-        name: "Layton",
-        brand: "Parfums de Marly",
-        description:
-          "A sophisticated blend of vanilla, sandalwood, and subtle spices. Perfect for the confident and elegant individual.",
-        match_profile: {
-          luxury: 5,
-          sophisticated: 4,
-          warm: 3,
-          evening: 4,
-          winter: 3,
-          confident: 4,
-          vanilla: 5,
-          woody: 3,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "autumn", "winter", "special"],
-        personality: ["confident", "sophisticated"],
-        image: "layton.png",
-      },
-      {
-        name: "Haltane",
-        brand: "Parfums de Marly",
-        description:
-          "Rich and creamy with notes of praline, vanilla, and oud. A gourmand masterpiece for those who love sweet sophistication.",
-        match_profile: {
-          luxury: 5,
-          gourmand: 5,
-          sweet: 5,
-          sophisticated: 3,
-          oriental: 4,
-          winter: 4,
-          romantic: 4,
-          praline: 5,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "winter", "special"],
-        personality: ["romantic", "sophisticated"],
-        image: "haltane.png",
-      },
-      {
-        name: "Pegasus",
-        brand: "Parfums de Marly",
-        description:
-          "A fresh and elegant fragrance with almond, heliotrope, and sandalwood. Perfect balance of freshness and warmth.",
-        match_profile: {
-          luxury: 5,
-          fresh: 4,
-          elegant: 5,
-          versatile: 4,
-          balanced: 4,
-          spring: 4,
-          summer: 3,
-          sophisticated: 4,
-        },
-        price_range: "luxury",
-        best_for: ["morning", "spring", "summer", "both"],
-        personality: ["sophisticated", "confident"],
-        image: "pegasus.png",
-      },
-      {
-        name: "Greenly",
-        brand: "Parfums de Marly",
-        description:
-          "A vibrant green fragrance with fig leaves, petitgrain, and cedarwood. Fresh and natural with sophisticated depth.",
-        match_profile: {
-          luxury: 5,
-          fresh: 5,
-          green: 5,
-          natural: 4,
-          adventurous: 4,
-          spring: 5,
-          summer: 4,
-          energetic: 4,
-        },
-        price_range: "luxury",
-        best_for: ["morning", "spring", "summer", "both"],
-        personality: ["adventurous", "sophisticated"],
-        image: "GREENLEY.png",
-      },
-      // Additional Premium Options
-      {
-        name: "Tom Ford Black Orchid",
-        brand: "Tom Ford",
-        description:
-          "A luxurious and sensual fragrance with dark chocolate, vanilla, and black orchid. Perfect for mysterious personalities.",
-        match_profile: {
-          luxury: 4,
-          mysterious: 5,
-          dark: 5,
-          evening: 5,
-          sophisticated: 4,
-          seductive: 5,
-          oriental: 4,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "winter", "special"],
-        personality: ["mysterious", "confident"],
-        image: "black-orchid.png",
-      },
-      {
-        name: "Creed Aventus",
-        brand: "Creed",
-        description:
-          "A bold and confident fragrance with pineapple, birch, and musk. The scent of success and leadership.",
-        match_profile: {
-          luxury: 5,
-          confident: 5,
-          bold: 5,
-          professional: 4,
-          versatile: 4,
-          masculine: 4,
-          fresh: 3,
-        },
-        price_range: "luxury",
-        best_for: ["morning", "professional", "both"],
-        personality: ["confident", "adventurous"],
-        image: "aventus.png",
-      },
-      {
-        name: "Maison Margiela Replica Jazz Club",
-        brand: "Maison Margiela",
-        description:
-          "A warm and cozy fragrance evoking the atmosphere of a jazz club with tobacco, vanilla, and pink pepper.",
-        match_profile: {
-          creative: 5,
-          warm: 4,
-          relaxed: 4,
-          sophisticated: 3,
-          evening: 4,
-          artistic: 5,
-          nostalgic: 4,
-        },
-        price_range: "premium",
-        best_for: ["evening", "autumn", "winter"],
-        personality: ["creative", "relaxed"],
-        image: "jazz-club.png",
-      },
-      {
-        name: "Dior Sauvage",
-        brand: "Dior",
-        description:
-          "A fresh and spicy fragrance with bergamot, Sichuan pepper, and ambroxan. Modern masculinity redefined.",
-        match_profile: {
-          designer: 4,
-          fresh: 4,
-          spicy: 3,
-          modern: 4,
-          versatile: 5,
-          confident: 3,
-          accessible: 4,
-        },
-        price_range: "premium",
-        best_for: ["morning", "spring", "summer", "both"],
-        personality: ["confident", "adventurous"],
-        image: "sauvage.png",
-      },
-      {
-        name: "Chanel Bleu de Chanel",
-        brand: "Chanel",
-        description:
-          "An elegant and refined fragrance with citrus, ginger, and sandalwood. Timeless sophistication.",
-        match_profile: {
-          luxury: 4,
-          sophisticated: 5,
-          elegant: 5,
-          professional: 4,
-          refined: 5,
-          versatile: 4,
-        },
-        price_range: "luxury",
-        best_for: ["morning", "professional", "both"],
-        personality: ["sophisticated", "confident"],
-        image: "bleu-de-chanel.png",
-      },
-      {
-        name: "Viktor & Rolf Flowerbomb",
-        brand: "Viktor & Rolf",
-        description:
-          "A romantic and explosive floral fragrance with jasmine, rose, and patchouli. Feminine power unleashed.",
-        match_profile: {
-          romantic: 5,
-          floral: 5,
-          feminine: 5,
-          bold: 3,
-          sophisticated: 3,
-          evening: 4,
-          seductive: 4,
-        },
-        price_range: "premium",
-        best_for: ["evening", "spring", "special"],
-        personality: ["romantic", "confident"],
-        image: "flowerbomb.png",
-      },
-
-      // === FEMALE FRAGRANCES ===
-      {
-        name: "Chanel Coco Mademoiselle",
-        brand: "Chanel",
-        description:
-          "A sparkling and bold ambery fragrance with orange, jasmine, and patchouli. Modern femininity with timeless elegance.",
-        match_profile: {
-          luxury: 5,
-          sophisticated: 5,
-          elegant: 4,
-          confident: 4,
-          feminine: 4,
-          oriental: 3,
-          versatile: 4,
-        },
-        price_range: "luxury",
-        best_for: ["both", "professional", "special"],
-        personality: ["sophisticated", "confident"],
-        image: "chanel-coco-mademoiselle.jpg",
-      },
-      {
-        name: "Dior J'adore",
-        brand: "Dior",
-        description:
-          "An opulent bouquet of the most beautiful flowers. Pure luxury and femininity in a bottle.",
-        match_profile: {
-          luxury: 4,
-          romantic: 5,
-          floral: 5,
-          feminine: 5,
-          elegant: 4,
-          sophisticated: 3,
-          spring: 4,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "spring", "special"],
-        personality: ["romantic", "sophisticated"],
-        image: "dior-jadore.jpg",
-      },
-      {
-        name: "Marc Jacobs Daisy",
-        brand: "Marc Jacobs",
-        description:
-          "A charming bouquet of daisies with violet leaves, jasmine, and musk. Youthful and carefree spirit.",
-        match_profile: {
-          accessible: 4,
-          fresh: 4,
-          floral: 4,
-          feminine: 4,
-          youthful: 5,
-          spring: 5,
-          casual: 4,
-        },
-        price_range: "mid_range",
-        best_for: ["morning", "spring", "summer"],
-        personality: ["romantic", "relaxed"],
-        image: "marc-jacobs-daisy.jpg",
-      },
-      {
-        name: "YSL Black Opium",
-        brand: "Yves Saint Laurent",
-        description:
-          "An addictive gourmand fragrance with coffee, vanilla, and white flowers. Dark and seductive.",
-        match_profile: {
-          seductive: 5,
-          gourmand: 5,
-          mysterious: 4,
-          evening: 5,
-          bold: 4,
-          coffee: 5,
-          addictive: 5,
-        },
-        price_range: "premium",
-        best_for: ["evening", "autumn", "winter"],
-        personality: ["mysterious", "confident"],
-        image: "ysl-black-opium.jpg",
-      },
-      {
-        name: "Lancôme La Vie Est Belle",
-        brand: "Lancôme",
-        description:
-          "A sweet gourmand with blackcurrant, jasmine, and vanilla. Happiness in a bottle.",
-        match_profile: {
-          sweet: 5,
-          gourmand: 4,
-          optimistic: 5,
-          feminine: 4,
-          accessible: 4,
-          vanilla: 4,
-          joyful: 5,
-        },
-        price_range: "premium",
-        best_for: ["both", "spring", "summer"],
-        personality: ["romantic", "confident"],
-        image: "lancome-la-vie-est-belle.jpg",
-      },
-
-      // === AFFORDABLE CLASSICS ===
-      {
-        name: "Hugo Boss Bottled",
-        brand: "Hugo Boss",
-        description:
-          "A modern masculine fragrance with apple, geranium, and sandalwood. Professional and reliable.",
-        match_profile: {
-          professional: 5,
-          accessible: 4,
-          reliable: 5,
-          masculine: 4,
-          versatile: 4,
-          apple: 3,
-          woody: 3,
-        },
-        price_range: "mid_range",
-        best_for: ["morning", "professional", "both"],
-        personality: ["professional", "confident"],
-        image: "hugo-boss-bottled.jpg",
-      },
-      {
-        name: "Davidoff Cool Water",
-        brand: "Davidoff",
-        description:
-          "A fresh aquatic fragrance with mint, lavender, and sandalwood. Clean and invigorating.",
-        match_profile: {
-          fresh: 5,
-          aquatic: 5,
-          clean: 5,
-          affordable: 4,
-          summer: 5,
-          energetic: 4,
-          mint: 4,
-        },
-        price_range: "budget",
-        best_for: ["morning", "summer", "both"],
-        personality: ["active", "relaxed"],
-        image: "davidoff-cool-water.jpg",
-      },
-      {
-        name: "Jean Paul Gaultier Le Male",
-        brand: "Jean Paul Gaultier",
-        description:
-          "A seductive blend with mint, lavender, and vanilla. Masculine charm with a playful twist.",
-        match_profile: {
-          seductive: 4,
-          playful: 4,
-          masculine: 4,
-          crowd_pleaser: 5,
-          vanilla: 3,
-          mint: 3,
-          charming: 5,
-        },
-        price_range: "mid_range",
-        best_for: ["evening", "both", "social"],
-        personality: ["confident", "social"],
-        image: "jpg-le-male.jpg",
-      },
-      {
-        name: "1 Million by Paco Rabanne",
-        brand: "Paco Rabanne",
-        description:
-          "A golden spicy fragrance with cinnamon, rose, and amber. Confidence and luxury combined.",
-        match_profile: {
-          bold: 5,
-          spicy: 4,
-          attention_grabbing: 5,
-          golden: 4,
-          confident: 5,
-          cinnamon: 4,
-          amber: 3,
-        },
-        price_range: "mid_range",
-        best_for: ["evening", "autumn", "special"],
-        personality: ["confident", "social"],
-        image: "paco-rabanne-1-million.jpg",
-      },
-
-      // === NICHE & ARTISTIC ===
-      {
-        name: "Byredo Bal d'Afrique",
-        brand: "Byredo",
-        description:
-          "A vibrant African-inspired fragrance with bergamot, violet, and cedar. Artistic and unique.",
-        match_profile: {
-          artistic: 5,
-          unique: 5,
-          niche: 5,
-          creative: 5,
-          african: 4,
-          violet: 3,
-          bergamot: 3,
-        },
-        price_range: "luxury",
-        best_for: ["both", "spring", "summer"],
-        personality: ["creative", "adventurous"],
-        image: "byredo-bal-dafrique.jpg",
-      },
-      {
-        name: "Le Labo Santal 33",
-        brand: "Le Labo",
-        description:
-          "A cult favorite with sandalwood, cardamom, and iris. Minimalist luxury.",
-        match_profile: {
-          cult: 5,
-          niche: 5,
-          minimalist: 5,
-          sandalwood: 5,
-          unisex: 4,
-          artistic: 4,
-          sophisticated: 4,
-        },
-        price_range: "luxury",
-        best_for: ["both", "professional", "artistic"],
-        personality: ["sophisticated", "creative"],
-        image: "le-labo-santal-33.jpg",
-      },
-      {
-        name: "Maison Francis Kurkdjian Baccarat Rouge 540",
-        brand: "Maison Francis Kurkdjian",
-        description:
-          "A luminous and radiant fragrance with saffron, jasmine, and amberwood. Pure luxury.",
-        match_profile: {
-          luxury: 5,
-          radiant: 5,
-          sophisticated: 5,
-          unique: 4,
-          saffron: 4,
-          amber: 4,
-          prestigious: 5,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "special", "luxury"],
-        personality: ["sophisticated", "confident"],
-        image: "mfk-baccarat-rouge-540.jpg",
-      },
-      {
-        name: "Diptyque Philosykos",
-        brand: "Diptyque",
-        description:
-          "A green and creamy fragrance capturing the essence of a fig tree. Natural artistry.",
-        match_profile: {
-          green: 5,
-          natural: 5,
-          artistic: 5,
-          fig: 5,
-          unique: 4,
-          niche: 4,
-          creamy: 3,
-        },
-        price_range: "luxury",
-        best_for: ["spring", "summer", "artistic"],
-        personality: ["creative", "sophisticated"],
-        image: "diptyque-philosykos.jpg",
-      },
-
-      // === SEASONAL SPECIALISTS ===
-      {
-        name: "Hermès Eau des Merveilles",
-        brand: "Hermès",
-        description:
-          "A magical woody fragrance with orange, pink pepper, and cedar. Sophisticated warmth.",
-        match_profile: {
-          sophisticated: 5,
-          warm: 4,
-          magical: 4,
-          orange: 4,
-          woody: 4,
-          elegant: 4,
-          autumn: 4,
-        },
-        price_range: "luxury",
-        best_for: ["autumn", "winter", "evening"],
-        personality: ["sophisticated", "mysterious"],
-        image: "hermes-eau-des-merveilles.jpg",
-      },
-      {
-        name: "L'Artisan Parfumeur Thé Pour un Été",
-        brand: "L'Artisan Parfumeur",
-        description:
-          "A refreshing summer tea with bergamot, mint, and white tea. Perfect summer companion.",
-        match_profile: {
-          fresh: 5,
-          summer: 5,
-          tea: 5,
-          refreshing: 5,
-          mint: 4,
-          bergamot: 4,
-          green: 4,
-        },
-        price_range: "premium",
-        best_for: ["morning", "summer", "fresh"],
-        personality: ["relaxed", "sophisticated"],
-        image: "lartisan-the-pour-un-ete.jpg",
-      },
-
-      // === CROWD PLEASERS ===
-      {
-        name: "Versace Eros",
-        brand: "Versace",
-        description:
-          "A passionate and seductive fragrance with mint, apple, and vanilla. Irresistible magnetism.",
-        match_profile: {
-          seductive: 5,
-          passionate: 5,
-          crowd_pleaser: 5,
-          mint: 4,
-          apple: 3,
-          vanilla: 3,
-          magnetic: 5,
-        },
-        price_range: "mid_range",
-        best_for: ["evening", "social", "both"],
-        personality: ["confident", "social"],
-        image: "versace-eros.jpg",
-      },
-      {
-        name: "Acqua di Gio Profumo",
-        brand: "Giorgio Armani",
-        description:
-          "An aquatic aromatic fragrance with bergamot, geranium, and patchouli. Marine sophistication.",
-        match_profile: {
-          aquatic: 5,
-          sophisticated: 4,
-          fresh: 4,
-          marine: 5,
-          versatile: 4,
-          bergamot: 3,
-          professional: 4,
-        },
-        price_range: "premium",
-        best_for: ["both", "summer", "professional"],
-        personality: ["sophisticated", "confident"],
-        image: "adg-profumo.jpg",
-      },
-
-      // === UNIQUE PERSONALITIES ===
-      {
-        name: "Thierry Mugler Angel",
-        brand: "Thierry Mugler",
-        description:
-          "A revolutionary gourmand with praline, honey, and patchouli. Bold and unforgettable.",
-        match_profile: {
-          revolutionary: 5,
-          gourmand: 5,
-          bold: 5,
-          unique: 5,
-          praline: 4,
-          honey: 3,
-          unforgettable: 5,
-        },
-        price_range: "premium",
-        best_for: ["evening", "winter", "special"],
-        personality: ["mysterious", "confident"],
-        image: "mugler-angel.jpg",
-      },
-      {
-        name: "Comme des Garçons Incense",
-        brand: "Comme des Garçons",
-        description:
-          "A pure and meditative incense fragrance. Minimalist spirituality.",
-        match_profile: {
-          meditative: 5,
-          spiritual: 5,
-          minimalist: 5,
-          incense: 5,
-          unique: 5,
-          artistic: 5,
-          zen: 5,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "meditation", "artistic"],
-        personality: ["creative", "sophisticated"],
-        image: "cdg-incense.jpg",
-      },
-
-      // === BUDGET-FRIENDLY GEMS ===
-      {
-        name: "Zara Red Vanilla",
-        brand: "Zara",
-        description:
-          "An affordable gourmand with vanilla, amber, and spices. Great value for money.",
-        match_profile: {
-          affordable: 5,
-          gourmand: 4,
-          vanilla: 5,
-          sweet: 4,
-          accessible: 5,
-          value: 5,
-          warm: 3,
-        },
-        price_range: "budget",
-        best_for: ["evening", "autumn", "winter"],
-        personality: ["relaxed", "confident"],
-        image: "zara-red-vanilla.jpg",
-      },
-      {
-        name: "The Body Shop White Musk",
-        brand: "The Body Shop",
-        description:
-          "A clean and soft musk fragrance with lily and rose. Pure and gentle.",
-        match_profile: {
-          clean: 5,
-          soft: 5,
-          musk: 5,
-          gentle: 5,
-          affordable: 5,
-          lily: 3,
-          pure: 5,
-        },
-        price_range: "budget",
-        best_for: ["both", "daily", "fresh"],
-        personality: ["relaxed", "romantic"],
-        image: "body-shop-white-musk.jpg",
-      },
-
-      // === ADDITIONAL LUXURY OPTIONS ===
-      {
-        name: "Creed Silver Mountain Water",
-        brand: "Creed",
-        description:
-          "A fresh and clean fragrance with citrus and metallic notes. Mountain freshness.",
-        match_profile: {
-          fresh: 5,
-          clean: 5,
-          luxury: 5,
-          citrus: 4,
-          metallic: 3,
-          mountain: 4,
-          crisp: 5,
-        },
-        price_range: "luxury",
-        best_for: ["morning", "summer", "fresh"],
-        personality: ["confident", "adventurous"],
-        image: "creed-silver-mountain-water.jpg",
-      },
-      {
-        name: "Tom Ford Oud Wood",
-        brand: "Tom Ford",
-        description:
-          "A smooth and sophisticated oud fragrance with rosewood, cardamom, and sandalwood.",
-        match_profile: {
-          sophisticated: 5,
-          luxury: 5,
-          oud: 5,
-          smooth: 4,
-          exotic: 4,
-          rosewood: 3,
-          cardamom: 3,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "winter", "special"],
-        personality: ["sophisticated", "mysterious"],
-        image: "tom-ford-oud-wood.jpg",
-      },
-
-      // === MORE FEMALE OPTIONS ===
-      {
-        name: "Guerlain Shalimar",
-        brand: "Guerlain",
-        description:
-          "A legendary oriental with bergamot, iris, and vanilla. Timeless feminine elegance.",
-        match_profile: {
-          legendary: 5,
-          oriental: 5,
-          timeless: 5,
-          sophisticated: 5,
-          vanilla: 4,
-          bergamot: 3,
-          iris: 3,
-        },
-        price_range: "luxury",
-        best_for: ["evening", "winter", "special"],
-        personality: ["sophisticated", "romantic"],
-        image: "guerlain-shalimar.jpg",
-      },
-      {
-        name: "Calvin Klein Euphoria",
-        brand: "Calvin Klein",
-        description:
-          "A hypnotic blend with pomegranate, orchid, and amber. Seductive femininity.",
-        match_profile: {
-          seductive: 5,
-          hypnotic: 4,
-          feminine: 4,
-          pomegranate: 3,
-          orchid: 3,
-          amber: 3,
-          accessible: 4,
-        },
-        price_range: "mid_range",
-        best_for: ["evening", "autumn", "winter"],
-        personality: ["mysterious", "romantic"],
-        image: "calvin-klein-euphoria.jpg",
-      },
-
-      // === SPORTS & FRESH ===
-      {
-        name: "Lacoste Eau de Lacoste L.12.12 Blanc",
-        brand: "Lacoste",
-        description:
-          "A clean sporty fragrance with grapefruit, cardamom, and cedar. Athletic freshness.",
-        match_profile: {
-          sporty: 5,
-          clean: 5,
-          fresh: 4,
-          athletic: 5,
-          grapefruit: 4,
-          accessible: 4,
-          energetic: 4,
-        },
-        price_range: "mid_range",
-        best_for: ["morning", "summer", "sports"],
-        personality: ["active", "confident"],
-        image: "lacoste-blanc.jpg",
-      },
-      {
-        name: "Azzaro Chrome",
-        brand: "Azzaro",
-        description:
-          "A fresh aquatic citrus with bergamot, cyclamen, and musk. Mediterranean freshness.",
-        match_profile: {
-          fresh: 5,
-          aquatic: 4,
-          citrus: 4,
-          mediterranean: 4,
-          bergamot: 3,
-          accessible: 4,
-          clean: 4,
-        },
-        price_range: "mid_range",
-        best_for: ["morning", "summer", "fresh"],
-        personality: ["active", "relaxed"],
-        image: "azzaro-chrome.jpg",
-      },
-
-      // === WINTER WARMERS ===
-      {
-        name: "Viktor & Rolf Spicebomb",
-        brand: "Viktor & Rolf",
-        description:
-          "An explosive spicy fragrance with pink pepper, saffron, and tobacco. Masculine intensity.",
-        match_profile: {
-          spicy: 5,
-          explosive: 5,
-          masculine: 5,
-          intense: 5,
-          tobacco: 4,
-          saffron: 4,
-          winter: 5,
-        },
-        price_range: "premium",
-        best_for: ["evening", "winter", "autumn"],
-        personality: ["confident", "mysterious"],
-        image: "vr-spicebomb.jpg",
-      },
-      {
-        name: "Maison Margiela REPLICA By the Fireplace",
-        brand: "Maison Margiela",
-        description:
-          "A cozy winter fragrance with chestnut, smoke, and woody notes. Warm memories.",
-        match_profile: {
-          cozy: 5,
-          winter: 5,
-          warm: 5,
-          nostalgic: 5,
-          smoke: 4,
-          chestnuts: 3,
-          comfort: 5,
-        },
-        price_range: "premium",
-        best_for: ["winter", "evening", "cozy"],
-        personality: ["relaxed", "romantic"],
-        image: "mm-by-the-fireplace.jpg",
-      },
-
-      // === CELEBRITY & MAINSTREAM ===
-      {
-        name: "Ariana Grande Cloud",
-        brand: "Ariana Grande",
-        description:
-          "A dreamy gourmand with bergamot, pear, and coconut. Youthful sweetness.",
-        match_profile: {
-          dreamy: 5,
-          gourmand: 4,
-          youthful: 5,
-          sweet: 5,
-          coconut: 4,
-          affordable: 4,
-          playful: 4,
-        },
-        price_range: "budget",
-        best_for: ["both", "young", "sweet"],
-        personality: ["romantic", "relaxed"],
-        image: "ariana-grande-cloud.jpg",
-      },
-      {
-        name: "Britney Spears Fantasy",
-        brand: "Britney Spears",
-        description:
-          "A sweet fantasy with lychee, golden quince, and musk. Affordable sweetness.",
-        match_profile: {
-          sweet: 5,
-          fantasy: 4,
-          affordable: 5,
-          fruity: 4,
-          youthful: 4,
-          accessible: 5,
-          playful: 4,
-        },
-        price_range: "budget",
-        best_for: ["both", "young", "casual"],
-        personality: ["romantic", "relaxed"],
-        image: "britney-spears-fantasy.jpg",
-      },
-
-      // === FINAL ADDITIONS ===
-      {
-        name: "Hermès Terre d'Hermès",
-        brand: "Hermès",
-        description:
-          "An earthy woody fragrance with orange, flint, and vetiver. Masculine sophistication.",
-        match_profile: {
-          sophisticated: 5,
-          earthy: 5,
-          masculine: 4,
-          woody: 5,
-          orange: 3,
-          vetiver: 4,
-          luxury: 4,
-        },
-        price_range: "luxury",
-        best_for: ["both", "autumn", "professional"],
-        personality: ["sophisticated", "confident"],
-        image: "hermes-terre.jpg",
-      },
-      {
-        name: "Prada Luna Rossa Carbon",
-        brand: "Prada",
-        description:
-          "A modern masculine fragrance with bergamot, pepper, and ambroxan. Futuristic masculinity.",
-        match_profile: {
-          modern: 5,
-          masculine: 5,
-          futuristic: 4,
-          bergamot: 3,
-          pepper: 3,
-          fresh: 3,
-          sophisticated: 4,
-        },
-        price_range: "premium",
-        best_for: ["both", "professional", "modern"],
-        personality: ["confident", "professional"],
-        image: "prada-carbon.jpg",
-      },
-    ];
+    this.fragranceService = new FragranceAPIService();
+    this.fragranceDatabase = this.generateDatabaseFromService();
 
     this.init();
+  }
+
+  generateDatabaseFromService() {
+    const db = this.fragranceService.comprehensiveDatabase;
+    return Object.entries(db).map(([name, profile]) => {
+      // Generate match profile based on family and ingredients
+      const match_profile = {};
+      const best_for = [];
+      const personality = [];
+      
+      // Basic mapping based on family
+      const family = (profile.family || '').toLowerCase();
+      if (family.includes('oriental') || family.includes('spicy')) {
+        match_profile.oriental = 5;
+        match_profile.warm = 4;
+        match_profile.winter = 4;
+        match_profile.evening = 4;
+        best_for.push('evening', 'winter', 'autumn');
+        personality.push('confident', 'mysterious');
+      }
+      if (family.includes('floral')) {
+        match_profile.floral = 5;
+        match_profile.romantic = 4;
+        match_profile.spring = 4;
+        best_for.push('daytime', 'spring');
+        personality.push('romantic', 'elegant');
+      }
+      if (family.includes('citrus') || family.includes('fresh')) {
+        match_profile.citrus = 5;
+        match_profile.fresh = 5;
+        match_profile.summer = 4;
+        best_for.push('daytime', 'summer');
+        personality.push('active', 'energetic');
+      }
+      if (family.includes('woody')) {
+        match_profile.woody = 5;
+        match_profile.sophisticated = 4;
+        match_profile.autumn = 4;
+        best_for.push('evening', 'autumn');
+        personality.push('sophisticated', 'confident');
+      }
+      if (family.includes('gourmand') || family.includes('sweet')) {
+        match_profile.gourmand = 5;
+        match_profile.sweet = 5;
+        match_profile.comforting = 4;
+        best_for.push('evening', 'winter');
+        personality.push('romantic', 'playful');
+      }
+      if (family.includes('aquatic') || family.includes('marine')) {
+        match_profile.aquatic = 5;
+        match_profile.fresh = 4;
+        match_profile.summer = 4;
+        best_for.push('daytime', 'summer');
+        personality.push('active', 'adventurous');
+      }
+
+      // Add ingredient-based weights
+      if (profile.ingredients) {
+        profile.ingredients.forEach(ing => {
+          const i = ing.toLowerCase();
+          if (i.includes('vanilla') || i.includes('caramel') || i.includes('praline')) {
+            match_profile.sweet = (match_profile.sweet || 0) + 2;
+            match_profile.gourmand = (match_profile.gourmand || 0) + 2;
+          }
+          if (i.includes('oud') || i.includes('leather') || i.includes('tobacco')) {
+            match_profile.luxury = (match_profile.luxury || 0) + 2;
+            match_profile.bold = (match_profile.bold || 0) + 2;
+            personality.push('bold', 'sophisticated');
+          }
+          if (i.includes('rose') || i.includes('jasmine') || i.includes('iris')) {
+            match_profile.floral = (match_profile.floral || 0) + 2;
+            match_profile.romantic = (match_profile.romantic || 0) + 2;
+          }
+          if (i.includes('lemon') || i.includes('bergamot') || i.includes('orange')) {
+            match_profile.citrus = (match_profile.citrus || 0) + 2;
+            match_profile.fresh = (match_profile.fresh || 0) + 2;
+          }
+        });
+      }
+
+      // Ensure unique values
+      const uniqueBestFor = [...new Set(best_for)];
+      const uniquePersonality = [...new Set(personality)];
+
+      // Default values if empty
+      if (uniqueBestFor.length === 0) uniqueBestFor.push('daytime', 'year_round');
+      if (uniquePersonality.length === 0) uniquePersonality.push('versatile', 'approachable');
+      if (Object.keys(match_profile).length === 0) {
+        match_profile.versatile = 5;
+        match_profile.balanced = 4;
+      }
+
+      // Determine price range based on brand
+      let price_range = 'mid_range';
+      const brand = (profile.brand || '').toLowerCase();
+      if (brand.includes('creed') || brand.includes('marly') || brand.includes('roja') || brand.includes('amouage') || brand.includes('kurkdjian') || brand.includes('tom ford') || brand.includes('xerjoff') || brand.includes('initio') || brand.includes('clive christian')) {
+        price_range = 'luxury';
+      } else if (brand.includes('dior') || brand.includes('chanel') || brand.includes('tom ford') || brand.includes('kilian') || brand.includes('le labo') || brand.includes('byredo') || brand.includes('penhaligon')) {
+        price_range = 'premium';
+      } else if (brand.includes('zara') || brand.includes('h&m') || brand.includes('bath & body')) {
+        price_range = 'budget';
+      }
+
+      return {
+        name: name,
+        brand: profile.brand || 'Unknown Brand',
+        description: profile.description || `A beautiful ${profile.family || 'fragrance'} by ${profile.brand || 'Unknown Brand'}.`,
+        match_profile: match_profile,
+        price_range: price_range,
+        best_for: uniqueBestFor,
+        personality: uniquePersonality,
+        image: profile.image || 'default-fragrance.png'
+      };
+    });
   }
 
   init() {
