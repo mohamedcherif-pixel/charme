@@ -81,7 +81,6 @@
     border: 1px solid rgba(201,76,93,0.12) !important;
     border-radius: 12px !important;
     padding: 30px !important;
-    backdrop-filter: blur(8px) !important;
 }
 .lostcherry-profile-card .profile-title { color: #f5e0e4 !important; font-family: 'Playfair Display', serif !important; }
 .lostcherry-profile-card .profile-subtitle { color: #a63a4a !important; }

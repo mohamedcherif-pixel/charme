@@ -88,28 +88,31 @@ document.addEventListener("DOMContentLoaded", function () {
   let lastScrollTop = 0;
   let marqueeHeightState = "normal"; // normal, compact, minimal
 
+    let marqueeTick = false;
   window.addEventListener("scroll", function () {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-    // Determine marquee height state based on scroll position
-    if (scrollTop > 100) {
-      if (scrollTop > 300) {
-        if (marqueeHeightState !== "minimal") {
-          marqueeHeightState = "minimal";
-          document.body.classList.remove("marquee-compact");
-          document.body.classList.add("marquee-minimal");
+    if (!marqueeTick) {
+      window.requestAnimationFrame(function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > 100) {
+          if (scrollTop > 300) {
+            if (marqueeHeightState !== "minimal") {
+              marqueeHeightState = "minimal";
+              document.body.classList.remove("marquee-compact");
+              document.body.classList.add("marquee-minimal");
+            }
+          } else if (marqueeHeightState !== "compact") {
+            marqueeHeightState = "compact";
+            document.body.classList.remove("marquee-minimal");
+            document.body.classList.add("marquee-compact");
+          }
+        } else if (marqueeHeightState !== "normal") {
+          marqueeHeightState = "normal";
+          document.body.classList.remove("marquee-compact", "marquee-minimal");
         }
-      } else if (marqueeHeightState !== "compact") {
-        marqueeHeightState = "compact";
-        document.body.classList.remove("marquee-minimal");
-        document.body.classList.add("marquee-compact");
-      }
-    } else if (marqueeHeightState !== "normal") {
-      marqueeHeightState = "normal";
-      document.body.classList.remove("marquee-compact", "marquee-minimal");
+        marqueeTick = false;
+      });
+      marqueeTick = true;
     }
-
-    lastScrollTop = scrollTop;
   }, { passive: true });
   const video = document.getElementById("background-video");
   const navbar = document.querySelector(".navbar");
@@ -1056,7 +1059,41 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize with suggestions
   showSuggestions();
 
-  // Function to interpolate between two colors
+  // --- OPTIMIZED COLOR INTERPOLATION ---
+  // Pre-computed RGB cache: avoids regex parsing hex colors on every scroll frame
+  const _rgbCache = new Map();
+
+  function hexToRgb(hex) {
+    if (_rgbCache.has(hex)) return _rgbCache.get(hex);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    const rgb = result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null;
+    if (rgb) _rgbCache.set(hex, rgb);
+    return rgb;
+  }
+
+  // Pre-warm the RGB cache with ALL colors used in transitions
+  (function _prewarmRgbCache() {
+    const allColors = [
+      '#000000', '#ffffff', '#f5f0e6', '#171719', '#ffd43b', '#d4a017',
+      '#b8860b', '#74c0fc', '#1c7ed6', '#1864ab', '#f0f8f0', '#fdf2f2',
+      '#0a0a0f', '#e8e8ec', '#d6dde6', '#0d1b2a', '#2c1810', '#1a1f16',
+      '#0f0a1a', '#2d0a0a', '#0a0a1e', '#0a1a2a', '#1e150d', '#051a1a',
+      '#120a24', '#1a1e22', '#1e0f0f', '#0d0505', '#0d1318', '#0a0804',
+      '#0a0a14', '#0f0f0f', '#1a0e08', '#12060e', '#140d06', '#1a0e04',
+      '#0a0a14', '#1a0505', '#14100a', '#04101a', '#04080e', '#140e08',
+      '#0a0a0a', '#120e0a', '#060a14', '#0a120a', '#110e0a', '#1a0810',
+      '#060e04', '#0e0e12', '#120a02', '#14060a', '#140806', '#0a1206',
+      '#0a0a18', '#061208', '#180606', '#140e04', '#120e04',
+    ];
+    allColors.forEach(hexToRgb);
+  })();
+
   function interpolateColor(color1, color2, factor) {
     const rgb1 = hexToRgb(color1);
     const rgb2 = hexToRgb(color2);
@@ -1066,18 +1103,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const b = Math.round(rgb1.b + factor * (rgb2.b - rgb1.b));
 
     return `rgb(${r}, ${g}, ${b})`;
-  }
-
-  // Function to convert hex to RGB
-  function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : null;
   }
 
   // Function to update colors and vignette based on scroll position
@@ -1134,6 +1159,9 @@ function _getBoundingClientRect(el) {
   return _cachedRects.get(el);
 }
 
+// Cached CSS custom property (avoids getComputedStyle per frame)
+let _pegasusTransitionColor = '#171719';
+
 function invalidateScrollCache() {
   _cachedOffsets.clear();
   _cachedHeights.clear();
@@ -1142,17 +1170,25 @@ function invalidateScrollCache() {
   _lastAppliedTextColor = null;
   _bgBreakpoints = null; // force rebuild of background breakpoint table
   _lastCacheTime = Date.now();
+  // Re-read CSS custom property only on cache invalidation (resize, etc.)
+  try {
+    _pegasusTransitionColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--pegasus-transition-color')?.trim() || '#171719';
+  } catch(e) { /* ignore */ }
 }
 
 // Invalidate cache on resize
 window.addEventListener('resize', invalidateScrollCache, { passive: true });
 
-// Also invalidate periodically just in case layout changes (e.g. images load)
+// Also invalidate when images load (more targeted than polling)
+window.addEventListener('load', invalidateScrollCache, { passive: true });
+
+// Invalidate periodically but much less frequently (every 15s, not 3s)
 setInterval(() => {
-  if (Date.now() - _lastCacheTime > 3000) {
+  if (Date.now() - _lastCacheTime > 15000) {
     invalidateScrollCache();
   }
-}, 3000);
+}, 15000);
 
 // ---- DATA-DRIVEN BACKGROUND TRANSITION TABLE ----
 // Instead of 50+ _getOffsetTop calls per frame, we build a sorted list of
@@ -1284,10 +1320,10 @@ function updateColors() {
     const greyTransitionEnd = greyTransitionStart + greyTransitionRange;
 
     // Calculate transition points relative to the white transition section
+    // Use offsetTop/offsetHeight (cached, scroll-invariant) instead of getBoundingClientRect
     const whiteTransitionSection = _getEl("", ".white-transition-section",);
-    const whiteTransitionRect = _getBoundingClientRect(whiteTransitionSection);
-    const whiteTransitionTop = window.scrollY + whiteTransitionRect.top;
-    const whiteTransitionHeight = whiteTransitionRect.height;
+    const whiteTransitionTop = whiteTransitionSection ? _getOffsetTop(whiteTransitionSection) : 0;
+    const whiteTransitionHeight = whiteTransitionSection ? _getOffsetHeight(whiteTransitionSection) : 0;
 
     // Set the soft green transition to start at the bottom of the white transition section
     const softGreenTransitionStart =
@@ -1298,10 +1334,7 @@ function updateColors() {
 
     // Background transitions: black -> cream -> pegasus (red/black) -> vibrant green
     let backgroundColor;
-    const pegasusTransitionColor =
-      getComputedStyle(document.documentElement)
-        .getPropertyValue("--pegasus-transition-color")
-        ?.trim() || "#171719";
+    const pegasusTransitionColor = _pegasusTransitionColor;
     if (scrollTop < creamTransitionStart) {
       // Before emoji rating section - stay black
       backgroundColor = "#000000";
@@ -1614,28 +1647,10 @@ function updateColors() {
       }
     }
 
-    // Update vignette intensity and bottom blur
+    // Update vignette intensity (used by .hero::after opacity)
     document.documentElement.style.setProperty(
       "--vignette-intensity",
       vignetteIntensity,
-    );
-    document.documentElement.style.setProperty(
-      "--bottom-blur",
-      bottomBlurAmount + "px",
-    );
-
-    // Update other vignette overlays with CSS custom properties
-    document.documentElement.style.setProperty(
-      "--top-vignette-opacity",
-      gentleEase,
-    );
-    document.documentElement.style.setProperty(
-      "--top-vignette-blur",
-      blurAmount + "px",
-    );
-    document.documentElement.style.setProperty(
-      "--vignette-opacity",
-      easedVignetteProgress,
     );
 
     } // end scrollProgress change guard
@@ -2043,26 +2058,7 @@ function updateColors() {
       }
     }
 
-    // Add back to top, floating search, and floating cart update to scroll handler
-    const originalOnScroll = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          updateBackToTop();
-          if (floatingSearch || floatingMenu) {
-            updateFloatingElements();
-          }
-
-          updateSocialLinks();
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScroll);
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // NOTE: Scroll handler consolidated into final handler (see newSectionParallaxUpdaters block)
 
     // Enhanced smooth scroll to top with custom easing
     backToTopBtn.addEventListener("click", function () {
@@ -2286,7 +2282,7 @@ function updateColors() {
 
   // Brand Image Parallax Effect (First in sequence)
   if (brandImage) {
-    function updateBrandImageParallax() {
+    function updateBrandImageParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = _getEl("", ".hero");
@@ -2351,7 +2347,7 @@ function updateColors() {
   }
 
   if (laytonImage) {
-    function updateLaytonParallax() {
+    function updateLaytonParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = _getEl("", ".hero");
@@ -2393,7 +2389,7 @@ function updateColors() {
 
   // Layton Notes Parallax Effect
   if (laytonNotes) {
-    function updateLaytonNotesParallax() {
+    function updateLaytonNotesParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = _getEl("", ".hero");
@@ -2435,7 +2431,7 @@ function updateColors() {
 
   // Product Title Parallax Effect
   if (productTitle) {
-    function updateProductTitleParallax() {
+    function updateProductTitleParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = _getEl("", ".hero");
@@ -2477,7 +2473,7 @@ function updateColors() {
 
   // Fragrance Notes Parallax Effect
   if (fragranceNotes) {
-    function updateFragranceNotesParallax() {
+    function updateFragranceNotesParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = _getEl("", ".hero");
@@ -2519,7 +2515,7 @@ function updateColors() {
 
   // Perfume Rating Parallax Effect
   if (perfumeRating) {
-    function updatePerfumeRatingParallax() {
+    function updatePerfumeRatingParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const heroSection = _getEl("", ".hero");
@@ -2569,68 +2565,14 @@ function updateColors() {
       }
     }
 
-    // Add parallax update to scroll handler
-    const originalOnScrollWithParallax = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          if (backToTopBtn && progressRing) {
-            updateBackToTop();
-          }
-          if (floatingSearch) {
-            updateFloatingElements();
-          }
-          updateSocialLinks();
-          if (brandImage) {
-            updateBrandImageParallax();
-          }
-          updateLaytonParallax();
-          if (laytonNotes) {
-            updateLaytonNotesParallax();
-          }
-          if (productTitle) {
-            updateProductTitleParallax();
-          }
-          if (fragranceNotes) {
-            updateFragranceNotesParallax();
-          }
-          if (perfumeRating) {
-            updatePerfumeRatingParallax();
-          }
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScrollWithParallax);
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Initial parallax calls
-    if (brandImage) {
-      updateBrandImageParallax();
-    }
-    updateLaytonParallax();
-    if (laytonNotes) {
-      updateLaytonNotesParallax();
-    }
-    if (productTitle) {
-      updateProductTitleParallax();
-    }
-    if (fragranceNotes) {
-      updateFragranceNotesParallax();
-    }
-    if (perfumeRating) {
-      updatePerfumeRatingParallax();
-    }
+    // NOTE: Scroll handler consolidated into final handler (dead parallax calls removed)
   }
 
   // Pegasus Image Parallax Effect (matching Layton style)
   if (pegasusImage) {
     let pegasusImageLastProgress = -1;
 
-    function updatePegasusImageParallax() {
+    function updatePegasusImageParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const pegasusSection = pegasusImage.closest(".content");
@@ -2728,7 +2670,7 @@ function updateColors() {
   if (pegasusProductTitle) {
     let pegasusProductTitleLastProgress = -1;
 
-    function updatePegasusProductTitleParallax() {
+    function updatePegasusProductTitleParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const pegasusSection = pegasusProductTitle.closest(".content");
@@ -2844,7 +2786,7 @@ function updateColors() {
   if (pegasusFragranceProfile) {
     let pegasusFragranceProfileLastProgress = -1;
 
-    function updatePegasusFragranceProfileParallax() {
+    function updatePegasusFragranceProfileParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const pegasusSection = pegasusFragranceProfile.closest(".content");
@@ -2960,7 +2902,7 @@ function updateColors() {
   if (pegasusFragranceNotes) {
     let pegasusFragranceNotesLastProgress = -1;
 
-    function updatePegasusFragranceNotesParallax() {
+    function updatePegasusFragranceNotesParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const pegasusSection = pegasusFragranceNotes.closest(".content");
@@ -3072,7 +3014,7 @@ function updateColors() {
 
   // Pegasus Rating Parallax Effect
   if (pegasusPerfumeRating) {
-    function updatePegasusPerfumeRatingParallax() {
+    function updatePegasusPerfumeRatingParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const pegasusSection = pegasusPerfumeRating.closest(".content");
@@ -3099,76 +3041,7 @@ function updateColors() {
     pegasusFragranceNotes ||
     pegasusPerfumeRating
   ) {
-    // Add Pegasus parallax update to scroll handler
-    const originalOnScrollWithPegasus = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          if (backToTopBtn && progressRing) {
-            updateBackToTop();
-          }
-          if (floatingSearch) {
-            updateFloatingElements();
-          }
-          updateSocialLinks();
-          if (brandImage) {
-            updateBrandImageParallax();
-          }
-          updateLaytonParallax();
-          if (laytonNotes) {
-            updateLaytonNotesParallax();
-          }
-          if (productTitle) {
-            updateProductTitleParallax();
-          }
-          if (fragranceNotes) {
-            updateFragranceNotesParallax();
-          }
-          if (perfumeRating) {
-            updatePerfumeRatingParallax();
-          }
-          // Pegasus parallax functions
-          if (pegasusImage) {
-            updatePegasusImageParallax();
-          }
-          if (pegasusProductTitle) {
-            updatePegasusProductTitleParallax();
-          }
-          if (pegasusFragranceProfile) {
-            updatePegasusFragranceProfileParallax();
-          }
-          if (pegasusFragranceNotes) {
-            updatePegasusFragranceNotesParallax();
-          }
-          if (pegasusPerfumeRating) {
-            updatePegasusPerfumeRatingParallax();
-          }
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScrollWithPegasus);
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Initial Pegasus parallax calls
-    if (pegasusImage) {
-      updatePegasusImageParallax();
-    }
-    if (pegasusProductTitle) {
-      updatePegasusProductTitleParallax();
-    }
-    if (pegasusFragranceProfile) {
-      updatePegasusFragranceProfileParallax();
-    }
-    if (pegasusFragranceNotes) {
-      updatePegasusFragranceNotesParallax();
-    }
-    if (pegasusPerfumeRating) {
-      updatePegasusPerfumeRatingParallax();
-    }
+    // NOTE: Scroll handler consolidated into final handler (dead parallax calls removed)
   }
 
   // Greenly Parallax Effects
@@ -3184,7 +3057,7 @@ function updateColors() {
 
   // Greenly Image Parallax Effect
   if (greenlyImage) {
-    function updateGreenlyImageParallax() {
+    function updateGreenlyImageParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const greenlySection = greenlyImage.closest(".content");
@@ -3221,7 +3094,7 @@ function updateColors() {
 
   // Greenly Product Info Parallax Effect
   if (greenlyProductInfo) {
-    function updateGreenlyProductInfoParallax() {
+    function updateGreenlyProductInfoParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const greenlySection = greenlyProductInfo.closest(".content");
@@ -3258,7 +3131,7 @@ function updateColors() {
 
   // Greenly Scent Profile Parallax Effect
   if (greenlyScentProfile) {
-    function updateGreenlyScentProfileParallax() {
+    function updateGreenlyScentProfileParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const greenlySection = greenlyScentProfile.closest(".content");
@@ -3295,7 +3168,7 @@ function updateColors() {
 
   // Greenly Ingredients Parallax Effect
   if (greenlyIngredients) {
-    function updateGreenlyIngredientsParallax() {
+    function updateGreenlyIngredientsParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const greenlySection = greenlyIngredients.closest(".content");
@@ -3332,7 +3205,7 @@ function updateColors() {
 
   // Greenly Fragrance Description Parallax Effect
   if (greenlyFragranceDescription) {
-    function updateGreenlyFragranceDescriptionParallax() {
+    function updateGreenlyFragranceDescriptionParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const greenlySection = greenlyFragranceDescription.closest(
@@ -3376,92 +3249,7 @@ function updateColors() {
     greenlyIngredients ||
     greenlyFragranceDescription
   ) {
-    // Add Greenly parallax update to scroll handler
-    const originalOnScrollWithGreenly = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          if (backToTopBtn && progressRing) {
-            updateBackToTop();
-          }
-          if (floatingSearch) {
-            updateFloatingElements();
-          }
-          updateSocialLinks();
-          if (brandImage) {
-            updateBrandImageParallax();
-          }
-          updateLaytonParallax();
-          if (laytonNotes) {
-            updateLaytonNotesParallax();
-          }
-          if (productTitle) {
-            updateProductTitleParallax();
-          }
-          if (fragranceNotes) {
-            updateFragranceNotesParallax();
-          }
-          if (perfumeRating) {
-            updatePerfumeRatingParallax();
-          }
-          // Pegasus parallax functions
-          if (pegasusImage) {
-            updatePegasusImageParallax();
-          }
-          if (pegasusProductTitle) {
-            updatePegasusProductTitleParallax();
-          }
-          if (pegasusFragranceProfile) {
-            updatePegasusFragranceProfileParallax();
-          }
-          if (pegasusFragranceNotes) {
-            updatePegasusFragranceNotesParallax();
-          }
-          if (pegasusPerfumeRating) {
-            updatePegasusPerfumeRatingParallax();
-          }
-          // Greenly parallax functions
-          if (greenlyImage) {
-            updateGreenlyImageParallax();
-          }
-          if (greenlyProductInfo) {
-            updateGreenlyProductInfoParallax();
-          }
-          if (greenlyScentProfile) {
-            updateGreenlyScentProfileParallax();
-          }
-          if (greenlyIngredients) {
-            updateGreenlyIngredientsParallax();
-          }
-          if (greenlyFragranceDescription) {
-            updateGreenlyFragranceDescriptionParallax();
-          }
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScrollWithGreenly);
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Initial Greenly parallax calls
-    if (greenlyImage) {
-      updateGreenlyImageParallax();
-    }
-    if (greenlyProductInfo) {
-      updateGreenlyProductInfoParallax();
-    }
-    if (greenlyScentProfile) {
-      updateGreenlyScentProfileParallax();
-    }
-    if (greenlyIngredients) {
-      updateGreenlyIngredientsParallax();
-    }
-    if (greenlyFragranceDescription) {
-      updateGreenlyFragranceDescriptionParallax();
-    }
+    // NOTE: Scroll handler consolidated into final handler (dead parallax calls removed)
   }
 
   // Baccarat Rouge 540 Parallax Effects
@@ -3477,7 +3265,7 @@ function updateColors() {
 
   // Baccarat Rouge 540 Image Parallax Effect
   if (baccaratrougeImage) {
-    function updateBaccaratrougeImageParallax() {
+    function updateBaccaratrougeImageParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const baccaratrougeSection = baccaratrougeImage.closest(".content");
@@ -3514,7 +3302,7 @@ function updateColors() {
 
   // Baccarat Rouge 540 Product Info Parallax Effect
   if (baccaratrougeProductInfo) {
-    function updateBaccaratrougeProductInfoParallax() {
+    function updateBaccaratrougeProductInfoParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const baccaratrougeSection = baccaratrougeProductInfo.closest(".content");
@@ -3551,7 +3339,7 @@ function updateColors() {
 
   // Baccarat Rouge 540 Scent Profile Parallax Effect
   if (baccaratrougeScentProfile) {
-    function updateBaccaratrougeScentProfileParallax() {
+    function updateBaccaratrougeScentProfileParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const baccaratrougeSection = baccaratrougeScentProfile.closest(".content");
@@ -3588,7 +3376,7 @@ function updateColors() {
 
   // Baccarat Rouge 540 Ingredients Parallax Effect
   if (baccaratrougeIngredients) {
-    function updateBaccaratrougeIngredientsParallax() {
+    function updateBaccaratrougeIngredientsParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const baccaratrougeSection = baccaratrougeIngredients.closest(".content");
@@ -3625,7 +3413,7 @@ function updateColors() {
 
   // Baccarat Rouge 540 Fragrance Description Parallax Effect
   if (baccaratrougeFragranceDescription) {
-    function updateBaccaratrougeFragranceDescriptionParallax() {
+    function updateBaccaratrougeFragranceDescriptionParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const baccaratrougeSection = baccaratrougeFragranceDescription.closest(
@@ -3669,92 +3457,7 @@ function updateColors() {
     baccaratrougeIngredients ||
     baccaratrougeFragranceDescription
   ) {
-    // Add Baccarat Rouge 540 parallax update to scroll handler
-    const originalOnScrollWithBaccaratrouge = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          if (backToTopBtn && progressRing) {
-            updateBackToTop();
-          }
-          if (floatingSearch) {
-            updateFloatingElements();
-          }
-          updateSocialLinks();
-          if (brandImage) {
-            updateBrandImageParallax();
-          }
-          updateLaytonParallax();
-          if (laytonNotes) {
-            updateLaytonNotesParallax();
-          }
-          if (productTitle) {
-            updateProductTitleParallax();
-          }
-          if (fragranceNotes) {
-            updateFragranceNotesParallax();
-          }
-          if (perfumeRating) {
-            updatePerfumeRatingParallax();
-          }
-          // Pegasus parallax functions
-          if (pegasusImage) {
-            updatePegasusImageParallax();
-          }
-          if (pegasusProductTitle) {
-            updatePegasusProductTitleParallax();
-          }
-          if (pegasusFragranceProfile) {
-            updatePegasusFragranceProfileParallax();
-          }
-          if (pegasusFragranceNotes) {
-            updatePegasusFragranceNotesParallax();
-          }
-          if (pegasusPerfumeRating) {
-            updatePegasusPerfumeRatingParallax();
-          }
-          // Baccarat Rouge 540 parallax functions
-          if (baccaratrougeImage) {
-            updateBaccaratrougeImageParallax();
-          }
-          if (baccaratrougeProductInfo) {
-            updateBaccaratrougeProductInfoParallax();
-          }
-          if (baccaratrougeScentProfile) {
-            updateBaccaratrougeScentProfileParallax();
-          }
-          if (baccaratrougeIngredients) {
-            updateBaccaratrougeIngredientsParallax();
-          }
-          if (baccaratrougeFragranceDescription) {
-            updateBaccaratrougeFragranceDescriptionParallax();
-          }
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScrollWithBaccaratrouge);
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Initial Baccarat Rouge 540 parallax calls
-    if (baccaratrougeImage) {
-      updateBaccaratrougeImageParallax();
-    }
-    if (baccaratrougeProductInfo) {
-      updateBaccaratrougeProductInfoParallax();
-    }
-    if (baccaratrougeScentProfile) {
-      updateBaccaratrougeScentProfileParallax();
-    }
-    if (baccaratrougeIngredients) {
-      updateBaccaratrougeIngredientsParallax();
-    }
-    if (baccaratrougeFragranceDescription) {
-      updateBaccaratrougeFragranceDescriptionParallax();
-    }
+    // NOTE: Scroll handler consolidated into final handler (dead parallax calls removed)
   }
 
 
@@ -3771,7 +3474,7 @@ function updateColors() {
 
   // Black Orchid Image Parallax Effect
   if (blackorchidImage) {
-    function updateBlackorchidImageParallax() {
+    function updateBlackorchidImageParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const blackorchidSection = blackorchidImage.closest(".content");
@@ -3808,7 +3511,7 @@ function updateColors() {
 
   // Black Orchid Product Info Parallax Effect
   if (blackorchidProductInfo) {
-    function updateBlackorchidProductInfoParallax() {
+    function updateBlackorchidProductInfoParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const blackorchidSection = blackorchidProductInfo.closest(".content");
@@ -3845,7 +3548,7 @@ function updateColors() {
 
   // Black Orchid Scent Profile Parallax Effect
   if (blackorchidScentProfile) {
-    function updateBlackorchidScentProfileParallax() {
+    function updateBlackorchidScentProfileParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const blackorchidSection = blackorchidScentProfile.closest(".content");
@@ -3882,7 +3585,7 @@ function updateColors() {
 
   // Black Orchid Ingredients Parallax Effect
   if (blackorchidIngredients) {
-    function updateBlackorchidIngredientsParallax() {
+    function updateBlackorchidIngredientsParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const blackorchidSection = blackorchidIngredients.closest(".content");
@@ -3919,7 +3622,7 @@ function updateColors() {
 
   // Black Orchid Fragrance Description Parallax Effect
   if (blackorchidFragranceDescription) {
-    function updateBlackorchidFragranceDescriptionParallax() {
+    function updateBlackorchidFragranceDescriptionParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const blackorchidSection = blackorchidFragranceDescription.closest(
@@ -3963,92 +3666,7 @@ function updateColors() {
     blackorchidIngredients ||
     blackorchidFragranceDescription
   ) {
-    // Add Black Orchid parallax update to scroll handler
-    const originalOnScrollWithBlackorchid = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          if (backToTopBtn && progressRing) {
-            updateBackToTop();
-          }
-          if (floatingSearch) {
-            updateFloatingElements();
-          }
-          updateSocialLinks();
-          if (brandImage) {
-            updateBrandImageParallax();
-          }
-          updateLaytonParallax();
-          if (laytonNotes) {
-            updateLaytonNotesParallax();
-          }
-          if (productTitle) {
-            updateProductTitleParallax();
-          }
-          if (fragranceNotes) {
-            updateFragranceNotesParallax();
-          }
-          if (perfumeRating) {
-            updatePerfumeRatingParallax();
-          }
-          // Pegasus parallax functions
-          if (pegasusImage) {
-            updatePegasusImageParallax();
-          }
-          if (pegasusProductTitle) {
-            updatePegasusProductTitleParallax();
-          }
-          if (pegasusFragranceProfile) {
-            updatePegasusFragranceProfileParallax();
-          }
-          if (pegasusFragranceNotes) {
-            updatePegasusFragranceNotesParallax();
-          }
-          if (pegasusPerfumeRating) {
-            updatePegasusPerfumeRatingParallax();
-          }
-          // Black Orchid parallax functions
-          if (blackorchidImage) {
-            updateBlackorchidImageParallax();
-          }
-          if (blackorchidProductInfo) {
-            updateBlackorchidProductInfoParallax();
-          }
-          if (blackorchidScentProfile) {
-            updateBlackorchidScentProfileParallax();
-          }
-          if (blackorchidIngredients) {
-            updateBlackorchidIngredientsParallax();
-          }
-          if (blackorchidFragranceDescription) {
-            updateBlackorchidFragranceDescriptionParallax();
-          }
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScrollWithBlackorchid);
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Initial Black Orchid parallax calls
-    if (blackorchidImage) {
-      updateBlackorchidImageParallax();
-    }
-    if (blackorchidProductInfo) {
-      updateBlackorchidProductInfoParallax();
-    }
-    if (blackorchidScentProfile) {
-      updateBlackorchidScentProfileParallax();
-    }
-    if (blackorchidIngredients) {
-      updateBlackorchidIngredientsParallax();
-    }
-    if (blackorchidFragranceDescription) {
-      updateBlackorchidFragranceDescriptionParallax();
-    }
+    // NOTE: Scroll handler consolidated into final handler (dead parallax calls removed)
   }
 
 
@@ -4065,7 +3683,7 @@ function updateColors() {
 
   // Aventus Image Parallax Effect
   if (aventusImage) {
-    function updateAventusImageParallax() {
+    function updateAventusImageParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const aventusSection = aventusImage.closest(".content");
@@ -4102,7 +3720,7 @@ function updateColors() {
 
   // Aventus Product Info Parallax Effect
   if (aventusProductInfo) {
-    function updateAventusProductInfoParallax() {
+    function updateAventusProductInfoParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const aventusSection = aventusProductInfo.closest(".content");
@@ -4139,7 +3757,7 @@ function updateColors() {
 
   // Aventus Scent Profile Parallax Effect
   if (aventusScentProfile) {
-    function updateAventusScentProfileParallax() {
+    function updateAventusScentProfileParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const aventusSection = aventusScentProfile.closest(".content");
@@ -4176,7 +3794,7 @@ function updateColors() {
 
   // Aventus Ingredients Parallax Effect
   if (aventusIngredients) {
-    function updateAventusIngredientsParallax() {
+    function updateAventusIngredientsParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const aventusSection = aventusIngredients.closest(".content");
@@ -4213,7 +3831,7 @@ function updateColors() {
 
   // Aventus Fragrance Description Parallax Effect
   if (aventusFragranceDescription) {
-    function updateAventusFragranceDescriptionParallax() {
+    function updateAventusFragranceDescriptionParallax() { return; // PERF PATCH 
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const aventusSection = aventusFragranceDescription.closest(
@@ -4257,140 +3875,7 @@ function updateColors() {
     aventusIngredients ||
     aventusFragranceDescription
   ) {
-    // Add Aventus parallax update to scroll handler
-    const originalOnScrollWithAventus = onScroll;
-    onScroll = function () {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          updateColors();
-          if (backToTopBtn && progressRing) {
-            updateBackToTop();
-          }
-          if (floatingSearch) {
-            updateFloatingElements();
-          }
-          updateSocialLinks();
-          if (brandImage) {
-            updateBrandImageParallax();
-          }
-          updateLaytonParallax();
-          if (laytonNotes) {
-            updateLaytonNotesParallax();
-          }
-          if (productTitle) {
-            updateProductTitleParallax();
-          }
-          if (fragranceNotes) {
-            updateFragranceNotesParallax();
-          }
-          if (perfumeRating) {
-            updatePerfumeRatingParallax();
-          }
-          // Pegasus parallax functions
-          if (pegasusImage) {
-            updatePegasusImageParallax();
-          }
-          if (pegasusProductTitle) {
-            updatePegasusProductTitleParallax();
-          }
-          if (pegasusFragranceProfile) {
-            updatePegasusFragranceProfileParallax();
-          }
-          if (pegasusFragranceNotes) {
-            updatePegasusFragranceNotesParallax();
-          }
-          if (pegasusPerfumeRating) {
-            updatePegasusPerfumeRatingParallax();
-          }
-          // Greenly parallax functions
-          if (typeof greenlyImage !== 'undefined' && greenlyImage) {
-            updateGreenlyImageParallax();
-          }
-          if (typeof greenlyProductInfo !== 'undefined' && greenlyProductInfo) {
-            updateGreenlyProductInfoParallax();
-          }
-          if (typeof greenlyScentProfile !== 'undefined' && greenlyScentProfile) {
-            updateGreenlyScentProfileParallax();
-          }
-          if (typeof greenlyIngredients !== 'undefined' && greenlyIngredients) {
-            updateGreenlyIngredientsParallax();
-          }
-          if (typeof greenlyFragranceDescription !== 'undefined' && greenlyFragranceDescription) {
-            updateGreenlyFragranceDescriptionParallax();
-          }
-          // Baccarat Rouge 540 parallax functions
-          if (typeof baccaratrougeImage !== 'undefined' && baccaratrougeImage) {
-            updateBaccaratrougeImageParallax();
-          }
-          if (typeof baccaratrougeProductInfo !== 'undefined' && baccaratrougeProductInfo) {
-            updateBaccaratrougeProductInfoParallax();
-          }
-          if (typeof baccaratrougeScentProfile !== 'undefined' && baccaratrougeScentProfile) {
-            updateBaccaratrougeScentProfileParallax();
-          }
-          if (typeof baccaratrougeIngredients !== 'undefined' && baccaratrougeIngredients) {
-            updateBaccaratrougeIngredientsParallax();
-          }
-          if (typeof baccaratrougeFragranceDescription !== 'undefined' && baccaratrougeFragranceDescription) {
-            updateBaccaratrougeFragranceDescriptionParallax();
-          }
-          // Black Orchid parallax functions
-          if (typeof blackorchidImage !== 'undefined' && blackorchidImage) {
-            updateBlackorchidImageParallax();
-          }
-          if (typeof blackorchidProductInfo !== 'undefined' && blackorchidProductInfo) {
-            updateBlackorchidProductInfoParallax();
-          }
-          if (typeof blackorchidScentProfile !== 'undefined' && blackorchidScentProfile) {
-            updateBlackorchidScentProfileParallax();
-          }
-          if (typeof blackorchidIngredients !== 'undefined' && blackorchidIngredients) {
-            updateBlackorchidIngredientsParallax();
-          }
-          if (typeof blackorchidFragranceDescription !== 'undefined' && blackorchidFragranceDescription) {
-            updateBlackorchidFragranceDescriptionParallax();
-          }
-          // Aventus parallax functions
-          if (aventusImage) {
-            updateAventusImageParallax();
-          }
-          if (aventusProductInfo) {
-            updateAventusProductInfoParallax();
-          }
-          if (aventusScentProfile) {
-            updateAventusScentProfileParallax();
-          }
-          if (aventusIngredients) {
-            updateAventusIngredientsParallax();
-          }
-          if (aventusFragranceDescription) {
-            updateAventusFragranceDescriptionParallax();
-          }
-        });
-        ticking = true;
-      }
-    };
-
-    // Update scroll event listener
-    window.removeEventListener("scroll", originalOnScrollWithAventus);
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    // Initial Aventus parallax calls
-    if (aventusImage) {
-      updateAventusImageParallax();
-    }
-    if (aventusProductInfo) {
-      updateAventusProductInfoParallax();
-    }
-    if (aventusScentProfile) {
-      updateAventusScentProfileParallax();
-    }
-    if (aventusIngredients) {
-      updateAventusIngredientsParallax();
-    }
-    if (aventusFragranceDescription) {
-      updateAventusFragranceDescriptionParallax();
-    }
+    // NOTE: Scroll handler consolidated into final handler (dead parallax calls removed)
   }
 
   // ===== NEW SECTIONS PARALLAX (Sauvage, Bleu de Chanel, Tobacco Vanille, Oud Wood, La Nuit, Lost Cherry) =====
@@ -4537,90 +4022,15 @@ function updateColors() {
       if (!ticking) {
         requestAnimationFrame(() => {
           try {
-            const _st = window.pageYOffset || document.documentElement.scrollTop;
-            const _wh = window.innerHeight;
-
             updateColors();
             if (backToTopBtn && progressRing) { updateBackToTop(); }
             if (floatingSearch) { updateFloatingElements(); }
             updateSocialLinks();
 
-            // ---------- Viewport-culled parallax groups ----------
-            // Each group only runs if user is within ~2 screens of that section
-
-            // Layton group (near top of page)
-            const _laytonTop = brandImage ? _getOffsetTop(brandImage.closest('.content') || brandImage) : 0;
-            if (_st < _laytonTop + _wh * 3) {
-              if (brandImage) { updateBrandImageParallax(); }
-              updateLaytonParallax();
-              if (laytonNotes) { updateLaytonNotesParallax(); }
-              if (productTitle) { updateProductTitleParallax(); }
-              if (fragranceNotes) { updateFragranceNotesParallax(); }
-              if (perfumeRating) { updatePerfumeRatingParallax(); }
+            // New sections parallax (has viewport culling built in)
+            for (let i = 0; i < newSectionParallaxUpdaters.length; i++) {
+              newSectionParallaxUpdaters[i]();
             }
-
-            // Pegasus group
-            if (pegasusImage) {
-              const _pegTop = _getOffsetTop(pegasusImage.closest('.content') || pegasusImage);
-              if (_st + _wh * 2 > _pegTop && _st < _pegTop + _wh * 3) {
-                updatePegasusImageParallax();
-                if (pegasusProductTitle) { updatePegasusProductTitleParallax(); }
-                if (pegasusFragranceProfile) { updatePegasusFragranceProfileParallax(); }
-                if (pegasusFragranceNotes) { updatePegasusFragranceNotesParallax(); }
-                if (pegasusPerfumeRating) { updatePegasusPerfumeRatingParallax(); }
-              }
-            }
-
-            // Greenly group
-            if (typeof greenlyImage !== 'undefined' && greenlyImage) {
-              const _grTop = _getOffsetTop(greenlyImage.closest('.content') || greenlyImage);
-              if (_st + _wh * 2 > _grTop && _st < _grTop + _wh * 3) {
-                updateGreenlyImageParallax();
-                if (typeof greenlyProductInfo !== 'undefined' && greenlyProductInfo) { updateGreenlyProductInfoParallax(); }
-                if (typeof greenlyScentProfile !== 'undefined' && greenlyScentProfile) { updateGreenlyScentProfileParallax(); }
-                if (typeof greenlyIngredients !== 'undefined' && greenlyIngredients) { updateGreenlyIngredientsParallax(); }
-                if (typeof greenlyFragranceDescription !== 'undefined' && greenlyFragranceDescription) { updateGreenlyFragranceDescriptionParallax(); }
-              }
-            }
-
-            // Baccarat Rouge group
-            if (typeof baccaratrougeImage !== 'undefined' && baccaratrougeImage) {
-              const _brTop = _getOffsetTop(baccaratrougeImage.closest('.content') || baccaratrougeImage);
-              if (_st + _wh * 2 > _brTop && _st < _brTop + _wh * 3) {
-                updateBaccaratrougeImageParallax();
-                if (typeof baccaratrougeProductInfo !== 'undefined' && baccaratrougeProductInfo) { updateBaccaratrougeProductInfoParallax(); }
-                if (typeof baccaratrougeScentProfile !== 'undefined' && baccaratrougeScentProfile) { updateBaccaratrougeScentProfileParallax(); }
-                if (typeof baccaratrougeIngredients !== 'undefined' && baccaratrougeIngredients) { updateBaccaratrougeIngredientsParallax(); }
-                if (typeof baccaratrougeFragranceDescription !== 'undefined' && baccaratrougeFragranceDescription) { updateBaccaratrougeFragranceDescriptionParallax(); }
-              }
-            }
-
-            // Black Orchid group
-            if (typeof blackorchidImage !== 'undefined' && blackorchidImage) {
-              const _boTop = _getOffsetTop(blackorchidImage.closest('.content') || blackorchidImage);
-              if (_st + _wh * 2 > _boTop && _st < _boTop + _wh * 3) {
-                updateBlackorchidImageParallax();
-                if (typeof blackorchidProductInfo !== 'undefined' && blackorchidProductInfo) { updateBlackorchidProductInfoParallax(); }
-                if (typeof blackorchidScentProfile !== 'undefined' && blackorchidScentProfile) { updateBlackorchidScentProfileParallax(); }
-                if (typeof blackorchidIngredients !== 'undefined' && blackorchidIngredients) { updateBlackorchidIngredientsParallax(); }
-                if (typeof blackorchidFragranceDescription !== 'undefined' && blackorchidFragranceDescription) { updateBlackorchidFragranceDescriptionParallax(); }
-              }
-            }
-
-            // Aventus group
-            if (aventusImage) {
-              const _avTop = _getOffsetTop(aventusImage.closest('.content') || aventusImage);
-              if (_st + _wh * 2 > _avTop && _st < _avTop + _wh * 3) {
-                updateAventusImageParallax();
-                if (aventusProductInfo) { updateAventusProductInfoParallax(); }
-                if (aventusScentProfile) { updateAventusScentProfileParallax(); }
-                if (aventusIngredients) { updateAventusIngredientsParallax(); }
-                if (aventusFragranceDescription) { updateAventusFragranceDescriptionParallax(); }
-              }
-            }
-
-            // New sections parallax (already has viewport culling in createParallaxUpdater)
-            newSectionParallaxUpdaters.forEach(fn => fn());
           } finally {
             ticking = false;
           }

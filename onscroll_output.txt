@@ -1,0 +1,61 @@
+Found at line 1650
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(updateColors);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Initial color update
+  updateColors();
+
+  // Language changer functionality
+  const languageSelector = document.querySelector(".language-selector");
+  const currentLang = document.getElementById("current-lang");
+  const languageDropdown = document.getElementById("language-dropdown");
+  const langOptions = document.querySelectorAll(".lang-option");
+
+  // Toggle dropdown
+  currentLang.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    languageSelector.classList.toggle("active");
+    languageDropdown.classList.toggle("active");
+  });
+
+  // Language option selection
+  langOptions.forEach((option) => {
+    option.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const selectedLang = this.getAttribute("data-lang");
+      const selectedCode = this.getAttribute("data-code");
+
+      // Update current language display
+      const selectedFlagSvg = this.querySelector(".flag svg").cloneNode(true);
+      selectedFlagSvg.setAttribute("width", "20");
+      selectedFlagSvg.setAttribute("height", "14");
+
+      currentLang.querySelector(".flag").innerHTML = "";
+      currentLang.querySelector(".flag").appendChild(selectedFlagSvg);
+      currentLang.querySelector(".lang-code").textContent = selectedCode;
+
+      // Update HTML lang attribute
+      document.documentElement.setAttribute("lang", selectedLang);
+
+      // Close dropdown
+      languageSelector.classList.remove("active");
+      languageDropdown.classList.remove("active");
+
+      // You can add language switching logic here
+      console.log("Language changed to:", selectedLang);
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function (e) {
+    if (!languageSelector.contains(e.target)) {
+      languageSelector.classList.remove("active");

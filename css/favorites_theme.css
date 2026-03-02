@@ -68,7 +68,6 @@ button[class*="favorite"],
     ) !important;
     border: 2px solid var(--favorite-border) !important;
     border-radius: var(--favorite-radius) !important;
-    backdrop-filter: blur(10px) !important;
 
     /* Typography */
     color: var(--favorite-text) !important;

@@ -81,7 +81,6 @@
     border: 1px solid rgba(125,139,106,0.12) !important;
     border-radius: 6px !important;
     padding: 30px !important;
-    backdrop-filter: blur(8px) !important;
 }
 .oudwood-profile-card .profile-title { color: #e8ede0 !important; font-family: 'Libre Baskerville', serif !important; }
 .oudwood-profile-card .profile-subtitle { color: #5e6b4e !important; }

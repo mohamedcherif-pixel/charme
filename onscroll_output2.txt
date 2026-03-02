@@ -1,0 +1,151 @@
+Found at line 1254
+function updateColors() {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const documentHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const windowHeight = window.innerHeight;
+
+    const getSectionEl = _getEl;
+
+    // Calculate when user has scrolled past the video section (100vh)
+    const videoSectionHeight = windowHeight; // 100vh
+    const contentHeight =
+      _getOffsetHeight(_getEl("", ".content")) || windowHeight * 3;
+
+    // Define transition zones - black stays much longer
+    const blackDuration = contentHeight * 0.92; // Black stays for 92% of content height (was 85%)
+    const transitionStart = videoSectionHeight + blackDuration; // Start transition much later
+    const transitionRange = contentHeight * 0.08; // Use 8% of content height for transition (was 15%)
+    const transitionEnd = transitionStart + transitionRange;
+
+    // Start cream transition later into the Haltane section
+    const haltaneSection = _getEl("", ".haltane-section-container");
+    const creamTransitionStart = haltaneSection
+      ? _getOffsetTop(haltaneSection) + 500
+      : transitionEnd;
+    const creamTransitionRange = windowHeight * 0.3; // Transition over 30% of viewport height
+    const creamTransitionEnd = creamTransitionStart + creamTransitionRange;
+
+    // Start light grey transition at Pegasus section
+    const pegasusSection = _getEl("", ".pegasus-image");
+    const greyTransitionStart = pegasusSection
+      ? _getOffsetTop(pegasusSection.closest(".content")) - 800
+      : creamTransitionEnd + windowHeight;
+    const greyTransitionRange = windowHeight * 0.5; // Transition over 50% of viewport height
+    const greyTransitionEnd = greyTransitionStart + greyTransitionRange;
+
+    // Calculate transition points relative to the white transition section
+    const whiteTransitionSection = _getEl("", ".white-transition-section",);
+    const whiteTransitionRect = _getBoundingClientRect(whiteTransitionSection);
+    const whiteTransitionTop = window.scrollY + whiteTransitionRect.top;
+    const whiteTransitionHeight = whiteTransitionRect.height;
+
+    // Set the soft green transition to start at the bottom of the white transition section
+    const softGreenTransitionStart =
+      whiteTransitionTop + whiteTransitionHeight - window.innerHeight * 0.7; // Start much earlier (was 0.3)
+    const softGreenTransitionRange = windowHeight * 0.5; // Transition over 50% of viewport height
+    const softGreenTransitionEnd =
+      softGreenTransitionStart + softGreenTransitionRange;
+
+    // Background transitions: black -> cream -> pegasus (red/black) -> vibrant green
+    let backgroundColor;
+    const pegasusTransitionColor =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--pegasus-transition-color")
+        ?.trim() || "#171719";
+    if (scrollTop < creamTransitionStart) {
+      // Before emoji rating section - stay black
+      backgroundColor = "#000000";
+    } else if (scrollTop < creamTransitionEnd) {
+      // In cream transition zone - fade from black to cream
+      const rawProgress =
+        (scrollTop - creamTransitionStart) / creamTransitionRange;
+      // Apply slower easing curve for smoother, more gradual fade
+      const easedProgress = Math.pow(rawProgress, 0.7); // Slower than linear
+      backgroundColor = interpolateColor("#000000", "#f5f0e6", easedProgress);
+    } else if (scrollTop < greyTransitionStart) {
+      // Between cream and pegasus transition - stay cream
+      backgroundColor = "#f5f0e6";
+    } else if (scrollTop < greyTransitionEnd) {
+      // In pegasus transition zone - fade from cream to configured red/black
+      const rawProgress =
+        (scrollTop - greyTransitionStart) / greyTransitionRange;
+      const easedProgress = Math.pow(rawProgress, 0.6); // Smooth easing
+      backgroundColor = interpolateColor(
+        "#f5f0e6",
+        pegasusTransitionColor,
+        easedProgress,
+      );
+    } else if (scrollTop < softGreenTransitionStart) {
+      // Between pegasus and soft green transition - stay on pegasus color
+      backgroundColor = pegasusTransitionColor;
+    } else if (scrollTop < softGreenTransitionEnd) {
+      // In transition zone - fade from pegasus color to light grey
+      const rawProgress =
+        (scrollTop - softGreenTransitionStart) / softGreenTransitionRange;
+      const easedProgress = Math.pow(rawProgress, 0.5); // Gentle easing
+      // Fade to light green instead of pure white
+      backgroundColor = interpolateColor(
+        pegasusTransitionColor,
+        "#f0f8f0",
+        easedProgress,
+      );
+        } else {
+      // Past Greenly - use data-driven transition table
+      // Build breakpoint table lazily (only when cache is invalidated)
+      if (!_bgBreakpoints) {
+        _bgBreakpoints = _buildBgBreakpoints(windowHeight);
+      }
+      if (_bgBreakpoints.length > 0) {
+        backgroundColor = _lookupSectionBgColor(scrollTop, _bgBreakpoints);
+      } else {
+        backgroundColor = "#f0f8f0";
+      }
+    }
+
+    // Apply the color (avoid redundant style writes)
+    if (_lastAppliedBackgroundColor !== backgroundColor) {
+      body.style.backgroundColor = backgroundColor;
+      _lastAppliedBackgroundColor = backgroundColor;
+    }
+
+    // Haltane section fade-in effect aligned with cream transition
+    const haltaneImage = _getEl("", ".haltane-image");
+    const haltaneProductTitle = _getEl("", ".haltane-section-container .product-title",);
+    const haltaneNotes = _getEl("", ".haltane-notes");
+    const haltaneFragranceNotes = _getEl("", ".haltane-fragrance-notes",);
+
+    if (
+      haltaneImage ||
+      haltaneProductTitle ||
+      haltaneNotes ||
+      haltaneFragranceNotes
+    ) {
+      // Only compute haltane fade when near the transition zone
+      if (scrollTop < creamTransitionEnd + 200) {
+        let haltaneOpacity = 0;
+
+        // Start fade-in very late in the cream transition (at 95% progress)
+        const fadeInStart = creamTransitionStart + creamTransitionRange * 0.95;
+        const fadeInRange = creamTransitionRange * 0.05; // Use only last 5% for fade-in
+
+        if (scrollTop < fadeInStart) {
+          haltaneOpacity = 0;
+        } else if (scrollTop < creamTransitionEnd) {
+          const progress = (scrollTop - fadeInStart) / fadeInRange;
+          const easedProgress = Math.pow(progress, 0.15);
+          haltaneOpacity = easedProgress;
+        } else {
+          haltaneOpacity = 1;
+        }
+
+        if (haltaneImage) {
+          haltaneImage.style.opacity = haltaneOpacity;
+          haltaneImage.style.transform = `translateY(${20 * (1 - haltaneOpacity)}px)`;
+        }
+        if (haltaneProductTitle) {
+          haltaneProductTitle.style.opacity = haltaneOpacity;
+          haltaneProductTitle.style.transform = `translateY(${15 * (1 - haltaneOpacity)}px)`;
+        }
+        if (haltaneNotes) {
+          haltaneNotes.style.opacity = haltaneOpacity;

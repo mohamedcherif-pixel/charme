@@ -81,7 +81,6 @@
     border: 1px solid rgba(74,144,217,0.15) !important;
     border-radius: 10px !important;
     padding: 30px !important;
-    backdrop-filter: blur(10px) !important;
 }
 .bleudechanel-profile-card .profile-title { color: #e0e8f0 !important; font-family: 'Montserrat', sans-serif !important; }
 .bleudechanel-profile-card .profile-subtitle { color: #7BA3CC !important; }

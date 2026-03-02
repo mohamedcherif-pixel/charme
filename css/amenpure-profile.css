@@ -146,8 +146,6 @@
 /* Profile Card - Glassmorphism */
 .amenpure-profile-card {
     background: rgba(255,255,255,0.06) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(139,105,20,0.2) !important;
     border-radius: 20px !important;
     padding: 30px !important;
@@ -195,7 +193,6 @@
 .amenpure-crystal-grid { display: flex !important; gap: 12px !important; flex-wrap: wrap !important; }
 .amenpure-crystal-card {
     background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(139,105,20,0.06)) !important;
-    backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(139,105,20,0.2) !important;
     border-radius: 16px !important;
     padding: 16px 20px !important;
@@ -226,12 +223,12 @@
 .amenpure-metric-value { font-size: 0.75rem !important; font-weight: 600 !important; color: #d1c3a1 !important; min-width: 35px !important; text-align: right !important; }
 
 /* Description */
-.amenpure-fragrance-description { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(139,105,20,0.15) !important; border-radius: 20px !important; padding: 35px !important; }
+.amenpure-fragrance-description { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(139,105,20,0.15) !important; border-radius: 20px !important; padding: 35px !important; }
 .amenpure-fragrance-description .profile-title { color: rgba(255, 255, 255, 0.95) !important; }
 
 /* Reddit Review */
 .amenpure-reddit-review-container { margin-top: 10px !important; }
-.amenpure-reddit-card { background: rgba(255,255,255,0.06) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(139,105,20,0.2) !important; border-radius: 16px !important; padding: 25px !important; overflow: hidden !important; }
+.amenpure-reddit-card { background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(139,105,20,0.2) !important; border-radius: 16px !important; padding: 25px !important; overflow: hidden !important; }
 .amenpure-reddit-header { display: flex !important; align-items: center !important; gap: 15px !important; margin-bottom: 15px !important; padding-bottom: 12px !important; border-bottom: 1px solid rgba(139,105,20,0.1) !important; }
 .amenpure-reddit-votes { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 3px !important; }
 .amenpure-vote-btn { background: none !important; border: none !important; color: #d1c3a1 !important; cursor: pointer !important; font-size: 0.8rem !important; padding: 2px !important; }

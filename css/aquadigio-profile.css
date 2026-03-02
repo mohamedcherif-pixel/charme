@@ -138,8 +138,6 @@
 /* Profile Card - Glassmorphism */
 .aquadigio-profile-card {
     background: rgba(255,255,255,0.6) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(41, 128, 185,0.2) !important;
     border-radius: 20px !important;
     padding: 30px !important;
@@ -187,7 +185,6 @@
 .aquadigio-crystal-grid { display: flex !important; gap: 12px !important; flex-wrap: wrap !important; }
 .aquadigio-crystal-card {
     background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(41, 128, 185,0.06)) !important;
-    backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(41, 128, 185,0.2) !important;
     border-radius: 16px !important;
     padding: 16px 20px !important;
@@ -217,7 +214,7 @@
 .aquadigio-fill { background: linear-gradient(90deg, #2980b9, #5dade2) !important; border-radius: 10px !important; height: 100% !important; transition: width 1s ease !important; }
 
 /* Description */
-.aquadigio-fragrance-description { background: rgba(255,255,255,0.5) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(41, 128, 185,0.15) !important; border-radius: 20px !important; padding: 35px !important; }
+.aquadigio-fragrance-description { background: rgba(255,255,255,0.5) !important; border: 1px solid rgba(41, 128, 185,0.15) !important; border-radius: 20px !important; padding: 35px !important; }
 .aquadigio-description-title { color: #0d4f6e !important; font-family: 'Playfair Display', serif !important; font-size: 1.4rem !important; margin-bottom: 5px !important; }
 .aquadigio-description-subtitle { color: #2980b9 !important; font-size: 0.85rem !important; margin-bottom: 20px !important; }
 .aquadigio-description-text { color: #1a3a4a !important; line-height: 1.8 !important; margin-bottom: 15px !important; }
@@ -226,7 +223,7 @@
 /* Rating Bars */
 .aquadigio-additional-ratings { display: flex !important; flex-direction: column !important; gap: 25px !important; }
 .aquadigio-rating-row { display: flex !important; gap: 25px !important; flex-wrap: wrap !important; }
-.aquadigio-rating-category { flex: 1 !important; min-width: 280px !important; background: rgba(255,255,255,0.5) !important; backdrop-filter: blur(10px) !important; border: 1px solid rgba(41, 128, 185,0.15) !important; border-radius: 16px !important; padding: 20px !important; }
+.aquadigio-rating-category { flex: 1 !important; min-width: 280px !important; background: rgba(255,255,255,0.5) !important; border: 1px solid rgba(41, 128, 185,0.15) !important; border-radius: 16px !important; padding: 20px !important; }
 .aquadigio-category-header { display: flex !important; align-items: center !important; gap: 8px !important; margin-bottom: 15px !important; }
 .aquadigio-category-title { font-size: 0.8rem !important; font-weight: 700 !important; letter-spacing: 2px !important; color: #0d4f6e !important; }
 .aquadigio-category-icon { font-size: 1rem !important; }
@@ -240,7 +237,7 @@
 
 /* Reddit Review */
 .aquadigio-reddit-review-container { margin-top: 10px !important; }
-.aquadigio-reddit-card { background: rgba(255,255,255,0.6) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(41, 128, 185,0.2) !important; border-radius: 16px !important; padding: 25px !important; overflow: hidden !important; }
+.aquadigio-reddit-card { background: rgba(255,255,255,0.6) !important; border: 1px solid rgba(41, 128, 185,0.2) !important; border-radius: 16px !important; padding: 25px !important; overflow: hidden !important; }
 .aquadigio-reddit-header { display: flex !important; align-items: center !important; gap: 15px !important; margin-bottom: 15px !important; padding-bottom: 12px !important; border-bottom: 1px solid rgba(41, 128, 185,0.1) !important; }
 .aquadigio-reddit-votes { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 3px !important; }
 .aquadigio-vote-btn { background: none !important; border: none !important; color: #2980b9 !important; cursor: pointer !important; font-size: 0.8rem !important; padding: 2px !important; }

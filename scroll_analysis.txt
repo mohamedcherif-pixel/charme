@@ -1,0 +1,189 @@
+--- Line 92 ---
+
+    let marqueeTick = false;
+  window.addEventListener("scroll", function () {
+    if (!marqueeTick) {
+      window.requestAnimationFrame(function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > 100) {
+          if (scrollTop > 300) {
+            if (marqueeHeightState !== "minimal") {
+              marqueeHeightState = "minimal";
+              document.body.classList.remove("marquee-compact");
+              document.body.classList.add("marquee-minimal");
+            }
+          } else if (marqueeHeightState !== "compact") {
+            marqueeHeightState = "compact";
+            document.body.classList.remove("marquee-minimal");
+            document.body.classList.add("marquee-compact");
+
+--- Line 1657 ---
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Initial color update
+  updateColors();
+
+  // Language changer functionality
+  const languageSelector = document.querySelector(".language-selector");
+  const currentLang = document.getElementById("current-lang");
+  const languageDropdown = document.getElementById("language-dropdown");
+  const langOptions = document.querySelectorAll(".lang-option");
+
+  // Toggle dropdown
+  currentLang.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+--- Line 2068 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Enhanced smooth scroll to top with custom easing
+    backToTopBtn.addEventListener("click", function () {
+      const startPosition = window.pageYOffset;
+      const startTime = performance.now();
+      const duration = 2000; // 2 seconds for very smooth transition
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+      }
+
+      function animateScroll(currentTime) {
+
+--- Line 2611 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithParallax);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial parallax calls
+    if (brandImage) {
+      updateBrandImageParallax();
+    }
+    updateLaytonParallax();
+    if (laytonNotes) {
+      updateLaytonNotesParallax();
+    }
+    if (productTitle) {
+      updateProductTitleParallax();
+    }
+    if (fragranceNotes) {
+      updateFragranceNotesParallax();
+
+--- Line 3157 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithPegasus);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Pegasus parallax calls
+    if (pegasusImage) {
+      updatePegasusImageParallax();
+    }
+    if (pegasusProductTitle) {
+      updatePegasusProductTitleParallax();
+    }
+    if (pegasusFragranceProfile) {
+      updatePegasusFragranceProfileParallax();
+    }
+    if (pegasusFragranceNotes) {
+      updatePegasusFragranceNotesParallax();
+    }
+
+--- Line 3450 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithGreenly);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Greenly parallax calls
+    if (greenlyImage) {
+      updateGreenlyImageParallax();
+    }
+    if (greenlyProductInfo) {
+      updateGreenlyProductInfoParallax();
+    }
+    if (greenlyScentProfile) {
+      updateGreenlyScentProfileParallax();
+    }
+    if (greenlyIngredients) {
+      updateGreenlyIngredientsParallax();
+    }
+
+--- Line 3743 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithBaccaratrouge);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Baccarat Rouge 540 parallax calls
+    if (baccaratrougeImage) {
+      updateBaccaratrougeImageParallax();
+    }
+    if (baccaratrougeProductInfo) {
+      updateBaccaratrougeProductInfoParallax();
+    }
+    if (baccaratrougeScentProfile) {
+      updateBaccaratrougeScentProfileParallax();
+    }
+    if (baccaratrougeIngredients) {
+      updateBaccaratrougeIngredientsParallax();
+    }
+
+--- Line 4037 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithBlackorchid);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Black Orchid parallax calls
+    if (blackorchidImage) {
+      updateBlackorchidImageParallax();
+    }
+    if (blackorchidProductInfo) {
+      updateBlackorchidProductInfoParallax();
+    }
+    if (blackorchidScentProfile) {
+      updateBlackorchidScentProfileParallax();
+    }
+    if (blackorchidIngredients) {
+      updateBlackorchidIngredientsParallax();
+    }
+
+--- Line 4379 ---
+    // Update scroll event listener
+    window.removeEventListener("scroll", originalOnScrollWithAventus);
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // Initial Aventus parallax calls
+    if (aventusImage) {
+      updateAventusImageParallax();
+    }
+    if (aventusProductInfo) {
+      updateAventusProductInfoParallax();
+    }
+    if (aventusScentProfile) {
+      updateAventusScentProfileParallax();
+    }
+    if (aventusIngredients) {
+      updateAventusIngredientsParallax();
+    }
+
+--- Line 4636 ---
+
+    window.removeEventListener("scroll", previousOnScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
+
+    requestAnimationFrame(() => {
+      // Ensure cached layout values start fresh after initial render
+      try {
+        invalidateScrollCache();
+      } catch (e) {
+        // ignore
+      }
+      updateColors();
+    });
+  // Initialize Authentication System
+  initializeAuth();
+

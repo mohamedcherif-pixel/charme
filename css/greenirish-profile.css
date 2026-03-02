@@ -146,8 +146,6 @@
 /* Profile Card - Glassmorphism */
 .greenirish-profile-card {
     background: rgba(255,255,255,0.06) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(45,90,39,0.2) !important;
     border-radius: 20px !important;
     padding: 30px !important;
@@ -195,7 +193,6 @@
 .greenirish-crystal-grid { display: flex !important; gap: 12px !important; flex-wrap: wrap !important; }
 .greenirish-crystal-card {
     background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(45,90,39,0.06)) !important;
-    backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(45,90,39,0.2) !important;
     border-radius: 16px !important;
     padding: 16px 20px !important;
@@ -226,12 +223,12 @@
 .greenirish-metric-value { font-size: 0.75rem !important; font-weight: 600 !important; color: #abbda9 !important; min-width: 35px !important; text-align: right !important; }
 
 /* Description */
-.greenirish-fragrance-description { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(45,90,39,0.15) !important; border-radius: 20px !important; padding: 35px !important; }
+.greenirish-fragrance-description { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(45,90,39,0.15) !important; border-radius: 20px !important; padding: 35px !important; }
 .greenirish-fragrance-description .profile-title { color: rgba(255, 255, 255, 0.95) !important; }
 
 /* Reddit Review */
 .greenirish-reddit-review-container { margin-top: 10px !important; }
-.greenirish-reddit-card { background: rgba(255,255,255,0.06) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(45,90,39,0.2) !important; border-radius: 16px !important; padding: 25px !important; overflow: hidden !important; }
+.greenirish-reddit-card { background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(45,90,39,0.2) !important; border-radius: 16px !important; padding: 25px !important; overflow: hidden !important; }
 .greenirish-reddit-header { display: flex !important; align-items: center !important; gap: 15px !important; margin-bottom: 15px !important; padding-bottom: 12px !important; border-bottom: 1px solid rgba(45,90,39,0.1) !important; }
 .greenirish-reddit-votes { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 3px !important; }
 .greenirish-vote-btn { background: none !important; border: none !important; color: #abbda9 !important; cursor: pointer !important; font-size: 0.8rem !important; padding: 2px !important; }

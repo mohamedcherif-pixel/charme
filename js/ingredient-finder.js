@@ -717,8 +717,12 @@ class IngredientFragranceFinder {
       // Store the handler for later removal
       modal._wheelHandler = handleWheel;
 
-      // Add wheel event listener
-      document.addEventListener("wheel", handleWheel, { passive: false });
+      // Use CSS-based scroll lock (much more performant than blocking listeners)
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+
+      // Add wheel event listener only on modal overlay (not document-wide)
+      modal.addEventListener("wheel", handleWheel, { passive: false });
 
       // Also handle touch events for mobile scrolling
       const handleTouchMove = (e) => {
@@ -734,20 +738,23 @@ class IngredientFragranceFinder {
       };
 
       modal._touchHandler = handleTouchMove;
-      document.addEventListener("touchmove", handleTouchMove, {
+      modal.addEventListener("touchmove", handleTouchMove, {
         passive: false,
       });
     }
   }
 
   removeModalScrollHandling(modal) {
+    // Restore body scroll
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
     // Remove event listeners to prevent memory leaks
     if (modal._wheelHandler) {
-      document.removeEventListener("wheel", modal._wheelHandler);
+      modal.removeEventListener("wheel", modal._wheelHandler);
       delete modal._wheelHandler;
     }
     if (modal._touchHandler) {
-      document.removeEventListener("touchmove", modal._touchHandler);
+      modal.removeEventListener("touchmove", modal._touchHandler);
       delete modal._touchHandler;
     }
   }

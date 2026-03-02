@@ -81,7 +81,6 @@
     border: 1px solid rgba(155,127,212,0.12) !important;
     border-radius: 10px !important;
     padding: 30px !important;
-    backdrop-filter: blur(8px) !important;
 }
 .lanuit-profile-card .profile-title { color: #e0d8f0 !important; font-family: 'Space Grotesk', sans-serif !important; }
 .lanuit-profile-card .profile-subtitle { color: #7a60b8 !important; }

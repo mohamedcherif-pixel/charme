@@ -139,8 +139,6 @@
 /* Profile Card - Dark Glass */
 .blackorchid-profile-card {
     background: rgba(19,16,26,0.85) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(212,175,55,0.15) !important;
     border-radius: 16px !important;
     padding: 30px !important;
@@ -351,7 +349,6 @@
 /* Description */
 .blackorchid-fragrance-description {
     background: rgba(19,16,26,0.7) !important;
-    backdrop-filter: blur(15px) !important;
     border: 1px solid rgba(212,175,55,0.12) !important;
     border-radius: 16px !important;
     padding: 35px !important;
@@ -397,7 +394,6 @@
     flex: 1 !important;
     min-width: 280px !important;
     background: rgba(19,16,26,0.7) !important;
-    backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(212,175,55,0.1) !important;
     border-radius: 16px !important;
     padding: 20px !important;
@@ -473,7 +469,6 @@
 
 .blackorchid-reddit-card {
     background: rgba(19,16,26,0.8) !important;
-    backdrop-filter: blur(15px) !important;
     border: 1px solid rgba(212,175,55,0.12) !important;
     border-radius: 16px !important;
     padding: 25px !important;

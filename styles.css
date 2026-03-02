@@ -678,7 +678,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     z-index: 2;
-    backdrop-filter: blur(10px);
 }
 
 .clear-search:hover {
@@ -707,8 +706,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     width: max-content;
     max-width: 650px;
     background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 2px;
     margin-top: 8px;
@@ -1473,7 +1470,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     top: 100%;
     right: 0;
     background: rgba(24, 24, 24, 0.98);
-    backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 2px;
     padding: 6px 0;
@@ -1528,7 +1524,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0);
-    backdrop-filter: blur(0px);
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
@@ -1544,7 +1539,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: 1;
     visibility: visible;
     background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(15px);
 }
 
 /* Smooth closing animation */
@@ -1552,7 +1546,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: 0;
     visibility: visible;
     background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
     transition: all 1.2s cubic-bezier(0.55, 0.085, 0.68, 0.53);
 }
 
@@ -1609,11 +1602,9 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
 @keyframes modalBackdropEnter {
     0% {
         background: rgba(0, 0, 0, 0);
-        backdrop-filter: blur(0px);
     }
     100% {
         background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(15px);
     }
 }
 
@@ -2136,7 +2127,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     margin-bottom: 12px;
     transition: all 0.4s ease;
     cursor: pointer;
-    backdrop-filter: blur(10px);
     transform: translateY(10px);
     opacity: 0;
     animation: resultFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
@@ -2214,7 +2204,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     font-size: 11px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    backdrop-filter: blur(5px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -2424,7 +2413,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(25px);
     animation: fadeIn 0.3s ease;
     pointer-events: all !important;
     isolation: isolate;
@@ -2451,7 +2439,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     max-width: 440px;
     max-height: 85vh;
     overflow-y: auto;
-    backdrop-filter: blur(40px);
     box-shadow:
         0 50px 100px rgba(0, 0, 0, 0.7),
         0 0 0 1px rgba(255, 255, 255, 0.03);
@@ -2802,7 +2789,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     color: #ff6b7a;
     font-size: 14px;
     line-height: 1.4;
-    backdrop-filter: blur(10px);
     animation: errorSlideIn 0.3s ease-out;
 }
 
@@ -2860,7 +2846,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     border-radius: 2px;
     background: rgba(255, 255, 255, 0.1);
     color: white;
-    backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 }
 
@@ -2948,7 +2933,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     width: 100vw !important;
     height: 100vh !important;
     background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(15px) !important;
     z-index: 100002 !important;
     justify-content: center !important;
     align-items: center !important;
@@ -2967,7 +2951,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     width: 95% !important;
     max-height: 90vh !important;
     overflow-y: auto !important;
-    backdrop-filter: blur(20px) !important;
     box-shadow:
         0 30px 60px rgba(0, 0, 0, 0.8),
         0 0 0 1px rgba(212, 175, 55, 0.2),
@@ -3036,7 +3019,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     border-radius: 4px;
     padding: 20px;
     text-align: center;
-    backdrop-filter: blur(10px);
 }
 
 .stat-card h3 {
@@ -3319,8 +3301,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
 }
 
 .search-container:hover {
@@ -3366,8 +3346,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
     font-size: 14px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
@@ -3448,8 +3426,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     right: 0;
     margin-top: 12px;
     background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
     border: 2px solid rgba(255, 255, 255, 0.15);
     border-radius: 4px;
     overflow: hidden;
@@ -3778,8 +3754,7 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     -webkit-mask: linear-gradient(to top, black 0%, transparent 100%);
 }
 .hero.blur-active::before {
-    backdrop-filter: blur(var(--bottom-blur, 0px));
-    transition: backdrop-filter 0.1s ease;
+    /* backdrop-filter transition removed - too expensive; blur is applied directly via JS */
 }
 
 /* Brand Image Section */
@@ -3803,7 +3778,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     transition:
         opacity 0.3s ease,
         transform 0.3s ease;
-    will-change: transform, opacity;
     transform: translateY(-30px);
     /* Ensure consistent appearance regardless of background */
     mix-blend-mode: normal;
@@ -3831,6 +3805,7 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
 }
 
 /* Dynamic scroll-responsive vignette overlay */
+/* Using fixed gradient with opacity control for GPU-composited animation (no per-frame gradient recalc) */
 .hero::after {
     content: "";
     position: absolute;
@@ -3843,29 +3818,30 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
             ellipse 150% 100% at 50% 100%,
             transparent 0%,
             transparent 20%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.6)) 50%,
-            rgba(0, 0, 0, var(--vignette-intensity, 0)) 80%,
-            rgba(0, 0, 0, var(--vignette-intensity, 0)) 100%
+            rgba(0, 0, 0, 0.6) 50%,
+            rgba(0, 0, 0, 1) 80%,
+            rgba(0, 0, 0, 1) 100%
         ),
         linear-gradient(
             to top,
-            rgba(0, 0, 0, var(--vignette-intensity, 0)) 0%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.9)) 15%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.7)) 30%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.5)) 45%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.3)) 60%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.1)) 80%,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 0.9) 15%,
+            rgba(0, 0, 0, 0.7) 30%,
+            rgba(0, 0, 0, 0.5) 45%,
+            rgba(0, 0, 0, 0.3) 60%,
+            rgba(0, 0, 0, 0.1) 80%,
             transparent 100%
         ),
         radial-gradient(
             ellipse 200% 150% at 50% 100%,
             transparent 0%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.4)) 60%,
-            rgba(0, 0, 0, calc(var(--vignette-intensity, 0) * 0.8)) 100%
+            rgba(0, 0, 0, 0.4) 60%,
+            rgba(0, 0, 0, 0.8) 100%
         );
+    opacity: var(--vignette-intensity, 0);
     z-index: 1;
     pointer-events: none;
-    transition: all 0.1s ease-out;
+    transition: opacity 0.1s ease-out;
 }
 
 /* Video Controls */
@@ -3894,8 +3870,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     border: none;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 2px solid rgba(255, 255, 255, 0.2);
     color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
@@ -4263,7 +4237,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.4s ease;
-    backdrop-filter: blur(16px);
     z-index: 1001;
     display: flex;
     align-items: center;
@@ -4348,7 +4321,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.4s ease;
-    backdrop-filter: blur(16px);
     z-index: 1001;
     display: flex;
     align-items: center;
@@ -4559,7 +4531,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(12px);
 }
 
 .back-to-top.visible {
@@ -4729,7 +4700,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: 1;
     transform: translateY(0) scale(1);
     transition: none;
-    will-change: transform, opacity;
     text-align: center;
 }
 
@@ -5160,7 +5130,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: 0;
     transform: translateX(100px) scale(0.8);
     transition: none;
-    will-change: transform, opacity;
     cursor: pointer;
 }
 
@@ -5172,7 +5141,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
 
 .fragrance-profile-container {
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(20px) saturate(1.3);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 4px;
     padding: 28px;
@@ -5487,10 +5455,10 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
 
 @keyframes qualityShimmer {
     0% {
-        left: -100%;
+        transform: translateX(-200%);
     }
     100% {
-        left: 100%;
+        transform: translateX(200%);
     }
 }
 
@@ -5708,7 +5676,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: 1;
     transform: translateX(0) scale(1);
     transition: none;
-    will-change: transform, opacity;
     max-width: 400px;
 }
 
@@ -5720,7 +5687,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
 
 .notes-section {
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     padding: 30px;
@@ -5789,7 +5755,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: 1 !important;
     transform: translateY(0px);
     transition: none;
-    will-change: transform, opacity;
 }
 
 .perfume-rating.parallax-active {
@@ -5937,7 +5902,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
 
 .perfume-description {
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     padding: 25px;
@@ -5977,7 +5941,6 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     border-radius: 4px;
     padding: 25px;
     margin: 0 10px;
-    backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -7511,7 +7474,6 @@ html {
 
 /* Quality badges refinement */
 .pegasus-section .quality-badge {
-    backdrop-filter: blur(4px);
 }
 .pegasus-section
     .quality-option
@@ -7938,7 +7900,6 @@ html {
     );
     border: 2px solid #c9a86c;
     border-radius: 2px;
-    backdrop-filter: blur(10px);
     box-shadow: 0 8px 25px rgba(139, 115, 85, 0.3);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -8307,7 +8268,6 @@ html {
     );
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     border-radius: 4px;
-    backdrop-filter: blur(8px);
     box-shadow:
         0 4px 15px rgba(255, 255, 255, 0.1),
         0 0 10px rgba(255, 255, 255, 0.05),
@@ -8574,7 +8534,6 @@ html {
     border: 2px solid #d4af37;
     border-radius: 4px;
     padding: 30px;
-    backdrop-filter: blur(10px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -8757,7 +8716,6 @@ html {
     background: rgba(0, 0, 0, 0.8);
     border-radius: 4px;
     padding: 30px;
-    backdrop-filter: blur(10px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -8850,7 +8808,6 @@ html {
     );
     border: 1px solid rgba(139, 115, 85, 0.3);
     border-radius: 4px;
-    backdrop-filter: blur(10px);
 }
 
 .haltane-metric-item {
@@ -8913,7 +8870,6 @@ html {
     );
     border: 1px solid rgba(139, 115, 85, 0.25);
     border-radius: 2px;
-    backdrop-filter: blur(15px);
     flex: 2;
     min-width: 400px;
     max-width: 600px;
@@ -10176,7 +10132,6 @@ html {
     margin: 210px 0 0 20px;
     display: inline-block;
     vertical-align: top;
-    will-change: transform, opacity;
     cursor: pointer;
     filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.3));
     transform-origin: center center;
@@ -10206,7 +10161,6 @@ html {
     width: 280px; /* reduced from 320px */
     margin: 160px 0 0 20px;
     display: inline-block;
-    will-change: transform, opacity;
     cursor: pointer;
     /* Ultra-smooth hardware acceleration */
     transform: translate3d(0, 0, 0);
@@ -10284,7 +10238,6 @@ input[name="pegasus-quality"] {
     background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
     border: 2px solid var(--quality-top);
     box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2);
-    backdrop-filter: blur(10px);
     color: #1a5c30;
 }
 
@@ -10306,7 +10259,6 @@ input[name="pegasus-quality"] + label .quality-badge {
     color: #495057;
     transition: all 0.3s ease;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    backdrop-filter: blur(10px);
 }
 
 input[name="pegasus-quality"] + label:hover .quality-badge {
@@ -10516,7 +10468,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     box-shadow:
         0 20px 40px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(20px);
     border-radius: 2px;
     padding: 32px;
     position: relative;
@@ -10634,7 +10585,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
     overflow: hidden;
-    backdrop-filter: blur(10px);
     position: relative;
 }
 
@@ -10741,7 +10691,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     border-radius: 6px;
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(10px);
     margin-bottom: 10px;
 }
 
@@ -10897,7 +10846,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     perspective: 1000px;
     /* Optimize for smooth scrolling */
     contain: layout style paint;
-    will-change: transform, opacity;
 }
 
 /* Pegasus Fragrance Notes - Transparent Theme - Single Container */
@@ -10907,14 +10855,12 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
     border-radius: 4px !important;
     padding: 30px !important;
-    backdrop-filter: blur(10px) !important;
 }
 
 .pegasus-image ~ .fragrance-notes .notes-section {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    backdrop-filter: none !important;
     padding: 0 !important;
     margin-bottom: 25px !important;
 }
@@ -10976,7 +10922,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     min-width: 280px;
     max-width: 400px;
     background: rgba(10, 10, 10, 0.97);
-    backdrop-filter: blur(20px);
     border-radius: 2px;
     border: 1px solid rgba(255, 255, 255, 0.04);
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
@@ -11116,7 +11061,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     justify-content: center !important;
     padding: 20px !important;
     background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(20px) saturate(1.3) !important;
 }
 
 .profile-modal.show,
@@ -11141,7 +11085,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     position: relative !important;
     z-index: 2 !important;
     background: rgba(10, 10, 10, 0.98) !important;
-    backdrop-filter: blur(30px) !important;
     border: 1px solid rgba(201, 169, 78, 0.08) !important;
     border-radius: 4px !important;
     box-shadow: 0 50px 100px rgba(0, 0, 0, 0.7) !important;
@@ -12180,7 +12123,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     align-items: center !important;
     justify-content: center !important;
     background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(15px) !important;
 }
 
 #verificationModal.show {
@@ -12194,7 +12136,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     width: 100% !important;
     height: 100% !important;
     background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(15px) !important;
     z-index: 1 !important;
 }
 
@@ -12279,7 +12220,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     align-items: center !important;
     justify-content: center !important;
     background: rgba(0, 0, 0, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
 }
 
 #banModal .modal-overlay {
@@ -12289,7 +12229,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     width: 100% !important;
     height: 100% !important;
     background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(15px) !important;
     z-index: 2020 !important;
 }
 
@@ -12540,7 +12479,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     z-index: 2015;
     opacity: 0;
     transition: opacity var(--transition-normal);
-    backdrop-filter: blur(20px);
 }
 
 .login-prompt-overlay.show {
@@ -12554,7 +12492,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     box-shadow: 0 50px 100px rgba(0, 0, 0, 0.6);
     transform: scale(0.95);
     transition: transform var(--transition-spring);
-    backdrop-filter: blur(20px);
     max-width: 400px;
     width: 90%;
 }
@@ -13061,7 +12998,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     background: rgba(255, 255, 255, 0.015);
     border-radius: 4px;
     border: 1px solid rgba(201, 169, 78, 0.08);
-    backdrop-filter: blur(16px);
 }
 
 .reviews-header {
@@ -13528,7 +13464,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     opacity: 1;
     transform: translateX(0px) scale(1);
     transition: all 0.6s ease;
-    will-change: transform, opacity;
     cursor: pointer;
     filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.35));
     transform-origin: center center;
@@ -13832,7 +13767,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     align-items: center;
     justify-content: center;
     z-index: 10000;
-    backdrop-filter: blur(16px);
 }
 
 .review-edit-content {
@@ -14585,7 +14519,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     justify-content: center !important;
     padding: 20px !important;
     background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(20px) !important;
     box-sizing: border-box !important;
 }
 
@@ -14600,7 +14533,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     width: 100% !important;
     height: 100% !important;
     background: rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(15px) !important;
     z-index: 1999 !important;
 }
 
@@ -14946,7 +14878,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     border: 1px solid rgba(201, 169, 78, 0.12);
     border-radius: 4px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(20px);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -15721,7 +15652,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
         rgba(4, 120, 87, 0.1) 100%
     );
     border: 1px solid rgba(16, 185, 129, 0.2);
-    backdrop-filter: blur(10px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     overflow: hidden;
@@ -16438,7 +16368,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     border-radius: 4px;
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.15);
-    backdrop-filter: blur(8px);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -16601,7 +16530,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
     cursor: pointer;
 }
 
@@ -16614,7 +16542,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     border-radius: 4px;
     border: 1px solid rgba(201, 169, 78, 0.1);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(20px);
     overflow: hidden;
     transform: scale(0.95);
     transition: transform 0.3s ease;
@@ -16886,7 +16813,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
         0 20px 60px rgba(0, 0, 0, 0.4),
         0 8px 25px rgba(255, 193, 7, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
     overflow: hidden;
     z-index: 10000;
 
@@ -17701,7 +17627,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     align-items: center !important;
     justify-content: center !important;
     background: rgba(0, 0, 0, 0.95) !important;
-    backdrop-filter: blur(15px) !important;
     padding: 20px !important;
     box-sizing: border-box !important;
 }
@@ -18949,7 +18874,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(10px);
 }
 
 .ingredient-finder-icon::before {
@@ -19001,7 +18925,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0);
-    backdrop-filter: blur(0px);
     z-index: 10000;
     opacity: 0;
     visibility: hidden;
@@ -19016,7 +18939,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     opacity: 1;
     visibility: visible;
     background: rgba(0, 0, 0, 0.92);
-    backdrop-filter: blur(20px);
 }
 
 .ingredient-modal-overlay {
@@ -19535,7 +19457,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     border-radius: 4px;
     padding: 25px;
     margin-top: 30px;
-    backdrop-filter: blur(15px);
     position: relative;
     overflow: hidden;
     opacity: 0;
@@ -19592,7 +19513,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -19840,7 +19760,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 
 .back-to-search-btn:hover {
@@ -19866,7 +19785,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     border-radius: 4px;
     padding: 0;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    backdrop-filter: blur(15px);
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -20290,7 +20208,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     );
     border: 1px solid rgba(212, 175, 55, 0.2);
     border-radius: 4px;
-    backdrop-filter: blur(10px);
 }
 
 .stat-item {
@@ -20349,7 +20266,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     justify-content: center;
     gap: 8px;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(10px);
     box-shadow:
         0 4px 15px rgba(212, 175, 55, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -20417,7 +20333,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    backdrop-filter: blur(15px);
     color: rgba(255, 255, 255, 0.8);
     position: relative;
     overflow: hidden;
@@ -20540,7 +20455,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     padding: 0;
     min-width: 300px;
     max-width: 400px;
-    backdrop-filter: blur(20px);
     box-shadow:
         0 20px 40px rgba(0, 0, 0, 0.5),
         0 0 0 1px rgba(212, 175, 55, 0.2),
@@ -20653,7 +20567,6 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     font-size: 12px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
     flex-shrink: 0;
     min-width: 0;
     max-width: 200px;
