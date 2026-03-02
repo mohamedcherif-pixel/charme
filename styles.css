@@ -238,7 +238,7 @@ html {
     scroll-padding-top: 80px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+    text-rendering: auto; /* FIX: optimizeLegibility causes severe relayout lag */
 }
 
 body {
@@ -3747,11 +3747,9 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     left: 0;
     width: 100%;
     height: 50%;
-    background: transparent;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
     z-index: 0;
     pointer-events: none;
-    mask: linear-gradient(to top, black 0%, transparent 100%);
-    -webkit-mask: linear-gradient(to top, black 0%, transparent 100%);
 }
 .hero.blur-active::before {
     /* backdrop-filter transition removed - too expensive; blur is applied directly via JS */
@@ -3841,7 +3839,7 @@ body.marquee-minimal .top-marquee .marquee-close-btn {
     opacity: var(--vignette-intensity, 0);
     z-index: 1;
     pointer-events: none;
-    transition: opacity 0.1s ease-out;
+    /* transition removed to prevent rendering conflicts with JS frame-by-frame updates */
 }
 
 /* Video Controls */
@@ -21138,4 +21136,11 @@ input[name="pegasus-quality"] + label:hover .quality-badge {
     .database-fragrance-grid {
         grid-template-columns: 1fr;
     }
+}
+
+
+/* FATAL SCROLL LAG FIX: Prevent JS and CSS fighting over interpolation */
+.parallax-active {
+    transition: none !important;
+    will-change: transform, opacity;
 }

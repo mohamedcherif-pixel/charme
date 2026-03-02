@@ -1,3 +1,20 @@
+
+// Caches element zero-state to prevent layout thrashing
+const _parallaxZeroState = new WeakSet();
+function resetParallaxElement(element, transformString) {
+  if (!element || _parallaxZeroState.has(element)) return;
+  element.classList.remove("parallax-active");
+  element.style.transform = transformString;
+  element.style.opacity = "0";
+  _parallaxZeroState.add(element);
+}
+// Removes from zero-state set when made active
+function activateParallaxElement(element) {
+  if (element && _parallaxZeroState.has(element)) {
+    _parallaxZeroState.delete(element);
+  }
+}
+
 // Immediately hide modals on page load (before DOMContentLoaded)
 (function () {
   const hideModalsImmediately = () => {
@@ -92,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", function () {
     if (!marqueeTick) {
       window.requestAnimationFrame(function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
         if (scrollTop > 100) {
           if (scrollTop > 300) {
             if (marqueeHeightState !== "minimal") {
@@ -1117,6 +1134,9 @@ let _lastAppliedBackgroundColor = null;
 let _lastAppliedTextColor = null;
 let _lastScrollProgressRounded = -1;  // guards navbar/video/vignette writes
 let _navbarScrollFxDisabledApplied = false;
+let _lastBlurActive = null; // track hero blur-active class state
+let _lastVideoBlurAmount = -1; // track video blur to avoid redundant writes
+let _lastVignetteIntensity = -1; // track vignette intensity to avoid redundant writes
 // Pre-built sorted breakpoint table for background transitions
 let _bgBreakpoints = null;
 
@@ -1285,7 +1305,7 @@ function _lookupSectionBgColor(scrollTop, breakpoints) {
 // --------------------------------
 
 function updateColors() {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
     const documentHeight =
       document.documentElement.scrollHeight - window.innerHeight;
     const windowHeight = window.innerHeight;
@@ -1421,21 +1441,28 @@ function updateColors() {
           haltaneOpacity = 1;
         }
 
-        if (haltaneImage) {
-          haltaneImage.style.opacity = haltaneOpacity;
-          haltaneImage.style.transform = `translateY(${20 * (1 - haltaneOpacity)}px)`;
-        }
-        if (haltaneProductTitle) {
-          haltaneProductTitle.style.opacity = haltaneOpacity;
-          haltaneProductTitle.style.transform = `translateY(${15 * (1 - haltaneOpacity)}px)`;
-        }
-        if (haltaneNotes) {
-          haltaneNotes.style.opacity = haltaneOpacity;
-          haltaneNotes.style.transform = `translateY(${25 * (1 - haltaneOpacity)}px)`;
-        }
-        if (haltaneFragranceNotes) {
-          haltaneFragranceNotes.style.opacity = haltaneOpacity;
-          haltaneFragranceNotes.style.transform = `translateY(${30 * (1 - haltaneOpacity)}px)`;
+        haltaneOpacity = Math.round(haltaneOpacity * 100) / 100;
+        
+        if (typeof window._lastHaltaneOpacity === 'undefined') window._lastHaltaneOpacity = -1;
+        
+        if (window._lastHaltaneOpacity !== haltaneOpacity) {
+          window._lastHaltaneOpacity = haltaneOpacity;
+          if (haltaneImage) {
+            haltaneImage.style.opacity = haltaneOpacity;
+            haltaneImage.style.transform = `translateY(${20 * (1 - haltaneOpacity)}px)`;
+          }
+          if (haltaneProductTitle) {
+            haltaneProductTitle.style.opacity = haltaneOpacity;
+            haltaneProductTitle.style.transform = `translateY(${15 * (1 - haltaneOpacity)}px)`;
+          }
+          if (haltaneNotes) {
+            haltaneNotes.style.opacity = haltaneOpacity;
+            haltaneNotes.style.transform = `translateY(${25 * (1 - haltaneOpacity)}px)`;
+          }
+          if (haltaneFragranceNotes) {
+            haltaneFragranceNotes.style.opacity = haltaneOpacity;
+            haltaneFragranceNotes.style.transform = `translateY(${30 * (1 - haltaneOpacity)}px)`;
+          }
         }
       }
     }
@@ -1602,22 +1629,8 @@ function updateColors() {
     const exponentialEase = 1 - Math.pow(1 - vignetteProgress, 2.5);
     const easedVignetteProgress = smoothStep * 0.6 + exponentialEase * 0.4;
 
-    // Video blur effect (increases with scroll) - Applied to all videos
-    // Start blurring immediately, reach maximum blur at 50% scroll for stronger effect
-    const videoBlurEnd = 0.5;
-    let videoBlurProgress = Math.min(scrollProgress / videoBlurEnd, 1);
-
-    // Apply smooth easing for natural blur progression
-    const videoBlurEased =
-      videoBlurProgress * videoBlurProgress * (3 - 2 * videoBlurProgress); // Smoothstep
-
-    // Calculate blur amount (0px to 25px for stronger effect)
-    const videoBlurAmount = Math.round(videoBlurEased * 25 * 10) / 10; // round to 1 decimal
-
-    // Apply blur to videos (use cached elements)
-    const vid1 = _getEl('background-video', '#background-video');
-    if (vid1) vid1.style.filter = 'blur(' + videoBlurAmount + 'px)';
-    // video-2 and video-3 have preload="none", skip blur
+    // Video dynamic blur removed for performance.
+    // We rely on .blur-active class and vignette opacity transition instead.
 
     // Dynamic bottom vignette effect (increases with scroll)
     // Start vignette immediately, reach full intensity at 40% scroll for faster effect
@@ -1637,21 +1650,24 @@ function updateColors() {
     // Bottom blur effect (increases with scroll for more pronounced bottom blur)
     const bottomBlurAmount = vignetteEase * 15; // Max 15px additional blur at bottom
 
-    // Toggle blur-active class on hero to avoid GPU compositing at blur(0)
+    // Toggle blur-active class on hero — only when state changes to avoid layout thrashing
     const heroEl = _getEl('', '.hero');
     if (heroEl) {
-      if (bottomBlurAmount > 0.5) {
-        heroEl.classList.add('blur-active');
-      } else {
-        heroEl.classList.remove('blur-active');
+      const blurShouldBeActive = bottomBlurAmount > 0.5;
+      if (blurShouldBeActive !== _lastBlurActive) {
+        _lastBlurActive = blurShouldBeActive;
+        heroEl.classList.toggle('blur-active', blurShouldBeActive);
       }
     }
 
-    // Update vignette intensity (used by .hero::after opacity)
-    document.documentElement.style.setProperty(
-      "--vignette-intensity",
-      vignetteIntensity,
-    );
+    // Update vignette intensity (used by .hero::after opacity) — only when changed
+    const roundedIntensity = Math.round(vignetteIntensity * 100) / 100;
+    if (roundedIntensity !== _lastVignetteIntensity) {
+      _lastVignetteIntensity = roundedIntensity;
+      if (heroEl) {
+        heroEl.style.setProperty("--vignette-intensity", roundedIntensity);
+      }
+    }
 
     } // end scrollProgress change guard
 
@@ -1889,7 +1905,7 @@ function updateColors() {
 
     function updateBackToTop() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const documentHeight =
         document.documentElement.scrollHeight - window.innerHeight;
       const scrollPercent = scrollTop / documentHeight;
@@ -1919,7 +1935,7 @@ function updateColors() {
       if (!socialLinks) return;
 
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const contentHeight =
         _getOffsetHeight(_getEl("", ".content")) ||
         window.innerHeight * 3;
@@ -1971,7 +1987,7 @@ function updateColors() {
     // Floating search icon and cart visibility function
     function updateFloatingElements() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const contentHeight =
         _getOffsetHeight(_getEl("", ".content")) ||
         window.innerHeight * 3;
@@ -2103,7 +2119,7 @@ function updateColors() {
     const topVignette = document.getElementById("topVignette");
     if (!topVignette) return;
 
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
     const haltaneSection = _getEl("", ".haltane-section-container");
     const creamTransitionStart = haltaneSection
       ? _getOffsetTop(haltaneSection) + 500
@@ -2282,9 +2298,9 @@ function updateColors() {
 
   // Brand Image Parallax Effect (First in sequence)
   if (brandImage) {
-    function updateBrandImageParallax() { return; // PERF PATCH 
+    function updateBrandImageParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
         ? _getOffsetHeight(heroSection)
@@ -2297,6 +2313,7 @@ function updateColors() {
       const fadeOutEnd = heroHeight * 1.8; // Complete fade out at 180% (much later)
 
       if (scrollTop > triggerPoint && scrollTop < fadeOutEnd) {
+        activateParallaxElement(brandImage);
         brandImage.classList.add("parallax-active");
 
         let opacity, translateY;
@@ -2332,24 +2349,20 @@ function updateColors() {
         brandImage.style.transition = "opacity 0.3s ease, transform 0.3s ease";
       } else if (scrollTop <= triggerPoint) {
         // Reset to hidden state when above trigger point
-        brandImage.classList.remove("parallax-active");
-        brandImage.style.transform = "translateY(-30px)";
-        brandImage.style.opacity = "0";
+        resetParallaxElement(brandImage, "translateY(-30px)");
         brandImage.style.filter = "drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))";
       } else {
         // Completely hidden when past fade out point
-        brandImage.classList.remove("parallax-active");
-        brandImage.style.transform = "translateY(-10px)";
-        brandImage.style.opacity = "0";
+        resetParallaxElement(brandImage, "translateY(-10px)");
         brandImage.style.filter = "drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))";
       }
     }
   }
 
   if (laytonImage) {
-    function updateLaytonParallax() { return; // PERF PATCH 
+    function updateLaytonParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
         ? _getOffsetHeight(heroSection)
@@ -2360,6 +2373,7 @@ function updateColors() {
       const parallaxRange = 400; // Distance over which the effect occurs
 
       if (scrollTop > triggerPoint) {
+        activateParallaxElement(laytonImage);
         laytonImage.classList.add("parallax-active");
 
         // Calculate progress (0 to 1) over the parallax range
@@ -2380,18 +2394,16 @@ function updateColors() {
         laytonImage.style.opacity = opacity;
       } else {
         // Reset to hidden state when above trigger point
-        laytonImage.classList.remove("parallax-active");
-        laytonImage.style.transform = "translateX(-100px) scale(0.8)";
-        laytonImage.style.opacity = "0";
+        resetParallaxElement(laytonImage, "translateX(-100px) scale(0.8)");
       }
     }
   }
 
   // Layton Notes Parallax Effect
   if (laytonNotes) {
-    function updateLaytonNotesParallax() { return; // PERF PATCH 
+    function updateLaytonNotesParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
         ? _getOffsetHeight(heroSection)
@@ -2402,6 +2414,7 @@ function updateColors() {
       const parallaxRange = 400; // Same distance as bottle image
 
       if (scrollTop > triggerPoint) {
+        activateParallaxElement(laytonNotes);
         laytonNotes.classList.add("parallax-active");
 
         // Calculate progress (0 to 1) over the parallax range
@@ -2422,18 +2435,16 @@ function updateColors() {
         laytonNotes.style.opacity = opacity;
       } else {
         // Reset to hidden state when above trigger point
-        laytonNotes.classList.remove("parallax-active");
-        laytonNotes.style.transform = "translateX(100px) scale(0.8)";
-        laytonNotes.style.opacity = "0";
+        resetParallaxElement(laytonNotes, "translateX(100px) scale(0.8)");
       }
     }
   }
 
   // Product Title Parallax Effect
   if (productTitle) {
-    function updateProductTitleParallax() { return; // PERF PATCH 
+    function updateProductTitleParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
         ? _getOffsetHeight(heroSection)
@@ -2444,6 +2455,7 @@ function updateColors() {
       const parallaxRange = 350; // Smooth transition range
 
       if (scrollTop > triggerPoint) {
+        activateParallaxElement(productTitle);
         productTitle.classList.add("parallax-active");
 
         // Calculate progress (0 to 1) over the parallax range
@@ -2464,18 +2476,16 @@ function updateColors() {
         productTitle.style.opacity = opacity;
       } else {
         // Reset to hidden state when above trigger point
-        productTitle.classList.remove("parallax-active");
-        productTitle.style.transform = "translateY(30px) scale(0.9)";
-        productTitle.style.opacity = "0";
+        resetParallaxElement(productTitle, "translateY(30px) scale(0.9)");
       }
     }
   }
 
   // Fragrance Notes Parallax Effect
   if (fragranceNotes) {
-    function updateFragranceNotesParallax() { return; // PERF PATCH 
+    function updateFragranceNotesParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
         ? _getOffsetHeight(heroSection)
@@ -2486,6 +2496,7 @@ function updateColors() {
       const parallaxRange = 400; // Same distance as other images
 
       if (scrollTop > triggerPoint) {
+        activateParallaxElement(fragranceNotes);
         fragranceNotes.classList.add("parallax-active");
 
         // Calculate progress (0 to 1) over the parallax range
@@ -2506,18 +2517,16 @@ function updateColors() {
         fragranceNotes.style.opacity = opacity;
       } else {
         // Reset to hidden state when above trigger point
-        fragranceNotes.classList.remove("parallax-active");
-        fragranceNotes.style.transform = "translateX(150px) scale(0.8)";
-        fragranceNotes.style.opacity = "0";
+        resetParallaxElement(fragranceNotes, "translateX(150px) scale(0.8)");
       }
     }
   }
 
   // Perfume Rating Parallax Effect
   if (perfumeRating) {
-    function updatePerfumeRatingParallax() { return; // PERF PATCH 
+    function updatePerfumeRatingParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const heroSection = _getEl("", ".hero");
       const heroHeight = heroSection
         ? _getOffsetHeight(heroSection)
@@ -2528,6 +2537,7 @@ function updateColors() {
       const parallaxRange = 300; // Shorter range for final element
 
       if (scrollTop > triggerPoint) {
+        activateParallaxElement(perfumeRating);
         perfumeRating.classList.add("parallax-active");
 
         // Calculate progress (0 to 1) over the parallax range
@@ -2572,9 +2582,9 @@ function updateColors() {
   if (pegasusImage) {
     let pegasusImageLastProgress = -1;
 
-    function updatePegasusImageParallax() { return; // PERF PATCH 
+    function updatePegasusImageParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const pegasusSection = pegasusImage.closest(".content");
 
       if (pegasusSection) {
@@ -2592,7 +2602,8 @@ function updateColors() {
           if (Math.abs(progress - pegasusImageLastProgress) > 0.0008) {
             pegasusImageLastProgress = progress;
 
-            pegasusImage.classList.add("parallax-active");
+            activateParallaxElement(pegasusImage);
+        pegasusImage.classList.add("parallax-active");
 
             // Ultra-gentle easing with multiple curves for silk-smooth motion
             const easeOutQuint = 1 - Math.pow(1 - progress, 5); // Even gentler than quartic
@@ -2627,7 +2638,8 @@ function updateColors() {
           // Fully visible state with smooth transition
           if (pegasusImageLastProgress !== 1) {
             pegasusImageLastProgress = 1;
-            pegasusImage.classList.add("parallax-active");
+            activateParallaxElement(pegasusImage);
+        pegasusImage.classList.add("parallax-active");
             requestAnimationFrame(() => {
               pegasusImage.style.setProperty(
                 "transform",
@@ -2670,9 +2682,9 @@ function updateColors() {
   if (pegasusProductTitle) {
     let pegasusProductTitleLastProgress = -1;
 
-    function updatePegasusProductTitleParallax() { return; // PERF PATCH 
+    function updatePegasusProductTitleParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const pegasusSection = pegasusProductTitle.closest(".content");
       const parallaxRange = 800; // Shorter range for quicker completion
 
@@ -2690,7 +2702,8 @@ function updateColors() {
           if (Math.abs(progress - pegasusProductTitleLastProgress) > 0.0008) {
             pegasusProductTitleLastProgress = progress;
 
-            pegasusProductTitle.classList.add("parallax-active");
+            activateParallaxElement(pegasusProductTitle);
+        pegasusProductTitle.classList.add("parallax-active");
 
             // Ultra-gentle easing with multiple curves for silk-smooth motion
             const easeOutQuint = 1 - Math.pow(1 - progress, 5); // Even gentler than quartic
@@ -2733,7 +2746,8 @@ function updateColors() {
           // Fully visible state with smooth transition
           if (pegasusProductTitleLastProgress !== 1) {
             pegasusProductTitleLastProgress = 1;
-            pegasusProductTitle.classList.add("parallax-active");
+            activateParallaxElement(pegasusProductTitle);
+        pegasusProductTitle.classList.add("parallax-active");
             requestAnimationFrame(() => {
               pegasusProductTitle.style.setProperty(
                 "transform",
@@ -2786,9 +2800,9 @@ function updateColors() {
   if (pegasusFragranceProfile) {
     let pegasusFragranceProfileLastProgress = -1;
 
-    function updatePegasusFragranceProfileParallax() { return; // PERF PATCH 
+    function updatePegasusFragranceProfileParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const pegasusSection = pegasusFragranceProfile.closest(".content");
 
       if (pegasusSection) {
@@ -2808,7 +2822,8 @@ function updateColors() {
           ) {
             pegasusFragranceProfileLastProgress = progress;
 
-            pegasusFragranceProfile.classList.add("parallax-active");
+            activateParallaxElement(pegasusFragranceProfile);
+        pegasusFragranceProfile.classList.add("parallax-active");
 
             // Ultra-gentle easing with multiple curves for silk-smooth motion
             const easeOutQuint = 1 - Math.pow(1 - progress, 5); // Even gentler than cubic
@@ -2851,7 +2866,8 @@ function updateColors() {
           // Fully visible state with smooth transition
           if (pegasusFragranceProfileLastProgress !== 1) {
             pegasusFragranceProfileLastProgress = 1;
-            pegasusFragranceProfile.classList.add("parallax-active");
+            activateParallaxElement(pegasusFragranceProfile);
+        pegasusFragranceProfile.classList.add("parallax-active");
             requestAnimationFrame(() => {
               pegasusFragranceProfile.style.setProperty(
                 "transform",
@@ -2902,9 +2918,9 @@ function updateColors() {
   if (pegasusFragranceNotes) {
     let pegasusFragranceNotesLastProgress = -1;
 
-    function updatePegasusFragranceNotesParallax() { return; // PERF PATCH 
+    function updatePegasusFragranceNotesParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const pegasusSection = pegasusFragranceNotes.closest(".content");
 
       if (pegasusSection) {
@@ -2922,7 +2938,8 @@ function updateColors() {
           if (Math.abs(progress - pegasusFragranceNotesLastProgress) > 0.0008) {
             pegasusFragranceNotesLastProgress = progress;
 
-            pegasusFragranceNotes.classList.add("parallax-active");
+            activateParallaxElement(pegasusFragranceNotes);
+        pegasusFragranceNotes.classList.add("parallax-active");
 
             // Ultra-gentle easing with multiple curves for silk-smooth motion
             const easeOutQuint = 1 - Math.pow(1 - progress, 5); // Even gentler than cubic
@@ -2965,7 +2982,8 @@ function updateColors() {
           // Fully visible state with smooth transition
           if (pegasusFragranceNotesLastProgress !== 1) {
             pegasusFragranceNotesLastProgress = 1;
-            pegasusFragranceNotes.classList.add("parallax-active");
+            activateParallaxElement(pegasusFragranceNotes);
+        pegasusFragranceNotes.classList.add("parallax-active");
             requestAnimationFrame(() => {
               pegasusFragranceNotes.style.setProperty(
                 "transform",
@@ -3014,9 +3032,9 @@ function updateColors() {
 
   // Pegasus Rating Parallax Effect
   if (pegasusPerfumeRating) {
-    function updatePegasusPerfumeRatingParallax() { return; // PERF PATCH 
+    function updatePegasusPerfumeRatingParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const pegasusSection = pegasusPerfumeRating.closest(".content");
 
       if (pegasusSection) {
@@ -3028,7 +3046,8 @@ function updateColors() {
           scrollTop + windowHeight > sectionTop &&
           scrollTop < sectionTop + sectionHeight
         ) {
-          pegasusPerfumeRating.classList.add("parallax-active");
+          activateParallaxElement(pegasusPerfumeRating);
+        pegasusPerfumeRating.classList.add("parallax-active");
         }
       }
     }
@@ -3057,9 +3076,9 @@ function updateColors() {
 
   // Greenly Image Parallax Effect
   if (greenlyImage) {
-    function updateGreenlyImageParallax() { return; // PERF PATCH 
+    function updateGreenlyImageParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const greenlySection = greenlyImage.closest(".content");
 
       if (greenlySection) {
@@ -3070,7 +3089,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          greenlyImage.classList.add("parallax-active");
+          activateParallaxElement(greenlyImage);
+        greenlyImage.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3084,9 +3104,7 @@ function updateColors() {
           greenlyImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
           greenlyImage.style.opacity = opacity;
         } else {
-          greenlyImage.classList.remove("parallax-active");
-          greenlyImage.style.transform = "translateX(-35px) scale(0.96)";
-          greenlyImage.style.opacity = "0";
+          resetParallaxElement(greenlyImage, "translateX(-35px) scale(0.96)");
         }
       }
     }
@@ -3094,9 +3112,9 @@ function updateColors() {
 
   // Greenly Product Info Parallax Effect
   if (greenlyProductInfo) {
-    function updateGreenlyProductInfoParallax() { return; // PERF PATCH 
+    function updateGreenlyProductInfoParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const greenlySection = greenlyProductInfo.closest(".content");
 
       if (greenlySection) {
@@ -3107,7 +3125,8 @@ function updateColors() {
         const parallaxRange = 350;
 
         if (scrollTop > triggerPoint) {
-          greenlyProductInfo.classList.add("parallax-active");
+          activateParallaxElement(greenlyProductInfo);
+        greenlyProductInfo.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3121,9 +3140,7 @@ function updateColors() {
           greenlyProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
           greenlyProductInfo.style.opacity = opacity;
         } else {
-          greenlyProductInfo.classList.remove("parallax-active");
-          greenlyProductInfo.style.transform = "translateY(30px) scale(0.9)";
-          greenlyProductInfo.style.opacity = "0";
+          resetParallaxElement(greenlyProductInfo, "translateY(30px) scale(0.9)");
         }
       }
     }
@@ -3131,9 +3148,9 @@ function updateColors() {
 
   // Greenly Scent Profile Parallax Effect
   if (greenlyScentProfile) {
-    function updateGreenlyScentProfileParallax() { return; // PERF PATCH 
+    function updateGreenlyScentProfileParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const greenlySection = greenlyScentProfile.closest(".content");
 
       if (greenlySection) {
@@ -3144,7 +3161,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          greenlyScentProfile.classList.add("parallax-active");
+          activateParallaxElement(greenlyScentProfile);
+        greenlyScentProfile.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3158,9 +3176,7 @@ function updateColors() {
           greenlyScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
           greenlyScentProfile.style.opacity = opacity;
         } else {
-          greenlyScentProfile.classList.remove("parallax-active");
-          greenlyScentProfile.style.transform = "translateX(150px) scale(0.8)";
-          greenlyScentProfile.style.opacity = "0";
+          resetParallaxElement(greenlyScentProfile, "translateX(150px) scale(0.8)");
         }
       }
     }
@@ -3168,9 +3184,9 @@ function updateColors() {
 
   // Greenly Ingredients Parallax Effect
   if (greenlyIngredients) {
-    function updateGreenlyIngredientsParallax() { return; // PERF PATCH 
+    function updateGreenlyIngredientsParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const greenlySection = greenlyIngredients.closest(".content");
 
       if (greenlySection) {
@@ -3181,7 +3197,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          greenlyIngredients.classList.add("parallax-active");
+          activateParallaxElement(greenlyIngredients);
+        greenlyIngredients.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3195,9 +3212,7 @@ function updateColors() {
           greenlyIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
           greenlyIngredients.style.opacity = opacity;
         } else {
-          greenlyIngredients.classList.remove("parallax-active");
-          greenlyIngredients.style.transform = "translateX(-150px) scale(0.8)";
-          greenlyIngredients.style.opacity = "0";
+          resetParallaxElement(greenlyIngredients, "translateX(-150px) scale(0.8)");
         }
       }
     }
@@ -3205,9 +3220,9 @@ function updateColors() {
 
   // Greenly Fragrance Description Parallax Effect
   if (greenlyFragranceDescription) {
-    function updateGreenlyFragranceDescriptionParallax() { return; // PERF PATCH 
+    function updateGreenlyFragranceDescriptionParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const greenlySection = greenlyFragranceDescription.closest(
         ".greenly-main-container",
       );
@@ -3220,7 +3235,8 @@ function updateColors() {
         const parallaxRange = 300;
 
         if (scrollTop > triggerPoint) {
-          greenlyFragranceDescription.classList.add("parallax-active");
+          activateParallaxElement(greenlyFragranceDescription);
+        greenlyFragranceDescription.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3233,9 +3249,7 @@ function updateColors() {
           greenlyFragranceDescription.style.transform = `translateY(${translateY}px)`;
           greenlyFragranceDescription.style.opacity = opacity;
         } else {
-          greenlyFragranceDescription.classList.remove("parallax-active");
-          greenlyFragranceDescription.style.transform = "translateY(50px)";
-          greenlyFragranceDescription.style.opacity = "0";
+          resetParallaxElement(greenlyFragranceDescription, "translateY(50px)");
         }
       }
     }
@@ -3265,9 +3279,9 @@ function updateColors() {
 
   // Baccarat Rouge 540 Image Parallax Effect
   if (baccaratrougeImage) {
-    function updateBaccaratrougeImageParallax() { return; // PERF PATCH 
+    function updateBaccaratrougeImageParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const baccaratrougeSection = baccaratrougeImage.closest(".content");
 
       if (baccaratrougeSection) {
@@ -3278,7 +3292,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          baccaratrougeImage.classList.add("parallax-active");
+          activateParallaxElement(baccaratrougeImage);
+        baccaratrougeImage.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3292,9 +3307,7 @@ function updateColors() {
           baccaratrougeImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
           baccaratrougeImage.style.opacity = opacity;
         } else {
-          baccaratrougeImage.classList.remove("parallax-active");
-          baccaratrougeImage.style.transform = "translateX(-35px) scale(0.96)";
-          baccaratrougeImage.style.opacity = "0";
+          resetParallaxElement(baccaratrougeImage, "translateX(-35px) scale(0.96)");
         }
       }
     }
@@ -3302,9 +3315,9 @@ function updateColors() {
 
   // Baccarat Rouge 540 Product Info Parallax Effect
   if (baccaratrougeProductInfo) {
-    function updateBaccaratrougeProductInfoParallax() { return; // PERF PATCH 
+    function updateBaccaratrougeProductInfoParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const baccaratrougeSection = baccaratrougeProductInfo.closest(".content");
 
       if (baccaratrougeSection) {
@@ -3315,7 +3328,8 @@ function updateColors() {
         const parallaxRange = 350;
 
         if (scrollTop > triggerPoint) {
-          baccaratrougeProductInfo.classList.add("parallax-active");
+          activateParallaxElement(baccaratrougeProductInfo);
+        baccaratrougeProductInfo.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3329,9 +3343,7 @@ function updateColors() {
           baccaratrougeProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
           baccaratrougeProductInfo.style.opacity = opacity;
         } else {
-          baccaratrougeProductInfo.classList.remove("parallax-active");
-          baccaratrougeProductInfo.style.transform = "translateY(30px) scale(0.9)";
-          baccaratrougeProductInfo.style.opacity = "0";
+          resetParallaxElement(baccaratrougeProductInfo, "translateY(30px) scale(0.9)");
         }
       }
     }
@@ -3339,9 +3351,9 @@ function updateColors() {
 
   // Baccarat Rouge 540 Scent Profile Parallax Effect
   if (baccaratrougeScentProfile) {
-    function updateBaccaratrougeScentProfileParallax() { return; // PERF PATCH 
+    function updateBaccaratrougeScentProfileParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const baccaratrougeSection = baccaratrougeScentProfile.closest(".content");
 
       if (baccaratrougeSection) {
@@ -3352,7 +3364,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          baccaratrougeScentProfile.classList.add("parallax-active");
+          activateParallaxElement(baccaratrougeScentProfile);
+        baccaratrougeScentProfile.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3366,9 +3379,7 @@ function updateColors() {
           baccaratrougeScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
           baccaratrougeScentProfile.style.opacity = opacity;
         } else {
-          baccaratrougeScentProfile.classList.remove("parallax-active");
-          baccaratrougeScentProfile.style.transform = "translateX(150px) scale(0.8)";
-          baccaratrougeScentProfile.style.opacity = "0";
+          resetParallaxElement(baccaratrougeScentProfile, "translateX(150px) scale(0.8)");
         }
       }
     }
@@ -3376,9 +3387,9 @@ function updateColors() {
 
   // Baccarat Rouge 540 Ingredients Parallax Effect
   if (baccaratrougeIngredients) {
-    function updateBaccaratrougeIngredientsParallax() { return; // PERF PATCH 
+    function updateBaccaratrougeIngredientsParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const baccaratrougeSection = baccaratrougeIngredients.closest(".content");
 
       if (baccaratrougeSection) {
@@ -3389,7 +3400,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          baccaratrougeIngredients.classList.add("parallax-active");
+          activateParallaxElement(baccaratrougeIngredients);
+        baccaratrougeIngredients.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3403,9 +3415,7 @@ function updateColors() {
           baccaratrougeIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
           baccaratrougeIngredients.style.opacity = opacity;
         } else {
-          baccaratrougeIngredients.classList.remove("parallax-active");
-          baccaratrougeIngredients.style.transform = "translateX(-150px) scale(0.8)";
-          baccaratrougeIngredients.style.opacity = "0";
+          resetParallaxElement(baccaratrougeIngredients, "translateX(-150px) scale(0.8)");
         }
       }
     }
@@ -3413,9 +3423,9 @@ function updateColors() {
 
   // Baccarat Rouge 540 Fragrance Description Parallax Effect
   if (baccaratrougeFragranceDescription) {
-    function updateBaccaratrougeFragranceDescriptionParallax() { return; // PERF PATCH 
+    function updateBaccaratrougeFragranceDescriptionParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const baccaratrougeSection = baccaratrougeFragranceDescription.closest(
         ".baccaratrouge-main-container",
       );
@@ -3428,7 +3438,8 @@ function updateColors() {
         const parallaxRange = 300;
 
         if (scrollTop > triggerPoint) {
-          baccaratrougeFragranceDescription.classList.add("parallax-active");
+          activateParallaxElement(baccaratrougeFragranceDescription);
+        baccaratrougeFragranceDescription.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3441,9 +3452,7 @@ function updateColors() {
           baccaratrougeFragranceDescription.style.transform = `translateY(${translateY}px)`;
           baccaratrougeFragranceDescription.style.opacity = opacity;
         } else {
-          baccaratrougeFragranceDescription.classList.remove("parallax-active");
-          baccaratrougeFragranceDescription.style.transform = "translateY(50px)";
-          baccaratrougeFragranceDescription.style.opacity = "0";
+          resetParallaxElement(baccaratrougeFragranceDescription, "translateY(50px)");
         }
       }
     }
@@ -3474,9 +3483,9 @@ function updateColors() {
 
   // Black Orchid Image Parallax Effect
   if (blackorchidImage) {
-    function updateBlackorchidImageParallax() { return; // PERF PATCH 
+    function updateBlackorchidImageParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const blackorchidSection = blackorchidImage.closest(".content");
 
       if (blackorchidSection) {
@@ -3487,7 +3496,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          blackorchidImage.classList.add("parallax-active");
+          activateParallaxElement(blackorchidImage);
+        blackorchidImage.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3501,9 +3511,7 @@ function updateColors() {
           blackorchidImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
           blackorchidImage.style.opacity = opacity;
         } else {
-          blackorchidImage.classList.remove("parallax-active");
-          blackorchidImage.style.transform = "translateX(-35px) scale(0.96)";
-          blackorchidImage.style.opacity = "0";
+          resetParallaxElement(blackorchidImage, "translateX(-35px) scale(0.96)");
         }
       }
     }
@@ -3511,9 +3519,9 @@ function updateColors() {
 
   // Black Orchid Product Info Parallax Effect
   if (blackorchidProductInfo) {
-    function updateBlackorchidProductInfoParallax() { return; // PERF PATCH 
+    function updateBlackorchidProductInfoParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const blackorchidSection = blackorchidProductInfo.closest(".content");
 
       if (blackorchidSection) {
@@ -3524,7 +3532,8 @@ function updateColors() {
         const parallaxRange = 350;
 
         if (scrollTop > triggerPoint) {
-          blackorchidProductInfo.classList.add("parallax-active");
+          activateParallaxElement(blackorchidProductInfo);
+        blackorchidProductInfo.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3538,9 +3547,7 @@ function updateColors() {
           blackorchidProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
           blackorchidProductInfo.style.opacity = opacity;
         } else {
-          blackorchidProductInfo.classList.remove("parallax-active");
-          blackorchidProductInfo.style.transform = "translateY(30px) scale(0.9)";
-          blackorchidProductInfo.style.opacity = "0";
+          resetParallaxElement(blackorchidProductInfo, "translateY(30px) scale(0.9)");
         }
       }
     }
@@ -3548,9 +3555,9 @@ function updateColors() {
 
   // Black Orchid Scent Profile Parallax Effect
   if (blackorchidScentProfile) {
-    function updateBlackorchidScentProfileParallax() { return; // PERF PATCH 
+    function updateBlackorchidScentProfileParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const blackorchidSection = blackorchidScentProfile.closest(".content");
 
       if (blackorchidSection) {
@@ -3561,7 +3568,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          blackorchidScentProfile.classList.add("parallax-active");
+          activateParallaxElement(blackorchidScentProfile);
+        blackorchidScentProfile.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3575,9 +3583,7 @@ function updateColors() {
           blackorchidScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
           blackorchidScentProfile.style.opacity = opacity;
         } else {
-          blackorchidScentProfile.classList.remove("parallax-active");
-          blackorchidScentProfile.style.transform = "translateX(150px) scale(0.8)";
-          blackorchidScentProfile.style.opacity = "0";
+          resetParallaxElement(blackorchidScentProfile, "translateX(150px) scale(0.8)");
         }
       }
     }
@@ -3585,9 +3591,9 @@ function updateColors() {
 
   // Black Orchid Ingredients Parallax Effect
   if (blackorchidIngredients) {
-    function updateBlackorchidIngredientsParallax() { return; // PERF PATCH 
+    function updateBlackorchidIngredientsParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const blackorchidSection = blackorchidIngredients.closest(".content");
 
       if (blackorchidSection) {
@@ -3598,7 +3604,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          blackorchidIngredients.classList.add("parallax-active");
+          activateParallaxElement(blackorchidIngredients);
+        blackorchidIngredients.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3612,9 +3619,7 @@ function updateColors() {
           blackorchidIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
           blackorchidIngredients.style.opacity = opacity;
         } else {
-          blackorchidIngredients.classList.remove("parallax-active");
-          blackorchidIngredients.style.transform = "translateX(-150px) scale(0.8)";
-          blackorchidIngredients.style.opacity = "0";
+          resetParallaxElement(blackorchidIngredients, "translateX(-150px) scale(0.8)");
         }
       }
     }
@@ -3622,9 +3627,9 @@ function updateColors() {
 
   // Black Orchid Fragrance Description Parallax Effect
   if (blackorchidFragranceDescription) {
-    function updateBlackorchidFragranceDescriptionParallax() { return; // PERF PATCH 
+    function updateBlackorchidFragranceDescriptionParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const blackorchidSection = blackorchidFragranceDescription.closest(
         ".blackorchid-main-container",
       );
@@ -3637,7 +3642,8 @@ function updateColors() {
         const parallaxRange = 300;
 
         if (scrollTop > triggerPoint) {
-          blackorchidFragranceDescription.classList.add("parallax-active");
+          activateParallaxElement(blackorchidFragranceDescription);
+        blackorchidFragranceDescription.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3650,9 +3656,7 @@ function updateColors() {
           blackorchidFragranceDescription.style.transform = `translateY(${translateY}px)`;
           blackorchidFragranceDescription.style.opacity = opacity;
         } else {
-          blackorchidFragranceDescription.classList.remove("parallax-active");
-          blackorchidFragranceDescription.style.transform = "translateY(50px)";
-          blackorchidFragranceDescription.style.opacity = "0";
+          resetParallaxElement(blackorchidFragranceDescription, "translateY(50px)");
         }
       }
     }
@@ -3683,9 +3687,9 @@ function updateColors() {
 
   // Aventus Image Parallax Effect
   if (aventusImage) {
-    function updateAventusImageParallax() { return; // PERF PATCH 
+    function updateAventusImageParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const aventusSection = aventusImage.closest(".content");
 
       if (aventusSection) {
@@ -3696,7 +3700,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          aventusImage.classList.add("parallax-active");
+          activateParallaxElement(aventusImage);
+        aventusImage.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3710,9 +3715,7 @@ function updateColors() {
           aventusImage.style.transform = `translateX(${translateX}px) scale(${scale})`;
           aventusImage.style.opacity = opacity;
         } else {
-          aventusImage.classList.remove("parallax-active");
-          aventusImage.style.transform = "translateX(-35px) scale(0.96)";
-          aventusImage.style.opacity = "0";
+          resetParallaxElement(aventusImage, "translateX(-35px) scale(0.96)");
         }
       }
     }
@@ -3720,9 +3723,9 @@ function updateColors() {
 
   // Aventus Product Info Parallax Effect
   if (aventusProductInfo) {
-    function updateAventusProductInfoParallax() { return; // PERF PATCH 
+    function updateAventusProductInfoParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const aventusSection = aventusProductInfo.closest(".content");
 
       if (aventusSection) {
@@ -3733,7 +3736,8 @@ function updateColors() {
         const parallaxRange = 350;
 
         if (scrollTop > triggerPoint) {
-          aventusProductInfo.classList.add("parallax-active");
+          activateParallaxElement(aventusProductInfo);
+        aventusProductInfo.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3747,9 +3751,7 @@ function updateColors() {
           aventusProductInfo.style.transform = `translateY(${translateY}px) scale(${scale})`;
           aventusProductInfo.style.opacity = opacity;
         } else {
-          aventusProductInfo.classList.remove("parallax-active");
-          aventusProductInfo.style.transform = "translateY(30px) scale(0.9)";
-          aventusProductInfo.style.opacity = "0";
+          resetParallaxElement(aventusProductInfo, "translateY(30px) scale(0.9)");
         }
       }
     }
@@ -3757,9 +3759,9 @@ function updateColors() {
 
   // Aventus Scent Profile Parallax Effect
   if (aventusScentProfile) {
-    function updateAventusScentProfileParallax() { return; // PERF PATCH 
+    function updateAventusScentProfileParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const aventusSection = aventusScentProfile.closest(".content");
 
       if (aventusSection) {
@@ -3770,7 +3772,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          aventusScentProfile.classList.add("parallax-active");
+          activateParallaxElement(aventusScentProfile);
+        aventusScentProfile.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3784,9 +3787,7 @@ function updateColors() {
           aventusScentProfile.style.transform = `translateX(${translateX}px) scale(${scale})`;
           aventusScentProfile.style.opacity = opacity;
         } else {
-          aventusScentProfile.classList.remove("parallax-active");
-          aventusScentProfile.style.transform = "translateX(150px) scale(0.8)";
-          aventusScentProfile.style.opacity = "0";
+          resetParallaxElement(aventusScentProfile, "translateX(150px) scale(0.8)");
         }
       }
     }
@@ -3794,9 +3795,9 @@ function updateColors() {
 
   // Aventus Ingredients Parallax Effect
   if (aventusIngredients) {
-    function updateAventusIngredientsParallax() { return; // PERF PATCH 
+    function updateAventusIngredientsParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const aventusSection = aventusIngredients.closest(".content");
 
       if (aventusSection) {
@@ -3807,7 +3808,8 @@ function updateColors() {
         const parallaxRange = 400;
 
         if (scrollTop > triggerPoint) {
-          aventusIngredients.classList.add("parallax-active");
+          activateParallaxElement(aventusIngredients);
+        aventusIngredients.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3821,9 +3823,7 @@ function updateColors() {
           aventusIngredients.style.transform = `translateX(${translateX}px) scale(${scale})`;
           aventusIngredients.style.opacity = opacity;
         } else {
-          aventusIngredients.classList.remove("parallax-active");
-          aventusIngredients.style.transform = "translateX(-150px) scale(0.8)";
-          aventusIngredients.style.opacity = "0";
+          resetParallaxElement(aventusIngredients, "translateX(-150px) scale(0.8)");
         }
       }
     }
@@ -3831,9 +3831,9 @@ function updateColors() {
 
   // Aventus Fragrance Description Parallax Effect
   if (aventusFragranceDescription) {
-    function updateAventusFragranceDescriptionParallax() { return; // PERF PATCH 
+    function updateAventusFragranceDescriptionParallax() {
       const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
+        (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const aventusSection = aventusFragranceDescription.closest(
         ".aventus-main-container",
       );
@@ -3846,7 +3846,8 @@ function updateColors() {
         const parallaxRange = 300;
 
         if (scrollTop > triggerPoint) {
-          aventusFragranceDescription.classList.add("parallax-active");
+          activateParallaxElement(aventusFragranceDescription);
+        aventusFragranceDescription.classList.add("parallax-active");
           const progress = Math.min(
             (scrollTop - triggerPoint) / parallaxRange,
             1,
@@ -3859,9 +3860,7 @@ function updateColors() {
           aventusFragranceDescription.style.transform = `translateY(${translateY}px)`;
           aventusFragranceDescription.style.opacity = opacity;
         } else {
-          aventusFragranceDescription.classList.remove("parallax-active");
-          aventusFragranceDescription.style.transform = "translateY(50px)";
-          aventusFragranceDescription.style.opacity = "0";
+          resetParallaxElement(aventusFragranceDescription, "translateY(50px)");
         }
       }
     }
@@ -3931,15 +3930,39 @@ function updateColors() {
   // Generic parallax function factory
   function createParallaxUpdater(element, triggerOffset, range, transformFn) {
     let _lastEased = -1; // skip redundant style writes
+    let section = null;
+    let sectionTop = 0;
+    let sectionHeight = 0;
+    let initDone = false;
+    
     return function() {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const section = element.closest('.content') || element.parentElement;
-      if (!section) return;
-      const sectionTop = _getOffsetTop(section);
+      const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const windowH = window.innerHeight;
+      
+      if (!initDone) {
+        section = element.closest('.content') || element.parentElement;
+        if (!section) return;
+        sectionTop = _getOffsetTop(section);
+        sectionHeight = _getOffsetHeight(section);
+        // Sometimes cached values are 0 early on, only lock them if they seem valid or if user scrolls
+        if (sectionTop > 0 || sectionHeight > 0) {
+          initDone = true;
+        }
+      }
+      
+      if (!section) return;
 
       // Skip elements far from viewport (2 screens away)
-      if (scrollTop + windowH * 2 < sectionTop || scrollTop > sectionTop + section.offsetHeight + windowH) return;
+      if (scrollTop + windowH * 2 < sectionTop || scrollTop > sectionTop + sectionHeight + windowH) {
+          if (_lastEased !== 0) {
+              _lastEased = 0;
+              element.classList.remove('parallax-active');
+              const { transform, opacity } = transformFn(0);
+              element.style.transform = transform;
+              element.style.opacity = opacity;
+          }
+          return;
+      }
 
       const triggerPoint = sectionTop - windowH * triggerOffset;
       let eased;
@@ -3954,6 +3977,7 @@ function updateColors() {
       if (eased === _lastEased) return;
       _lastEased = eased;
       if (eased > 0) {
+        activateParallaxElement(element);
         element.classList.add('parallax-active');
       } else {
         element.classList.remove('parallax-active');
@@ -4022,10 +4046,55 @@ function updateColors() {
       if (!ticking) {
         requestAnimationFrame(() => {
           try {
+            // Global cache update
+            window._globalScrollTop = window.pageYOffset || document.documentElement.scrollTop;
             updateColors();
             if (backToTopBtn && progressRing) { updateBackToTop(); }
             if (floatingSearch) { updateFloatingElements(); }
             updateSocialLinks();
+
+            // Legacy hand-written parallax functions (Layton, Pegasus, Greenly, Baccarat Rouge, Black Orchid, Aventus)
+            // FIX: Parallax cull to prevent massive layout thrashing lag in hero section
+            const _st = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
+            const _wh = window.innerHeight || 800;
+            const _shouldRunLegacy = (_st > _wh * 0.4);
+            
+            if (_shouldRunLegacy || !window._legacyParallaxResetDone) {
+              if (!_shouldRunLegacy) { window._legacyParallaxResetDone = true; }
+              else { window._legacyParallaxResetDone = false; }
+              
+              if (typeof updateBrandImageParallax === 'function') updateBrandImageParallax();
+              if (typeof updateLaytonParallax === 'function') updateLaytonParallax();
+              if (typeof updateLaytonNotesParallax === 'function') updateLaytonNotesParallax();
+              if (typeof updateProductTitleParallax === 'function') updateProductTitleParallax();
+              if (typeof updateFragranceNotesParallax === 'function') updateFragranceNotesParallax();
+              if (typeof updatePerfumeRatingParallax === 'function') updatePerfumeRatingParallax();
+              if (typeof updatePegasusImageParallax === 'function') updatePegasusImageParallax();
+              if (typeof updatePegasusProductTitleParallax === 'function') updatePegasusProductTitleParallax();
+              if (typeof updatePegasusFragranceProfileParallax === 'function') updatePegasusFragranceProfileParallax();
+              if (typeof updatePegasusFragranceNotesParallax === 'function') updatePegasusFragranceNotesParallax();
+              if (typeof updatePegasusPerfumeRatingParallax === 'function') updatePegasusPerfumeRatingParallax();
+              if (typeof updateGreenlyImageParallax === 'function') updateGreenlyImageParallax();
+              if (typeof updateGreenlyProductInfoParallax === 'function') updateGreenlyProductInfoParallax();
+              if (typeof updateGreenlyScentProfileParallax === 'function') updateGreenlyScentProfileParallax();
+              if (typeof updateGreenlyIngredientsParallax === 'function') updateGreenlyIngredientsParallax();
+              if (typeof updateGreenlyFragranceDescriptionParallax === 'function') updateGreenlyFragranceDescriptionParallax();
+              if (typeof updateBaccaratrougeImageParallax === 'function') updateBaccaratrougeImageParallax();
+              if (typeof updateBaccaratrougeProductInfoParallax === 'function') updateBaccaratrougeProductInfoParallax();
+              if (typeof updateBaccaratrougeScentProfileParallax === 'function') updateBaccaratrougeScentProfileParallax();
+              if (typeof updateBaccaratrougeIngredientsParallax === 'function') updateBaccaratrougeIngredientsParallax();
+              if (typeof updateBaccaratrougeFragranceDescriptionParallax === 'function') updateBaccaratrougeFragranceDescriptionParallax();
+              if (typeof updateBlackorchidImageParallax === 'function') updateBlackorchidImageParallax();
+              if (typeof updateBlackorchidProductInfoParallax === 'function') updateBlackorchidProductInfoParallax();
+              if (typeof updateBlackorchidScentProfileParallax === 'function') updateBlackorchidScentProfileParallax();
+              if (typeof updateBlackorchidIngredientsParallax === 'function') updateBlackorchidIngredientsParallax();
+              if (typeof updateBlackorchidFragranceDescriptionParallax === 'function') updateBlackorchidFragranceDescriptionParallax();
+              if (typeof updateAventusImageParallax === 'function') updateAventusImageParallax();
+              if (typeof updateAventusProductInfoParallax === 'function') updateAventusProductInfoParallax();
+              if (typeof updateAventusScentProfileParallax === 'function') updateAventusScentProfileParallax();
+              if (typeof updateAventusIngredientsParallax === 'function') updateAventusIngredientsParallax();
+              if (typeof updateAventusFragranceDescriptionParallax === 'function') updateAventusFragranceDescriptionParallax();
+            }
 
             // New sections parallax (has viewport culling built in)
             for (let i = 0; i < newSectionParallaxUpdaters.length; i++) {
@@ -12845,7 +12914,7 @@ class ThemeManager {
       this.calculateTransitionPoints();
     }
 
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
     const { creamStart, greyStart } = this.transitionPoints;
 
     if (scrollTop < creamStart) {
@@ -14164,7 +14233,7 @@ window.testThemes = function () {
 
 window.showCurrentTheme = function () {
   const theme = themeManager.getTheme();
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
 
   console.log("ðŸŽ¨ Current Theme Status:");
   console.log(`   ðŸŽ¯ Active theme: ${theme}`);
@@ -14247,7 +14316,7 @@ window.debugThemeStability = function () {
 
   if (window.themeManager) {
     const currentTheme = themeManager.getTheme();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
 
     console.log(`ðŸ“ Current scroll position: ${scrollTop}px`);
     console.log(`ðŸŽ¨ Current theme: ${currentTheme}`);
@@ -14456,7 +14525,7 @@ window.forceFixFavoritesVisibility = function () {
     const productId = button.getAttribute("data-product");
 
     // Determine theme based on scroll position or force cream/light themes
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
     let theme = "dark";
 
     // Simple theme detection based on scroll
@@ -18427,3 +18496,4 @@ console.log('   • debugProfileHandlers() - Debug existing handlers');
 console.log('   • triggerProfileSearch("query") - Search and add handlers');
 console.log('');
 console.log('🔧 Try: testClickOnElement() then click any red-bordered element');
+
