@@ -3930,40 +3930,15 @@ function updateColors() {
   // Generic parallax function factory
   function createParallaxUpdater(element, triggerOffset, range, transformFn) {
     let _lastEased = -1; // skip redundant style writes
-    let section = null;
-    let sectionTop = 0;
-    let sectionHeight = 0;
-    let initDone = false;
-    
+    let section = element.closest('.content') || element.parentElement;
+
     return function() {
+      if (!section) return;
+      
       const scrollTop = (window._globalScrollTop !== undefined ? window._globalScrollTop : (window.pageYOffset || document.documentElement.scrollTop));
       const windowH = window.innerHeight;
+      const sectionTop = _getOffsetTop(section);
       
-      if (!initDone) {
-        section = element.closest('.content') || element.parentElement;
-        if (!section) return;
-        sectionTop = _getOffsetTop(section);
-        sectionHeight = _getOffsetHeight(section);
-        // Sometimes cached values are 0 early on, only lock them if they seem valid or if user scrolls
-        if (sectionTop > 0 || sectionHeight > 0) {
-          initDone = true;
-        }
-      }
-      
-      if (!section) return;
-
-      // Skip elements far from viewport (2 screens away)
-      if (scrollTop + windowH * 2 < sectionTop || scrollTop > sectionTop + sectionHeight + windowH) {
-          if (_lastEased !== 0) {
-              _lastEased = 0;
-              element.classList.remove('parallax-active');
-              const { transform, opacity } = transformFn(0);
-              element.style.transform = transform;
-              element.style.opacity = opacity;
-          }
-          return;
-      }
-
       const triggerPoint = sectionTop - windowH * triggerOffset;
       let eased;
       if (scrollTop > triggerPoint) {
@@ -3972,16 +3947,20 @@ function updateColors() {
       } else {
         eased = 0;
       }
+      
       // Round to 3 decimals to reduce redundant writes
       eased = Math.round(eased * 1000) / 1000;
       if (eased === _lastEased) return;
       _lastEased = eased;
-      if (eased > 0) {
+      
+      if (eased > 0 && eased < 1) { // Active movement phase
         activateParallaxElement(element);
         element.classList.add('parallax-active');
       } else {
+        // Returned to bounds, restore normal hover transitions smoothly
         element.classList.remove('parallax-active');
       }
+      
       const { transform, opacity } = transformFn(eased);
       element.style.transform = transform;
       element.style.opacity = opacity;
